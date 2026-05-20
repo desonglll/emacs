@@ -1,0 +1,28 @@
+# Straight.el packages and builds
+straight/
+
+# Native compilation cache
+eln-cache/
+
+# Tree-sitter grammars
+tree-sitter/
+
+# Runtime data
+auto-save-list/
+backups/
+history
+recentf
+recentf.eld
+projectile-bookmarks.eld
+transient/
+
+# Auto-revert
+auto-revert/
+
+# Custom may be modified by Emacs at runtime
+# custom.el
+
+# macOS
+.DS_Store
+
+var
