@@ -10,7 +10,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(auto-revert-avoid-polling t)
- '(backup-directory-alist '(("" . "~/.config/emacs/backups")))
+ '(backup-directory-alist '(("" . "~/.emacs.d/backups")))
  '(change-major-mode-with-file-name t)
  '(default-frame-alist '((fullscreen . maximized)))
  '(delete-selection-mode t)
@@ -53,4 +53,12 @@
  '(what-cursor-show-names t)
  '(winner-mode t))
 
-(provide 'custom)
+(provide '.emacs.custom)
+
+;;; .emacs.custom.el ends here
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "#1e1e2e" :foreground "#cdd6f4" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 180 :width normal :foundry "nil" :family "Iosevka Term SS15")))))

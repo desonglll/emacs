@@ -1,8 +1,0 @@
-# -*- mode: lisp-mode -*-
-# name: usep
-# key: usep
-# --
-
-(use-package $1
-    :straight t
-    $2)
