@@ -1,0 +1,40 @@
+# Emacs-generated files
+*~
+\#*\#
+.#*
+*.elc
+*.eln
+
+# Runtime state and caches
+/var/
+/auto-save-list/
+/tramp
+/places
+/recentf
+/history
+/bookmarks
+/.lsp-session-v1
+/projectile-bookmarks.eld
+
+# Package managers and downloaded packages
+/elpa/
+/straight/*
+!/straight/versions/
+!/straight/versions/*.el
+/elpaca/
+/quelpa/
+/eln-cache/
+/tree-sitter/
+
+# Local and machine-specific configuration
+/custom.el
+/local.el
+/secrets.el
+/.dir-locals.el
+
+# Native compilation and server state
+/native-lisp/
+/server/
+
+# macOS
+.DS_Store
