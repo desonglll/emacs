@@ -6,22 +6,12 @@ A small, modular configuration using straight.el for package management.
 
 - `early-init.el`: startup and frame initialization.
 - `init.el`: paths and module loading.
-- `lisp/core-defaults.el`: encoding and general defaults.
-- `lisp/core-packages.el`: straight.el bootstrap and use-package integration.
-- `lisp/platform-macos.el`: modifier keys, shell environment, and frame focus.
-- `lisp/core-ui.el`: minimal interface settings.
-- `lisp/ui-appearance.el`: fonts, maximized frames, and theme.
-- `lisp/core-editing.el`: editing behavior and key bindings.
-- `lisp/core-state.el`: history, backups, and auto-save locations.
-- `lisp/completion-minibuffer.el`: Vertico completion and Consult actions.
-- `lisp/completion-buffer.el`: Corfu and Cape in-buffer completion.
-- `lisp/tools-version-control.el`: Magit commands and bindings.
-- `lisp/tools-lsp.el`: lsp-mode defaults.
-- `lisp/tools-navigation.el`: Avy, Dirvish, Treemacs, and buffer navigation.
-- `lisp/tools-productivity.el`: gptel and translation commands.
-- `lisp/input-chinese.el`: Pyim with the basedict dictionary.
-- `lisp/language-modes.el`: Just, Protobuf, and Typst modes.
-- `lisp/keybindings.el`: personal global key bindings.
+- `lisp/config-packages.el`: straight.el bootstrap and shared Git recipes.
+- `lisp/config-core.el`: defaults, editing, state, macOS, fonts, and theme.
+- `lisp/config-completion.el`: minibuffer and in-buffer completion.
+- `lisp/config-tools.el`: Git, LSP, navigation, AI, and translation tools.
+- `lisp/config-languages.el`: Pyim and additional language modes.
+- `lisp/config-keybindings.el`: personal global key bindings.
 - `local.el`: optional machine-specific settings; ignored by Git.
 
 Add future features as focused files under `lisp/`, then require them from
@@ -31,6 +21,14 @@ Declare packages with `use-package`; straight installs them automatically:
 
 ```elisp
 (use-package example-package)
+```
+
+For a package from a specific Git repository, use the shared helper:
+
+```elisp
+(my-use-git-package example-package github
+  "owner/repository"
+  :commands example-command)
 ```
 
 Run `M-x straight-freeze-versions` to write a reproducible package lockfile.

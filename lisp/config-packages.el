@@ -1,4 +1,4 @@
-;;; core-packages.el --- straight.el package management -*- lexical-binding: t; -*-
+;;; config-packages.el --- Package management -*- lexical-binding: t; -*-
 
 (setq straight-recipe-overrides nil)
 
@@ -18,13 +18,22 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-;; Let use-package install packages through straight by default.
 (straight-use-package 'use-package)
 (require 'use-package)
+
+;; Work around a case-sensitive filename collision in the ELPA mirror.
 (straight-override-recipe
  '(xr :type git :host github :repo "mattiase/xr"))
+
 (setq straight-use-package-by-default t
       use-package-always-defer t)
 
-(provide 'core-packages)
-;;; core-packages.el ends here
+(defmacro my-use-git-package (name host repository &rest arguments)
+  "Configure NAME from HOST/REPOSITORY with use-package ARGUMENTS."
+  (declare (indent 3))
+  `(use-package ,name
+     :straight (,name :type git :host ,host :repo ,repository)
+     ,@arguments))
+
+(provide 'config-packages)
+;;; config-packages.el ends here

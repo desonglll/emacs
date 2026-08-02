@@ -1,4 +1,4 @@
-;;; keybindings.el --- Personal global key bindings -*- lexical-binding: t; -*-
+;;; config-keybindings.el --- Personal global key bindings -*- lexical-binding: t; -*-
 
 (dolist (binding
          '(("M-<f1>" . magit-status)
@@ -15,5 +15,5 @@
            ("C-c RET" . ffap)))
   (keymap-global-set (car binding) (cdr binding)))
 
-(provide 'keybindings)
-;;; keybindings.el ends here
+(provide 'config-keybindings)
+;;; config-keybindings.el ends here
