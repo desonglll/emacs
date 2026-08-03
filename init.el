@@ -8,20 +8,23 @@
   (expand-file-name "var/" my-config-directory)
   "Directory for generated state and cache files.")
 
+(defconst my-modules-directory
+  (expand-file-name "modules/" my-config-directory)
+  "Directory containing plugin configuration modules.")
+
 (make-directory my-state-directory t)
-(add-to-list 'load-path (expand-file-name "lisp/" my-config-directory))
 
 ;; Keep Customize output separate from hand-written configuration.
 (setq custom-file (expand-file-name "custom.el" my-state-directory))
 (when (file-exists-p custom-file)
   (load custom-file nil 'nomessage))
 
-(require 'config-packages)
-(require 'config-core)
-(require 'config-completion)
-(require 'config-tools)
-(require 'config-languages)
-(require 'config-keybindings)
+;; Keep package declarations separate from all package configuration.
+(load (expand-file-name "packages.el" my-config-directory) nil 'nomessage)
+(load (expand-file-name "config.el" my-config-directory) nil 'nomessage)
+
+(dolist (module '("completion.el" "tools.el" "languages.el"))
+  (load (expand-file-name module my-modules-directory) nil 'nomessage))
 
 ;; Put personal, machine-specific settings in local.el.  It is gitignored.
 (let ((local-file (expand-file-name "local.el" my-config-directory)))

@@ -1,12 +1,12 @@
-;;; config-completion.el --- Minibuffer and in-buffer completion -*- lexical-binding: t; -*-
+;;; completion.el --- Completion package configuration -*- lexical-binding: t; -*-
 
 ;;;; Minibuffer
 
-(use-package vertico
+(my-use-package! vertico
   :init
   (vertico-mode 1))
 
-(use-package orderless
+(my-use-package! orderless
   :demand t
   :custom
   (completion-styles '(orderless basic))
@@ -14,11 +14,11 @@
   (completion-category-overrides
    '((file (styles partial-completion)))))
 
-(use-package marginalia
+(my-use-package! marginalia
   :init
   (marginalia-mode 1))
 
-(use-package consult
+(my-use-package! consult
   :bind
   (("C-s" . consult-line)
    ("C-x b" . consult-buffer)
@@ -34,7 +34,7 @@
    consult-source-recent-file consult-source-project-recent-file
    :preview-key '(:debounce 0.4 any)))
 
-(use-package embark
+(my-use-package! embark
   :bind
   (("C-." . embark-act)
    ("C-;" . embark-dwim)
@@ -42,14 +42,14 @@
   :init
   (setq prefix-help-command #'embark-prefix-help-command))
 
-(use-package embark-consult
+(my-use-package! embark-consult
   :after (embark consult)
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
 ;;;; In-buffer
 
-(use-package corfu
+(my-use-package! corfu
   :custom
   (corfu-auto t)
   (corfu-auto-delay 0.15)
@@ -62,7 +62,7 @@
   :config
   (corfu-popupinfo-mode 1))
 
-(use-package cape
+(my-use-package! cape
   :bind
   (("M-/" . cape-dabbrev)
    ("C-c p f" . cape-file)
@@ -71,5 +71,5 @@
   (add-hook 'completion-at-point-functions #'cape-dabbrev 90)
   (add-hook 'completion-at-point-functions #'cape-file 100))
 
-(provide 'config-completion)
-;;; config-completion.el ends here
+(provide 'my-completion)
+;;; completion.el ends here

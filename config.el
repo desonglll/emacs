@@ -1,4 +1,4 @@
-;;; config-core.el --- Core editor behavior and appearance -*- lexical-binding: t; -*-
+;;; config.el --- Native Emacs configuration -*- lexical-binding: t; -*-
 
 ;;;; Defaults
 
@@ -106,7 +106,7 @@
         ns-alternate-modifier 'meta
         ns-option-modifier 'meta))
 
-(use-package exec-path-from-shell
+(my-use-package! exec-path-from-shell
   :demand t
   :custom
   (exec-path-from-shell-arguments '("-l"))
@@ -155,9 +155,86 @@
 (add-hook 'after-make-frame-functions #'my-apply-fonts)
 (add-hook 'emacs-startup-hook #'my-apply-fonts)
 
-(straight-use-package 'gruber-darker-theme)
-(mapc #'disable-theme custom-enabled-themes)
-(load-theme 'gruber-darker t)
+(my-use-package! gruber-darker-theme
+  :demand t
+  :config
+  (mapc #'disable-theme custom-enabled-themes)
+  (load-theme 'gruber-darker t))
 
-(provide 'config-core)
-;;; config-core.el ends here
+;;;; Tree-sitter
+
+(require 'treesit)
+
+(defconst my-treesit-language-sources
+  '((c "https://github.com/tree-sitter/tree-sitter-c" "v0.23.6")
+    (cpp "https://github.com/tree-sitter/tree-sitter-cpp" "v0.22.0")
+    (go "https://github.com/tree-sitter/tree-sitter-go" "v0.23.4")
+    (java "https://github.com/tree-sitter/tree-sitter-java" "v0.23.5")
+    (python "https://github.com/tree-sitter/tree-sitter-python" "v0.23.6")
+    (rust "https://github.com/tree-sitter/tree-sitter-rust" "v0.23.3"))
+  "Tree-sitter grammars used by the configured language modes.")
+
+(defconst my-treesit-mode-remaps
+  '(((c cpp) c-or-c++-mode c-or-c++-ts-mode)
+    (c c-mode c-ts-mode)
+    (cpp c++-mode c++-ts-mode)
+    (go go-mode go-ts-mode)
+    (java java-mode java-ts-mode)
+    (python python-mode python-ts-mode)
+    (rust rust-mode rust-ts-mode))
+  "Mappings from traditional modes to Tree-sitter modes.")
+
+(dolist (source my-treesit-language-sources)
+  (setf (alist-get (car source) treesit-language-source-alist)
+        (cdr source)))
+
+(defun my-refresh-treesit-mode-remaps ()
+  "Prefer Tree-sitter modes for grammars that are installed."
+  (dolist (mapping my-treesit-mode-remaps)
+    (pcase-let ((`(,language ,base-mode ,treesit-mode) mapping))
+      (when (and (fboundp treesit-mode)
+                 (treesit-ready-p language t))
+        (setf (alist-get base-mode major-mode-remap-alist)
+              treesit-mode)))))
+
+(defun my-install-language-grammars ()
+  "Install missing Tree-sitter grammars used by this configuration."
+  (interactive)
+  (unless (treesit-available-p)
+    (user-error "This Emacs build has no Tree-sitter support"))
+  (let (failed-languages)
+    (dolist (source my-treesit-language-sources)
+      (let ((language (car source)))
+        (unless (treesit-language-available-p language)
+          (message "Installing the %s Tree-sitter grammar..." language)
+          (treesit-install-language-grammar language))
+        (unless (treesit-language-available-p language)
+          (push language failed-languages))))
+    (my-refresh-treesit-mode-remaps)
+    (if failed-languages
+        (user-error "Tree-sitter grammars failed: %s"
+                    (mapconcat #'symbol-name
+                               (nreverse failed-languages) ", "))
+      (message "Configured Tree-sitter grammars are installed"))))
+
+(my-refresh-treesit-mode-remaps)
+
+;;;; Global key bindings
+
+(dolist (binding
+         '(("M-<f1>" . magit-status)
+           ("M-<f2>" . dirvish)
+           ("C-," . duplicate-line)
+           ("C-:" . avy-goto-char-2)
+           ("s-\\" . avy-goto-char-2)
+           ("M-#" . consult-fd)
+           ("C-c r" . consult-ripgrep)
+           ("s-u" . revert-buffer)
+           ("s-i" . imenu-list)
+           ("s-e" . treemacs)
+           ("M-o" . ace-window)
+           ("C-c RET" . ffap)))
+  (keymap-global-set (car binding) (cdr binding)))
+
+(provide 'config)
+;;; config.el ends here

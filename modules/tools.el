@@ -1,14 +1,14 @@
-;;; config-tools.el --- Development and productivity tools -*- lexical-binding: t; -*-
+;;; tools.el --- Development and productivity packages -*- lexical-binding: t; -*-
 
 ;;;; Version control and LSP
 
-(use-package magit
+(my-use-package! magit
   :commands (magit-status magit-dispatch)
   :bind
   (("C-x g" . magit-status)
    ("C-x M-g" . magit-dispatch)))
 
-(use-package lsp-mode
+(my-use-package! lsp-mode
   :commands (lsp lsp-deferred)
   :init
   (setq lsp-keymap-prefix "C-c l")
@@ -26,33 +26,31 @@
 
 ;;;; Navigation and buffers
 
-(use-package ace-window
+(my-use-package! ace-window
   :commands ace-window)
 
-(use-package avy
+(my-use-package! avy
   :commands avy-goto-char-2)
 
-(use-package dirvish
+(my-use-package! dirvish
   :commands dirvish)
 
-(use-package imenu-list
+(my-use-package! imenu-list
   :commands imenu-list)
 
-(use-package treemacs
+(my-use-package! treemacs
   :commands treemacs)
 
-(my-use-git-package kill-other-buffers github
-  "desonglll/kill-other-buffers.el"
+(my-use-package! kill-other-buffers
   :commands kill-other-buffers)
 
 ;;;; AI and translation
 
-(use-package gptel
+(my-use-package! gptel
   :commands (gptel gptel-send gptel-menu))
 
-(my-use-git-package translate github
-  "desonglll/translate.el"
+(my-use-package! translate
   :commands (translate-trans translate-argo))
 
-(provide 'config-tools)
-;;; config-tools.el ends here
+(provide 'my-tools)
+;;; tools.el ends here

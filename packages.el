@@ -1,0 +1,94 @@
+;;; packages.el --- Central package declarations -*- lexical-binding: t; -*-
+
+(setq straight-recipe-overrides nil)
+
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir)
+            user-emacs-directory)))
+      (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+(straight-use-package 'use-package)
+(require 'use-package)
+
+;; Work around a case-sensitive filename collision in the ELPA mirror.
+(straight-override-recipe
+ '(xr :type git :host github :repo "mattiase/xr"))
+
+;; Package modules configure declared packages; they never install implicitly.
+(setq straight-use-package-by-default nil
+      use-package-always-defer t)
+
+(defmacro my-use-package! (name &rest arguments)
+  "Configure the declared package NAME with use-package ARGUMENTS."
+  (declare (indent 1))
+  `(use-package ,name
+     :straight nil
+     ,@arguments))
+
+(defmacro package! (name &rest recipe)
+  "Install NAME through straight.el, optionally using RECIPE."
+  (declare (indent 1))
+  `(straight-use-package
+    ',(if recipe (cons name recipe) name)))
+
+;;;; Core
+
+(package! exec-path-from-shell)
+(package! gruber-darker-theme)
+
+;;;; Completion
+
+(package! vertico)
+(package! orderless)
+(package! marginalia)
+(package! consult)
+(package! embark)
+(package! embark-consult)
+(package! corfu)
+(package! cape)
+
+;;;; Tools
+
+(package! magit)
+(package! lsp-mode)
+(package! ace-window)
+(package! avy)
+(package! dirvish)
+(package! imenu-list)
+(package! treemacs)
+(package! kill-other-buffers
+  :type git :host github
+  :repo "desonglll/kill-other-buffers.el")
+(package! gptel)
+(package! translate
+  :type git :host github
+  :repo "desonglll/translate.el")
+(package! nerd-icons)
+
+;;;; Languages
+
+(package! pyim)
+(package! pyim-basedict)
+(package! rust-mode)
+(package! go-mode)
+(package! lsp-java)
+(package! lsp-pyright)
+(package! just-mode)
+(package! protobuf-mode)
+(package! typst-ts-mode
+  :type git :host codeberg
+  :repo "meow_king/typst-ts-mode")
+
+(provide 'packages)
+;;; packages.el ends here

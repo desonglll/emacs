@@ -1,48 +1,72 @@
 # Emacs configuration
 
-A small, modular configuration using straight.el for package management.
+A small, Doom-style configuration using straight.el for package management.
 
 ## Structure
 
 - `early-init.el`: startup and frame initialization.
-- `init.el`: paths and module loading.
-- `lisp/config-packages.el`: straight.el bootstrap and shared Git recipes.
-- `lisp/config-core.el`: defaults, editing, state, macOS, fonts, and theme.
-- `lisp/config-completion.el`: minibuffer and in-buffer completion.
-- `lisp/config-tools.el`: Git, LSP, navigation, AI, and translation tools.
-- `lisp/config-languages.el`: Pyim and additional language modes.
-- `lisp/config-keybindings.el`: personal global key bindings.
+- `init.el`: state paths and deterministic load order.
+- `packages.el`: the only file that installs straight.el packages.
+- `config.el`: native Emacs behavior, UI, macOS, fonts, Tree-sitter, and keys.
+- `modules/completion.el`: Vertico, Consult, Embark, Corfu, and Cape settings.
+- `modules/tools.el`: Magit, LSP, navigation, AI, and translation settings.
+- `modules/languages.el`: Pyim, language modes, and language server settings.
 - `local.el`: optional machine-specific settings; ignored by Git.
 
-Add future features as focused files under `lisp/`, then require them from
-`init.el`.  Generated state is kept under `var/` and ignored by Git.
+Generated state is kept under `var/` and ignored by Git.
 
-Declare packages with `use-package`; straight installs them automatically:
+Declare every new package in `packages.el`:
 
 ```elisp
-(use-package example-package)
+(package! example-package)
 ```
 
-For a package from a specific Git repository, use the shared helper:
+Use an explicit recipe for a package from a specific Git repository:
 
 ```elisp
-(my-use-git-package example-package github
-  "owner/repository"
+(package! example-package
+  :type git :host github :repo "owner/repository")
+```
+
+Configure the package in the relevant module with `my-use-package!`.  This
+macro always sets `:straight nil`, so modules cannot install packages:
+
+```elisp
+(my-use-package! example-package
   :commands example-command)
 ```
 
-Run `M-x straight-freeze-versions` to write a reproducible package lockfile.
+Run `M-x straight-freeze-versions` after changing packages to update the
+reproducible lockfile.
 
-Start LSP in the current programming buffer with `M-x lsp`.  To enable it
-automatically for a language, add a mode hook to `local.el`, for example:
+LSP starts automatically for Rust, C, C++, Java, Python, and Go.  The
+configuration uses these language servers:
 
-```elisp
-(add-hook 'python-ts-mode-hook #'lsp-deferred)
+- Rust: `rust-analyzer`
+- C and C++: `clangd`
+- Java: `jdtls` through `lsp-java`
+- Python: `pyright` through `lsp-pyright`
+- Go: `gopls`
+
+Install those executables with the system package manager so they are on
+`PATH`.  On macOS with Homebrew, `jdtls` and `pyright` can be installed with:
+
+```sh
+brew install jdtls pyright
 ```
+
+Run `M-x my-install-language-grammars` once to install the C, C++, Go, Java,
+Python, and Rust Tree-sitter grammars.  Until a grammar is available, the
+configuration falls back to the traditional major mode.  Add a language to
+`my-treesit-language-sources`, `my-treesit-mode-remaps`, and
+`my-lsp-language-clients` to extend the same setup.
 
 Typst support uses the `tinymist` language server and a compiled Tree-sitter
 grammar.  The custom translation package uses the `trans` executable from
 translate-shell.
+
+Nerd Icons is declared in `packages.el`.  Run `M-x nerd-icons-install-fonts`
+once to install its symbol font.
 
 ## Key bindings
 
