@@ -7,13 +7,24 @@ A small, Doom-style configuration using straight.el for package management.
 - `early-init.el`: startup and frame initialization.
 - `init.el`: state paths and deterministic load order.
 - `packages.el`: the only file that installs straight.el packages.
+- `straight-versions.el`: reproducible straight.el package revisions.
 - `config.el`: native Emacs behavior, UI, macOS, fonts, Tree-sitter, and keys.
 - `modules/completion.el`: Vertico, Consult, Embark, Corfu, and Cape settings.
 - `modules/tools.el`: Magit, LSP, navigation, AI, and translation settings.
 - `modules/languages.el`: Pyim, language modes, and language server settings.
 - `local.el`: optional machine-specific settings; ignored by Git.
 
-Generated state is kept under `var/` and ignored by Git.
+The hand-written configuration lives in `~/.config/emacs`.  Downloaded
+packages, Tree-sitter grammars, native compilation output, and generated state
+live under `~/.emacs.d`; persistent state is grouped in `~/.emacs.d/var`.
+
+Because Emacs prefers an existing `~/.emacs.d` over the XDG configuration
+directory, these startup links connect the data directory to this repository:
+
+```sh
+ln -s ../.config/emacs/early-init.el ~/.emacs.d/early-init.el
+ln -s ../.config/emacs/init.el ~/.emacs.d/init.el
+```
 
 Declare every new package in `packages.el`:
 

@@ -233,7 +233,8 @@
            ("s-i" . imenu-list)
            ("s-e" . treemacs)
            ("M-o" . ace-window)
-           ("C-c RET" . ffap)))
+           ("C-c RET" . ffap)
+           ("C-c f r" . recentf)))
   (keymap-global-set (car binding) (cdr binding)))
 
 (provide 'config)

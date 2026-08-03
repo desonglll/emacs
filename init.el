@@ -1,11 +1,17 @@
 ;;; init.el --- Personal Emacs configuration -*- lexical-binding: t; -*-
 
 (defconst my-config-directory
-  (file-name-as-directory user-emacs-directory)
+  (file-name-as-directory
+   (file-name-directory
+    (file-truename (or load-file-name user-init-file))))
   "Root directory of this Emacs configuration.")
 
+(defconst my-data-directory
+  (file-name-as-directory (expand-file-name "~/.emacs.d/"))
+  "Root directory for generated Emacs data and downloaded packages.")
+
 (defconst my-state-directory
-  (expand-file-name "var/" my-config-directory)
+  (expand-file-name "var/" my-data-directory)
   "Directory for generated state and cache files.")
 
 (defconst my-modules-directory

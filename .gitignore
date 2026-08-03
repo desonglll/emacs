@@ -18,9 +18,7 @@
 
 # Package managers and downloaded packages
 /elpa/
-/straight/*
-!/straight/versions/
-!/straight/versions/*.el
+/straight/
 /elpaca/
 /quelpa/
 /eln-cache/

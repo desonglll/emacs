@@ -1,6 +1,10 @@
 ;;; packages.el --- Central package declarations -*- lexical-binding: t; -*-
 
-(setq straight-recipe-overrides nil)
+(setq straight-base-dir my-data-directory
+      straight-profiles
+      `((nil . ,(expand-file-name "straight-versions.el"
+                                  my-config-directory)))
+      straight-recipe-overrides nil)
 
 (defvar bootstrap-version)
 (let ((bootstrap-file

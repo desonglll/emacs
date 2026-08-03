@@ -26,6 +26,14 @@
 
 ;;;; Navigation and buffers
 
+(defun my/new-buffer ()
+  "Create a new buffer in the selected window."
+  (interactive)
+  (let ((buffer (generate-new-buffer "*new*")))
+    (set-window-buffer nil buffer)
+    (with-current-buffer buffer
+      (funcall (default-value 'major-mode)))))
+
 (my-use-package! ace-window
   :commands ace-window)
 
