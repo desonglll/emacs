@@ -46,10 +46,13 @@
   `(straight-use-package
     ',(if recipe (cons name recipe) name)))
 
-;;;; Core
+;;;; User interface
 
-(package! exec-path-from-shell)
 (package! gruber-darker-theme)
+(package! dirvish)
+(package! imenu-list)
+(package! treemacs)
+(package! nerd-icons)
 
 ;;;; Completion
 
@@ -62,28 +65,24 @@
 (package! corfu)
 (package! cape)
 
-;;;; Tools
+;;;; Editing
 
-(package! magit)
-(package! lsp-mode)
 (package! ace-window)
 (package! avy)
-(package! dirvish)
-(package! imenu-list)
-(package! treemacs)
 (package! kill-other-buffers
   :type git :host github
   :repo "desonglll/kill-other-buffers.el")
-(package! gptel)
 (package! translate
   :type git :host github
   :repo "desonglll/translate.el")
-(package! nerd-icons)
-
-;;;; Languages
-
 (package! pyim)
 (package! pyim-basedict)
+
+;;;; Development
+
+(package! exec-path-from-shell)
+(package! magit)
+(package! lsp-mode)
 (package! rust-mode)
 (package! go-mode)
 (package! lsp-java)
@@ -93,6 +92,10 @@
 (package! typst-ts-mode
   :type git :host codeberg
   :repo "meow_king/typst-ts-mode")
+
+;;;; AI
+
+(package! gptel)
 
 (provide 'packages)
 ;;; packages.el ends here

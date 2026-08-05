@@ -1,18 +1,39 @@
-;;; languages.el --- Language package configuration -*- lexical-binding: t; -*-
+;;; dev.el --- Development package configuration -*- lexical-binding: t; -*-
 
-;;;; Chinese input
+;;;; Environment and version control
 
-(my-use-package! pyim
-  :commands pyim-convert-string-at-point
+(my-use-package! exec-path-from-shell
+  :demand t
+  :custom
+  (exec-path-from-shell-arguments '("-l"))
+  :config
+  (when (and (eq system-type 'darwin)
+             (or (daemonp) (display-graphic-p)))
+    (exec-path-from-shell-initialize)))
+
+(my-use-package! magit
+  :commands (magit-status magit-dispatch)
+  :bind
+  (("C-x g" . magit-status)
+   ("C-x M-g" . magit-dispatch)))
+
+;;;; Language server core
+
+(my-use-package! lsp-mode
+  :commands (lsp lsp-deferred)
   :init
-  (setq default-input-method "pyim")
-  :config
-  (pyim-default-scheme 'quanpin))
-
-(my-use-package! pyim-basedict
-  :after pyim
-  :config
-  (pyim-basedict-enable))
+  (setq lsp-keymap-prefix "C-c l")
+  :custom
+  (lsp-session-file (expand-file-name "lsp-session-v1" my-state-directory))
+  ;; lsp-completion-mode still installs its CAPF; Corfu supplies the UI.
+  (lsp-completion-provider :none)
+  (lsp-diagnostics-provider :flymake)
+  (lsp-enable-snippet nil)
+  (lsp-headerline-breadcrumb-enable nil)
+  (lsp-idle-delay 0.5)
+  (lsp-keep-workspace-alive nil)
+  (lsp-lens-enable nil)
+  (lsp-log-io nil))
 
 ;;;; Language modes
 
@@ -21,8 +42,6 @@
 
 (my-use-package! go-mode
   :mode "\\.go\\'")
-
-;;;; Language servers
 
 (defconst my-lsp-language-clients
   '((c-mode)
@@ -39,16 +58,25 @@
     (rust-ts-mode))
   "Major modes with automatic LSP and any external client feature.")
 
+(defconst my-lsp-native-flymake-backends
+  '((python-mode . python-flymake)
+    (python-ts-mode . python-flymake)
+    (rust-ts-mode . rust-ts-flymake))
+  "Native Flymake backends superseded by LSP diagnostics.")
+
 (defun my-start-language-lsp ()
   "Start the configured language server for the current major mode."
   (when-let ((client (assq major-mode my-lsp-language-clients)))
-    (when (memq major-mode '(python-mode python-ts-mode))
-      (remove-hook 'flymake-diagnostic-functions #'python-flymake t))
+    (when-let ((backend
+                (alist-get major-mode my-lsp-native-flymake-backends)))
+      (remove-hook 'flymake-diagnostic-functions backend t))
     (when (cdr client)
       (require (cdr client)))
     (lsp-deferred)))
 
 (add-hook 'prog-mode-hook #'my-start-language-lsp)
+
+;;;; Language-specific clients
 
 (defun my-jdtls-server-directory ()
   "Return the JDTLS directory containing its plugins, when installed."
@@ -95,6 +123,8 @@
   (lsp-pyright-python-executable-cmd "python3")
   (lsp-pyright-type-checking-mode "standard"))
 
+;;;; Additional language tools
+
 (my-use-package! just-mode
   :mode ("\\(?:^\\|/\\)[Jj]ustfile\\'" . just-mode))
 
@@ -112,5 +142,5 @@
   :hook
   (typst-ts-mode . my-typst-start-lsp))
 
-(provide 'my-languages)
-;;; languages.el ends here
+(provide 'my-dev)
+;;; dev.el ends here

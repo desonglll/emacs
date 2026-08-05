@@ -68,6 +68,19 @@
 (add-hook 'before-save-hook #'my-delete-trailing-whitespace)
 (keymap-global-set "C-c w" #'whitespace-mode)
 
+(defun my/new-buffer ()
+  "Create a new buffer in the selected window."
+  (interactive)
+  (let ((buffer (generate-new-buffer "*new*")))
+    (set-window-buffer nil buffer)
+    (with-current-buffer buffer
+      (funcall (default-value 'major-mode)))))
+
+(defun my/config ()
+  "Open the main Emacs configuration file."
+  (interactive)
+  (find-file (expand-file-name "config.el" my-config-directory)))
+
 ;;;; Persistent state
 
 (defconst my-backup-directory
@@ -105,15 +118,6 @@
         ns-command-modifier 'super
         ns-alternate-modifier 'meta
         ns-option-modifier 'meta))
-
-(my-use-package! exec-path-from-shell
-  :demand t
-  :custom
-  (exec-path-from-shell-arguments '("-l"))
-  :config
-  (when (and (eq system-type 'darwin)
-             (or (daemonp) (display-graphic-p)))
-    (exec-path-from-shell-initialize)))
 
 (defun my-focus-initial-frame ()
   "Give the initial graphical frame keyboard focus."
@@ -154,12 +158,6 @@
 (add-hook 'after-setting-font-hook #'my-set-cjk-font)
 (add-hook 'after-make-frame-functions #'my-apply-fonts)
 (add-hook 'emacs-startup-hook #'my-apply-fonts)
-
-(my-use-package! gruber-darker-theme
-  :demand t
-  :config
-  (mapc #'disable-theme custom-enabled-themes)
-  (load-theme 'gruber-darker t))
 
 ;;;; Tree-sitter
 
@@ -234,7 +232,8 @@
            ("s-e" . treemacs)
            ("M-o" . ace-window)
            ("C-c RET" . ffap)
-           ("C-c f r" . recentf)))
+           ("C-c f r" . recentf)
+           ("s-<return>" . my/new-buffer)))
   (keymap-global-set (car binding) (cdr binding)))
 
 (provide 'config)

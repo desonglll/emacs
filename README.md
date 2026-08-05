@@ -8,10 +8,13 @@ A small, Doom-style configuration using straight.el for package management.
 - `init.el`: state paths and deterministic load order.
 - `packages.el`: the only file that installs straight.el packages.
 - `straight-versions.el`: reproducible straight.el package revisions.
-- `config.el`: native Emacs behavior, UI, macOS, fonts, Tree-sitter, and keys.
+- `config.el`: native Emacs behavior, state, macOS, fonts, Tree-sitter, commands,
+  and global keys.
+- `modules/ui.el`: theme, directory browser, file tree, and sidebars.
 - `modules/completion.el`: Vertico, Consult, Embark, Corfu, and Cape settings.
-- `modules/tools.el`: Magit, LSP, navigation, AI, and translation settings.
-- `modules/languages.el`: Pyim, language modes, and language server settings.
+- `modules/editing.el`: navigation, buffer tools, Chinese input, and translation.
+- `modules/dev.el`: environment, Git, LSP, language modes, and language tools.
+- `modules/ai.el`: AI tools and model configuration.
 - `local.el`: optional machine-specific settings; ignored by Git.
 
 The hand-written configuration lives in `~/.config/emacs`.  Downloaded
@@ -70,7 +73,7 @@ Run `M-x my-install-language-grammars` once to install the C, C++, Go, Java,
 Python, and Rust Tree-sitter grammars.  Until a grammar is available, the
 configuration falls back to the traditional major mode.  Add a language to
 `my-treesit-language-sources`, `my-treesit-mode-remaps`, and
-`my-lsp-language-clients` to extend the same setup.
+`my-lsp-language-clients` in `modules/dev.el` to extend the same setup.
 
 Typst support uses the `tinymist` language server and a compiled Tree-sitter
 grammar.  The custom translation package uses the `trans` executable from
