@@ -70,10 +70,11 @@ brew install jdtls pyright
 ```
 
 Run `M-x my-install-language-grammars` once to install the C, C++, Go, Java,
-Python, and Rust Tree-sitter grammars.  Until a grammar is available, the
-configuration falls back to the traditional major mode.  Add a language to
-`my-treesit-language-sources`, `my-treesit-mode-remaps`, and
-`my-lsp-language-clients` in `modules/dev.el` to extend the same setup.
+JavaScript, JSON, Python, Rust, TypeScript, TSX, and Typst Tree-sitter
+grammars. Until a grammar is available, existing major-mode associations stay
+unchanged; Tree-sitter-only TypeScript and TSX associations activate after
+installation. Add grammar sources and mode mappings in `config.el`; add LSP
+clients in `modules/dev.el` when the language should start LSP automatically.
 
 Typst support uses the `tinymist` language server and a compiled Tree-sitter
 grammar.  The custom translation package uses the `trans` executable from

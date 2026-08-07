@@ -88,10 +88,12 @@
 (package! lsp-java)
 (package! lsp-pyright)
 (package! just-mode)
-(package! protobuf-mode)
+;;; (package! protobuf-mode)
 (package! typst-ts-mode
   :type git :host codeberg
   :repo "meow_king/typst-ts-mode")
+
+(package! format-all)
 
 ;;;; AI
 

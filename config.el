@@ -24,7 +24,7 @@
 
 ;;;; Interface
 
-(setq frame-title-format '("%b - Emacs")
+(setq frame-title-format '("%b - GNU Emacs on Mike Shinoda")
       icon-title-format frame-title-format
       visible-bell nil
       cursor-in-non-selected-windows nil)
@@ -67,19 +67,6 @@
 
 (add-hook 'before-save-hook #'my-delete-trailing-whitespace)
 (keymap-global-set "C-c w" #'whitespace-mode)
-
-(defun my/new-buffer ()
-  "Create a new buffer in the selected window."
-  (interactive)
-  (let ((buffer (generate-new-buffer "*new*")))
-    (set-window-buffer nil buffer)
-    (with-current-buffer buffer
-      (funcall (default-value 'major-mode)))))
-
-(defun my/config ()
-  "Open the main Emacs configuration file."
-  (interactive)
-  (find-file (expand-file-name "config.el" my-config-directory)))
 
 ;;;; Persistent state
 
@@ -132,6 +119,8 @@
   (font-spec :family "Iosevka Term SS15" :size 16 :weight 'regular))
 (defconst my-cjk-font
   (font-spec :family "Sarasa Term SC"))
+(defconst my-serif-font
+  (font-spec :family "Iosevka Curly Slab" :size 16 :weight 'regular))
 
 (add-to-list 'default-frame-alist '(font . "Iosevka Term SS15-16"))
 
@@ -155,6 +144,11 @@
                             :weight 'regular))
       (my-set-cjk-font frame))))
 
+(add-hook 'Info-mode-hook
+          (lambda ()
+            (message "invoke!!!")
+            (face-remap-add-relative 'default :family "Iosevka Curly Slab" :height 160 :weight 'regular)))
+
 (add-hook 'after-setting-font-hook #'my-set-cjk-font)
 (add-hook 'after-make-frame-functions #'my-apply-fonts)
 (add-hook 'emacs-startup-hook #'my-apply-fonts)
@@ -164,12 +158,22 @@
 (require 'treesit)
 
 (defconst my-treesit-language-sources
-  '((c "https://github.com/tree-sitter/tree-sitter-c" "v0.23.6")
-    (cpp "https://github.com/tree-sitter/tree-sitter-cpp" "v0.22.0")
-    (go "https://github.com/tree-sitter/tree-sitter-go" "v0.23.4")
-    (java "https://github.com/tree-sitter/tree-sitter-java" "v0.23.5")
-    (python "https://github.com/tree-sitter/tree-sitter-python" "v0.23.6")
-    (rust "https://github.com/tree-sitter/tree-sitter-rust" "v0.23.3"))
+  '((c "https://github.com/tree-sitter/tree-sitter-c" "v0.23.6" "src")
+    (cpp "https://github.com/tree-sitter/tree-sitter-cpp" "v0.22.0" "src")
+    (go "https://github.com/tree-sitter/tree-sitter-go" "v0.23.4" "src")
+    (java "https://github.com/tree-sitter/tree-sitter-java" "v0.23.5" "src")
+    (javascript "https://github.com/tree-sitter/tree-sitter-javascript"
+                "v0.23.1" "src")
+    (json "https://github.com/tree-sitter/tree-sitter-json" "v0.24.8" "src")
+    (python "https://github.com/tree-sitter/tree-sitter-python"
+            "v0.23.6" "src")
+    (rust "https://github.com/tree-sitter/tree-sitter-rust" "v0.23.3"
+          "src")
+    (typescript "https://github.com/tree-sitter/tree-sitter-typescript"
+                "v0.23.2" "typescript/src")
+    (tsx "https://github.com/tree-sitter/tree-sitter-typescript"
+         "v0.23.2" "tsx/src")
+    (typst "https://github.com/uben0/tree-sitter-typst" "v0.11.0" "src"))
   "Tree-sitter grammars used by the configured language modes.")
 
 (defconst my-treesit-mode-remaps
@@ -182,6 +186,13 @@
     (rust rust-mode rust-ts-mode))
   "Mappings from traditional modes to Tree-sitter modes.")
 
+(defconst my-treesit-file-modes
+  '((javascript "\\.\\(?:[cm]?js\\|jsx\\)\\'" js-ts-mode)
+    (json "\\.json\\'" json-ts-mode)
+    (typescript "\\.ts\\'" typescript-ts-mode)
+    (tsx "\\.tsx\\'" tsx-ts-mode))
+  "File patterns for modes that require an installed Tree-sitter grammar.")
+
 (dolist (source my-treesit-language-sources)
   (setf (alist-get (car source) treesit-language-source-alist)
         (cdr source)))
@@ -193,7 +204,12 @@
       (when (and (fboundp treesit-mode)
                  (treesit-ready-p language t))
         (setf (alist-get base-mode major-mode-remap-alist)
-              treesit-mode)))))
+              treesit-mode))))
+  (dolist (mapping my-treesit-file-modes)
+    (pcase-let ((`(,language ,pattern ,treesit-mode) mapping))
+      (when (and (fboundp treesit-mode)
+                 (treesit-ready-p language t))
+        (add-to-list 'auto-mode-alist (cons pattern treesit-mode))))))
 
 (defun my-install-language-grammars ()
   "Install missing Tree-sitter grammars used by this configuration."
@@ -220,8 +236,7 @@
 ;;;; Global key bindings
 
 (dolist (binding
-         '(("M-<f1>" . magit-status)
-           ("M-<f2>" . dirvish)
+         '(("M-<f2>" . dirvish)
            ("C-," . duplicate-line)
            ("C-:" . avy-goto-char-2)
            ("s-\\" . avy-goto-char-2)
@@ -233,7 +248,9 @@
            ("M-o" . ace-window)
            ("C-c RET" . ffap)
            ("C-c f r" . recentf)
-           ("s-<return>" . my/new-buffer)))
+           ("s-<return>" . my/new-buffer)
+           ("C-<tab>" . next-buffer)
+           ("C-S-<tab>" . previous-buffer)))
   (keymap-global-set (car binding) (cdr binding)))
 
 (provide 'config)

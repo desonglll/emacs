@@ -7,7 +7,7 @@
   "Root directory of this Emacs configuration.")
 
 (defconst my-data-directory
-  (file-name-as-directory (expand-file-name "~/.emacs.d/"))
+  my-config-directory
   "Root directory for generated Emacs data and downloaded packages.")
 
 (defconst my-state-directory
@@ -29,7 +29,7 @@
 (load (expand-file-name "packages.el" my-config-directory) nil 'nomessage)
 (load (expand-file-name "config.el" my-config-directory) nil 'nomessage)
 
-(dolist (module '("ui.el" "completion.el" "editing.el" "dev.el" "ai.el"))
+(dolist (module '("ui.el" "completion.el" "editing.el" "dev.el" "rc.el"))
   (load (expand-file-name module my-modules-directory) nil 'nomessage))
 
 ;; Put personal, machine-specific settings in local.el.  It is gitignored.

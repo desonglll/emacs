@@ -131,6 +131,13 @@
 (my-use-package! protobuf-mode
   :mode ("\\.proto\\'" . protobuf-mode))
 
+(defun format/lsp-region-or-buffer ()
+  "Format the active region or current buffer through LSP."
+  (interactive)
+  (if (use-region-p)
+      (lsp-format-region (region-beginning) (region-end))
+    (lsp-format-buffer)))
+
 (defun my-typst-start-lsp ()
   "Start Tinymist for the current Typst buffer when it is installed."
   (if (executable-find "tinymist")
@@ -139,8 +146,75 @@
 
 (my-use-package! typst-ts-mode
   :mode ("\\.typ\\'" . typst-ts-mode)
+  :bind
+  (:map typst-ts-mode-map
+        ("C-M-\\" . format/lsp-region-or-buffer))
   :hook
   (typst-ts-mode . my-typst-start-lsp))
+
+(defun format/register-mode (language mode)
+  "Register MODE as LANGUAGE in language-id's mode table."
+  (if-let ((definition (assoc language language-id--definitions)))
+      (unless (memq mode (cdr definition))
+        (setcdr definition (cons mode (cdr definition))))
+    (push (list language mode) language-id--definitions)))
+
+(defun format/formatter-available-p (formatter)
+  "Return non-nil when FORMATTER can run in the current buffer."
+  (let* ((normalized (format-all--normalize-formatter formatter))
+         (name (car normalized)))
+    (and (gethash name format-all--format-table)
+         (condition-case nil
+             (progn
+               (format-all--command-args normalized)
+               t)
+           (format-all-executable-not-found nil)))))
+
+(defun format/enable-on-save ()
+  "Enable format-on-save when this buffer has an available formatter."
+  (require 'format-all)
+  (when-let* ((language (format-all--language-id-buffer))
+              (chain (format-all--get-chain language))
+              ((cl-every #'format/formatter-available-p chain)))
+    (format-all-mode 1)))
+
+(my-use-package! format-all
+  :diminish format-all-mode
+  :bind
+  ("C-M-\\" . format-all-region-or-buffer)
+  :hook
+  (prog-mode . format/enable-on-save)
+  (text-mode . format/enable-on-save)
+  :init
+  (add-to-list 'auto-mode-alist '("\\.jsonc\\'" . js-json-mode))
+  (with-eval-after-load 'language-id
+    (format/register-mode "JSON" 'js-json-mode)
+    (format/register-mode "Typst" 'typst-ts-mode))
+  :config
+  (setq-default format-all-formatters
+                '(("C" (clang-format "--style=LLVM"))
+                  ("C++" (clang-format "--style=LLVM"))
+                  ("CSS" prettier)
+                  ("Dockerfile" dockfmt)
+                  ("Emacs Lisp" emacs-lisp)
+                  ("Go" gofmt)
+                  ("HTML" prettier)
+                  ("Java" google-java-format)
+                  ("JavaScript" prettier)
+                  ("JSON" prettier)
+                  ("JSON5" prettier)
+                  ("JSX" prettier)
+                  ("Markdown" prettier)
+                  ("Python" (black "--line-length" "88"))
+                  ("Rust" rustfmt)
+                  ("SCSS" prettier)
+                  ("Shell" (shfmt "-i" "2"))
+                  ("TSX" prettier)
+                  ("TypeScript" prettier)
+                  ("Vue" prettier)
+                  ("XML" html-tidy)
+                  ("YAML" prettier)))
+  (setq format-all-show-errors 'errors))
 
 (provide 'my-dev)
 ;;; dev.el ends here

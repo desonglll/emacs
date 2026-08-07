@@ -4,7 +4,14 @@
 
 (my-use-package! vertico
   :init
-  (vertico-mode 1))
+  (vertico-mode 1)
+  :config
+  (require 'vertico-directory)
+  :bind
+  (:map vertico-map
+        ("RET" . vertico-directory-enter)
+        ("DEL" . vertico-directory-delete-char)
+        ("M-DEL" . vertico-directory-delete-word)))
 
 (my-use-package! orderless
   :demand t
@@ -24,8 +31,7 @@
    ("C-x b" . consult-buffer)
    ("M-y" . consult-yank-pop)
    ("M-g g" . consult-goto-line)
-   ("M-g i" . consult-imenu)
-   ("C-c s r" . consult-ripgrep))
+   ("M-g i" . consult-imenu))
   :config
   (consult-customize
    consult-ripgrep consult-git-grep consult-grep consult-man
