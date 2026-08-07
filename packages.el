@@ -69,9 +69,6 @@
 
 (package! ace-window)
 (package! avy)
-;; (package! kill-other-buffers
-;;   :type git :host github
-;;   :repo "desonglll/kill-other-buffers.el")
 (package! translate
   :type git :host github
   :repo "desonglll/translate.el")

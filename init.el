@@ -29,7 +29,7 @@
 (load (expand-file-name "packages.el" my-config-directory) nil 'nomessage)
 (load (expand-file-name "config.el" my-config-directory) nil 'nomessage)
 
-(dolist (module '("ui.el" "completion.el" "editing.el" "dev.el" "rc.el"))
+(dolist (module '("ui.el" "completion.el" "editing.el" "dev.el" "rc.el" "keymaps.el"))
   (load (expand-file-name module my-modules-directory) nil 'nomessage))
 
 ;; Put personal, machine-specific settings in local.el.  It is gitignored.

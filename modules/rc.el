@@ -45,4 +45,12 @@ before killing modified buffers."
              killed-count
              (if (= killed-count 1) "" "s"))))
 
+(defun my/list-buffers-focus ()
+  "List buffers and focus."
+  (interactive)
+  (list-buffers)
+  (pop-to-buffer "*Buffer List*")
+  (delete-other-windows)
+  )
+
 ;;; rc.el ends here.
