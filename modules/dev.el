@@ -43,6 +43,12 @@
 (my-use-package! go-mode
   :mode "\\.go\\'")
 
+(my-use-package! swift-mode
+  :mode "\\.swift\\(?:interface\\)?\\'")
+
+(my-use-package! swift-ts-mode
+  :commands swift-ts-mode)
+
 (defconst my-lsp-language-clients
   '((c-mode)
     (c-ts-mode)
@@ -55,7 +61,9 @@
     (python-mode . lsp-pyright)
     (python-ts-mode . lsp-pyright)
     (rust-mode)
-    (rust-ts-mode))
+    (rust-ts-mode)
+    (swift-mode . lsp-sourcekit)
+    (swift-ts-mode . lsp-sourcekit))
   "Major modes with automatic LSP and any external client feature.")
 
 (defconst my-lsp-native-flymake-backends
@@ -189,6 +197,7 @@
   (add-to-list 'auto-mode-alist '("\\.jsonc\\'" . js-json-mode))
   (with-eval-after-load 'language-id
     (format/register-mode "JSON" 'js-json-mode)
+    (format/register-mode "Swift" 'swift-ts-mode)
     (format/register-mode "Typst" 'typst-ts-mode))
   :config
   (setq-default format-all-formatters
@@ -209,6 +218,7 @@
                   ("Rust" rustfmt)
                   ("SCSS" prettier)
                   ("Shell" (shfmt "-i" "2"))
+                  ("Swift" swiftformat)
                   ("TSX" prettier)
                   ("TypeScript" prettier)
                   ("Vue" prettier)

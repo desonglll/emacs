@@ -53,7 +53,7 @@ macro always sets `:straight nil`, so modules cannot install packages:
 Run `M-x straight-freeze-versions` after changing packages to update the
 reproducible lockfile.
 
-LSP starts automatically for Rust, C, C++, Java, Python, and Go.  The
+LSP starts automatically for Rust, C, C++, Java, Python, Go, and Swift. The
 configuration uses these language servers:
 
 - Rust: `rust-analyzer`
@@ -61,6 +61,7 @@ configuration uses these language servers:
 - Java: `jdtls` through `lsp-java`
 - Python: `pyright` through `lsp-pyright`
 - Go: `gopls`
+- Swift: Xcode's `sourcekit-lsp` through `lsp-sourcekit`
 
 Install those executables with the system package manager so they are on
 `PATH`.  On macOS with Homebrew, `jdtls` and `pyright` can be installed with:
@@ -69,16 +70,21 @@ Install those executables with the system package manager so they are on
 brew install jdtls pyright
 ```
 
-Run `M-x my-install-language-grammars` once to install the C, C++, Go, Java,
-JavaScript, JSON, Python, Rust, TypeScript, TSX, and Typst Tree-sitter
-grammars. Until a grammar is available, existing major-mode associations stay
-unchanged; Tree-sitter-only TypeScript and TSX associations activate after
-installation. Add grammar sources and mode mappings in `config.el`; add LSP
-clients in `modules/dev.el` when the language should start LSP automatically.
+Run `M-x my-install-language-grammars` once to install the pinned grammars for
+all 25 file-editing Tree-sitter modes bundled with Emacs 30.2, plus Swift and
+Typst.
+PHPDoc and JSDoc are included because Emacs' PHP mode requires them. All parser
+revisions use ABI 14, matching this Emacs build. Until the required grammars are
+available, existing major-mode associations stay unchanged. Add grammar sources
+and mode mappings in `config.el`; add LSP clients in `modules/dev.el` when the
+language should start LSP automatically.
 
 Typst support uses the `tinymist` language server and a compiled Tree-sitter
 grammar.  The custom translation package uses the `trans` executable from
 translate-shell.
+
+Swift support requires Xcode or a Swift toolchain containing `sourcekit-lsp`.
+Optional format-on-save support uses SwiftFormat (`brew install swiftformat`).
 
 Nerd Icons is declared in `packages.el`.  Run `M-x nerd-icons-install-fonts`
 once to install its symbol font.

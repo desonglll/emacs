@@ -85,8 +85,11 @@
 (package! lsp-mode)
 (package! rust-mode)
 (package! go-mode)
+(package! swift-mode)
+(package! swift-ts-mode)
 (package! lsp-java)
 (package! lsp-pyright)
+(package! lsp-sourcekit)
 (package! just-mode)
 ;;; (package! protobuf-mode)
 (package! typst-ts-mode

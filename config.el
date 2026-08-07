@@ -158,39 +158,88 @@
 (require 'treesit)
 
 (defconst my-treesit-language-sources
-  '((c "https://github.com/tree-sitter/tree-sitter-c" "v0.23.6" "src")
+  '((bash "https://github.com/tree-sitter/tree-sitter-bash" "v0.23.3" "src")
+    (c "https://github.com/tree-sitter/tree-sitter-c" "v0.23.6" "src")
+    (cmake "https://github.com/uyha/tree-sitter-cmake" "v0.7.4" "src")
     (cpp "https://github.com/tree-sitter/tree-sitter-cpp" "v0.22.0" "src")
+    (c-sharp "https://github.com/tree-sitter/tree-sitter-c-sharp"
+             "v0.23.1" "src")
+    (css "https://github.com/tree-sitter/tree-sitter-css" "v0.23.2" "src")
+    (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile"
+                "v0.2.0" "src")
+    (elixir "https://github.com/elixir-lang/tree-sitter-elixir"
+            "v0.3.5" "src")
     (go "https://github.com/tree-sitter/tree-sitter-go" "v0.23.4" "src")
+    (gomod "https://github.com/camdencheek/tree-sitter-go-mod"
+           "v1.1.0" "src")
+    (heex "https://github.com/phoenixframework/tree-sitter-heex"
+          "v0.8.1" "src")
+    (html "https://github.com/tree-sitter/tree-sitter-html" "v0.23.2" "src")
     (java "https://github.com/tree-sitter/tree-sitter-java" "v0.23.5" "src")
     (javascript "https://github.com/tree-sitter/tree-sitter-javascript"
                 "v0.23.1" "src")
+    (jsdoc "https://github.com/tree-sitter/tree-sitter-jsdoc"
+           "v0.23.2" "src")
     (json "https://github.com/tree-sitter/tree-sitter-json" "v0.24.8" "src")
+    (lua "https://github.com/tree-sitter-grammars/tree-sitter-lua"
+         "v0.3.0" "src")
+    (php "https://github.com/tree-sitter/tree-sitter-php"
+         "v0.23.12" "php/src")
+    (phpdoc "https://github.com/claytonrcarter/tree-sitter-phpdoc"
+            "v0.1.6" "src")
     (python "https://github.com/tree-sitter/tree-sitter-python"
             "v0.23.6" "src")
+    (ruby "https://github.com/tree-sitter/tree-sitter-ruby" "v0.23.1" "src")
     (rust "https://github.com/tree-sitter/tree-sitter-rust" "v0.23.3"
           "src")
+    (swift "https://github.com/alex-pinkus/tree-sitter-swift"
+           "0.7.3-with-generated-files" "src")
+    (toml "https://github.com/tree-sitter-grammars/tree-sitter-toml"
+          "v0.7.0" "src")
     (typescript "https://github.com/tree-sitter/tree-sitter-typescript"
                 "v0.23.2" "typescript/src")
     (tsx "https://github.com/tree-sitter/tree-sitter-typescript"
          "v0.23.2" "tsx/src")
-    (typst "https://github.com/uben0/tree-sitter-typst" "v0.11.0" "src"))
-  "Tree-sitter grammars used by the configured language modes.")
+    (typst "https://github.com/uben0/tree-sitter-typst" "v0.11.0" "src")
+    (yaml "https://github.com/tree-sitter-grammars/tree-sitter-yaml"
+          "v0.7.2" "src"))
+  "Pinned Tree-sitter grammars used by the configured language modes.")
 
 (defconst my-treesit-mode-remaps
-  '(((c cpp) c-or-c++-mode c-or-c++-ts-mode)
-    (c c-mode c-ts-mode)
-    (cpp c++-mode c++-ts-mode)
-    (go go-mode go-ts-mode)
-    (java java-mode java-ts-mode)
-    (python python-mode python-ts-mode)
-    (rust rust-mode rust-ts-mode))
+  '(((bash) sh-mode bash-ts-mode)
+    ((c cpp) c-or-c++-mode c-or-c++-ts-mode)
+    ((c) c-mode c-ts-mode)
+    ((cpp) c++-mode c++-ts-mode)
+    ((c-sharp) csharp-mode csharp-ts-mode)
+    ((css) css-mode css-ts-mode)
+    ((go) go-mode go-ts-mode)
+    ((java) java-mode java-ts-mode)
+    ((python) python-mode python-ts-mode)
+    ((ruby) ruby-mode ruby-ts-mode)
+    ((rust) rust-mode rust-ts-mode)
+    ((swift) swift-mode swift-ts-mode))
   "Mappings from traditional modes to Tree-sitter modes.")
 
 (defconst my-treesit-file-modes
-  '((javascript "\\.\\(?:[cm]?js\\|jsx\\)\\'" js-ts-mode)
-    (json "\\.json\\'" json-ts-mode)
-    (typescript "\\.ts\\'" typescript-ts-mode)
-    (tsx "\\.tsx\\'" tsx-ts-mode))
+  '(((cmake) ("\\(?:CMakeLists\\.txt\\|\\.cmake\\)\\'") cmake-ts-mode)
+    ((dockerfile)
+     ("\\(?:Dockerfile\\(?:\\..*\\)?\\|\\.[Dd]ockerfile\\)\\'")
+     dockerfile-ts-mode)
+    ((elixir) ("\\.elixir\\'" "\\.exs?\\'" "mix\\.lock\\'") elixir-ts-mode)
+    ((gomod) ("/go\\.mod\\'") go-mod-ts-mode)
+    ((heex) ("\\.[hl]?eex\\'") heex-ts-mode)
+    ((html) ("\\.html\\'") html-ts-mode)
+    ((javascript) ("\\.\\(?:[cm]?js\\|jsx\\)\\'") js-ts-mode)
+    ((json) ("\\.json\\'") json-ts-mode)
+    ((lua) ("\\.lua\\'") lua-ts-mode)
+    ((php phpdoc html javascript jsdoc css)
+     ("\\.\\(?:php[s345]?\\|phtml\\|inc\\|stub\\)\\'"
+      "/\\.php_cs\\(?:\\.dist\\)?\\'")
+     php-ts-mode)
+    ((toml) ("\\.toml\\'") toml-ts-mode)
+    ((typescript) ("\\.ts\\'") typescript-ts-mode)
+    ((tsx) ("\\.tsx\\'") tsx-ts-mode)
+    ((yaml) ("\\.ya?ml\\'") yaml-ts-mode))
   "File patterns for modes that require an installed Tree-sitter grammar.")
 
 (dolist (source my-treesit-language-sources)
@@ -200,16 +249,22 @@
 (defun my-refresh-treesit-mode-remaps ()
   "Prefer Tree-sitter modes for grammars that are installed."
   (dolist (mapping my-treesit-mode-remaps)
-    (pcase-let ((`(,language ,base-mode ,treesit-mode) mapping))
+    (pcase-let ((`(,languages ,base-mode ,treesit-mode) mapping))
+      (setq major-mode-remap-alist
+            (delete (cons base-mode treesit-mode) major-mode-remap-alist))
       (when (and (fboundp treesit-mode)
-                 (treesit-ready-p language t))
+                 (treesit-ready-p languages t))
         (setf (alist-get base-mode major-mode-remap-alist)
               treesit-mode))))
   (dolist (mapping my-treesit-file-modes)
-    (pcase-let ((`(,language ,pattern ,treesit-mode) mapping))
-      (when (and (fboundp treesit-mode)
-                 (treesit-ready-p language t))
-        (add-to-list 'auto-mode-alist (cons pattern treesit-mode))))))
+    (pcase-let ((`(,languages ,patterns ,treesit-mode) mapping))
+      (let ((ready (and (fboundp treesit-mode)
+                        (treesit-ready-p languages t))))
+        (dolist (pattern patterns)
+          (setq auto-mode-alist
+                (delete (cons pattern treesit-mode) auto-mode-alist))
+          (when ready
+            (add-to-list 'auto-mode-alist (cons pattern treesit-mode))))))))
 
 (defun my-install-language-grammars ()
   "Install missing Tree-sitter grammars used by this configuration."
