@@ -69,9 +69,9 @@
 
 (package! ace-window)
 (package! avy)
-(package! kill-other-buffers
-  :type git :host github
-  :repo "desonglll/kill-other-buffers.el")
+;; (package! kill-other-buffers
+;;   :type git :host github
+;;   :repo "desonglll/kill-other-buffers.el")
 (package! translate
   :type git :host github
   :repo "desonglll/translate.el")
@@ -91,7 +91,6 @@
 (package! lsp-pyright)
 (package! lsp-sourcekit)
 (package! just-mode)
-;;; (package! protobuf-mode)
 (package! typst-ts-mode
   :type git :host codeberg
   :repo "meow_king/typst-ts-mode")
