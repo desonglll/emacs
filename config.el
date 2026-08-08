@@ -122,7 +122,7 @@
 (defconst my-serif-font
   (font-spec :family "Iosevka Curly Slab" :size 16 :weight 'regular))
 
-(add-to-list 'default-frame-alist '(font . "Iosevka Term SS15-16"))
+;; (add-to-list 'default-frame-alist '(font . "Iosevka Term SS15"))
 
 (defun my-set-cjk-font (&optional frame)
   "Use Sarasa Term SC for CJK characters in FRAME."
