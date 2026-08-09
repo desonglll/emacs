@@ -39,3 +39,4 @@
 .cache
 .dap-breakpoints
 pyim
+transient/

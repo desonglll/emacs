@@ -8,9 +8,6 @@
 (my-use-package! avy
   :commands avy-goto-char-2)
 
-(my-use-package! kill-other-buffers
-  :commands kill-other-buffers)
-
 ;;;; Input and text
 
 (my-use-package! pyim
