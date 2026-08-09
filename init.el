@@ -38,3 +38,4 @@
     (load local-file nil 'nomessage)))
 
 ;;; init.el ends here
+(put 'upcase-region 'disabled nil)
