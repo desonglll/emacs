@@ -10,7 +10,7 @@
       confirm-kill-emacs #'yes-or-no-p
       sentence-end-double-space nil
       require-final-newline t
-      tab-always-indent 'complete
+      ;; tab-always-indent 'complete
       read-process-output-max (* 1024 1024))
 
 (set-language-environment "UTF-8")

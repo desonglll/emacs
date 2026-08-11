@@ -55,18 +55,29 @@
 
 ;;;; In-buffer
 
-(my-use-package! corfu
-  :custom
-  (corfu-auto t)
-  (corfu-auto-delay 0.15)
-  (corfu-auto-prefix 2)
-  (corfu-cycle t)
-  (corfu-preselect 'prompt)
-  (corfu-preview-current nil)
-  :init
-  (global-corfu-mode 1)
+;; (my-use-package! corfu
+;;   :custom
+;;   (corfu-auto t)
+;;   (corfu-auto-delay 0.15)
+;;   (corfu-auto-prefix 2)
+;;   (corfu-cycle t)
+;;   (corfu-preselect 'prompt)
+;;   (corfu-preview-current nil)
+;;   :init
+;;   (global-corfu-mode 1)
+;;   :config
+;;   (corfu-popupinfo-mode 1))
+
+(my-use-package! company
+  :hook (after-init . global-company-mode)
+  :bind
+  (("M-<tab>" . #'company-complete))
   :config
-  (corfu-popupinfo-mode 1))
+  (setq company-idle-delay nil
+        company-minimum-prefix-length 2
+        company-selection-wrap-around t
+        company-tooltip-limit 12)
+  )
 
 (my-use-package! cape
   :bind

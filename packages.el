@@ -62,7 +62,8 @@
 (package! consult)
 (package! embark)
 (package! embark-consult)
-(package! corfu)
+;; (package! corfu)
+(package! company)
 (package! cape)
 
 ;;;; Editing
