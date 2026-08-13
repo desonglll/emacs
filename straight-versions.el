@@ -63,5 +63,6 @@
  ("vertico" . "5a764752fc70950e562c59a1ed2298d7296db4e8")
  ("with-editor" . "a1f92a26e53033ec58e1d2ce9b132da7ebae816e")
  ("xr" . "fc4d6b5ddae9eb2c8adc2b117e6f33f3a09a4e96")
- ("yaml.el" . "5546f36bde24a9a8c1934e0f6ce205cd41d72537"))
+ ("yaml.el" . "5546f36bde24a9a8c1934e0f6ce205cd41d72537")
+ ("yasnippet" . "c1e6ff23e9af16b856c88dfaab9d3ad7b746ad37"))
 :epsilon

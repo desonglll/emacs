@@ -1,5 +1,12 @@
 ;;; editing.el --- Editing and navigation packages -*- lexical-binding: t; -*-
 
+;;;; Snippets
+
+(my-use-package! yasnippet
+  :demand t
+  :config
+  (yas-global-mode 1))
+
 ;;;; Navigation and buffers
 
 (my-use-package! ace-window

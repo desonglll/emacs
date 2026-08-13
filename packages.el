@@ -68,6 +68,7 @@
 
 ;;;; Editing
 
+(package! yasnippet)
 (package! ace-window)
 (package! avy)
 (package! translate

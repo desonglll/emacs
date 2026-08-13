@@ -107,4 +107,38 @@ should start searching."
           (file-name-as-directory dir))
     (message "Directory: %s" default-directory)))
 
+(defun my/toggle-auto-completion()
+  (interactive)
+  (if company-idle-delay
+      (setq company-idle-delay nil)
+    (setq company-idle-delay 0.01)
+    )
+  )
+
+(defun my/user-buffer-p (buffer)
+  (with-current-buffer buffer
+    (and
+     (not (string-match-p "\\`[ *]" (buffer-name buffer)))
+     (not (derived-mode-p 'magit-mode))
+     (not (derived-mode-p
+           'help-mode
+           'completion-list-mode
+           'special-mode))
+     ))
+  )
+
+(defun my/change-buffer(&optional arg)
+  (interactive "P")
+  (let* ((buffers
+          (if arg
+              (buffer-list)
+            (seq-filter #'my/user-buffer-p (buffer-list))
+            ))
+         (names (mapcar #'buffer-name buffers))
+         (selected (completing-read "change to:" names nil t)))
+    (switch-to-buffer selected)
+    ))
+
+
+
 ;;; rc.el ends here.

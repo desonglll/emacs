@@ -13,7 +13,7 @@
            ("s-e" . treemacs)
            ("M-o" . ace-window)
            ("C-c RET" . ffap)
-           ("C-c f r" . recentf)
+           ("C-c f r" . my-recentf)
            ("C-c f f" . consult-fd)
            ("C-c f g" . consult-ripgrep)
            ("s-<return>" . my/new-buffer)
@@ -21,6 +21,7 @@
            ("C-S-<tab>" . previous-buffer)
            ("C-<iso-lefttab>" . previous-buffer)
            ("C-c b" . my/list-buffers-focus)
+           ("M-<return>" . delete-other-windows)
            ))
   (keymap-global-set (car binding) (cdr binding)))
 

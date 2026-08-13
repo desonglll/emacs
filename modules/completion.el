@@ -2,6 +2,12 @@
 
 ;;;; Minibuffer
 
+(defun my-recentf ()
+  "Open a recent file while preserving recentf's MRU order."
+  (interactive)
+  (let ((vertico-sort-override-function #'identity))
+    (call-interactively #'recentf)))
+
 (my-use-package! vertico
   :init
   (vertico-mode 1)
@@ -73,10 +79,16 @@
   :bind
   (("M-<tab>" . #'company-complete))
   :config
-  (setq company-idle-delay nil
+  (setq company-idle-delay 0.01
         company-minimum-prefix-length 2
         company-selection-wrap-around t
         company-tooltip-limit 12)
+  (with-eval-after-load 'company
+    (set-face-attribute 'company-tooltip-selection nil
+                        :background "#005f87"
+                        :foreground "white"
+                        :weight 'bold)
+    )
   )
 
 (my-use-package! cape
