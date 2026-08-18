@@ -29,7 +29,7 @@
 (straight-override-recipe
  '(xr :type git :host github :repo "mattiase/xr"))
 
-;; plugins.el configures declared packages; it never installs implicitly.
+;; Files under plugins/ configure packages; they never install implicitly.
 (setq straight-use-package-by-default nil
       use-package-always-defer t)
 

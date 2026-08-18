@@ -7,7 +7,8 @@ A small, Doom-style configuration using straight.el for package management.
 - `early-init.el`: startup and frame initialization.
 - `init.el`: state paths and deterministic load order.
 - `packages.el`: the only file that installs straight.el packages.
-- `plugins.el`: all third-party package configuration using `my-use-package!`.
+- `plugins/`: automatically loaded third-party package configuration, grouped by
+  feature with complex packages in dedicated files.
 - `straight-versions.el`: reproducible straight.el package revisions.
 - `config.el`: native Emacs behavior, state, macOS, fonts, and Tree-sitter.
 - `modules/rc.el`: personal interactive commands.
@@ -39,8 +40,9 @@ Use an explicit recipe for a package from a specific Git repository:
   :type git :host github :repo "owner/repository")
 ```
 
-Configure every package in `plugins.el` with `my-use-package!`.  This macro
-always sets `:straight nil`, so package configuration cannot install packages:
+Configure packages in a suitable file under `plugins/` with `my-use-package!`.
+Files are loaded automatically in filename order.  This macro always sets
+`:straight nil`, so package configuration cannot install packages:
 
 ```elisp
 (my-use-package! example-package
@@ -73,7 +75,7 @@ Typst.
 PHPDoc and JSDoc are included because Emacs' PHP mode requires them. All parser
 revisions use ABI 14, matching this Emacs build. Until the required grammars are
 available, existing major-mode associations stay unchanged. Add grammar sources
-and mode mappings in `config.el`; add LSP clients in `plugins.el` when the
+and mode mappings in `config.el`; add LSP clients in `plugins/lsp.el` when the
 language should start LSP automatically.
 
 Typst support uses the `tinymist` language server and a compiled Tree-sitter
