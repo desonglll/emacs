@@ -96,6 +96,7 @@
 
 (package! format-all)
 (package! pdf-tools)
+(package! projectile)
 
 
 ;;;; AI
