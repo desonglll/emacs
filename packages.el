@@ -95,6 +95,8 @@
   :repo "meow_king/typst-ts-mode")
 
 (package! format-all)
+(package! pdf-tools)
+
 
 ;;;; AI
 

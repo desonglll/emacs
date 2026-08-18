@@ -226,5 +226,11 @@
                   ("YAML" prettier)))
   (setq format-all-show-errors 'errors))
 
+(my-use-package! pdf-tools
+  :mode ("\\.pdf\\'" . pdf-view-mode)
+  :config
+  (pdf-tools-install)
+  )
+
 (provide 'my-dev)
 ;;; dev.el ends here

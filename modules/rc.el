@@ -14,13 +14,22 @@
       (funcall (default-value 'major-mode)))))
 
 (defun my/open-config ()
-  "Open the main Emacs configuration file."
+  "Recursively find and open an Emacs Lisp configuration file."
   (interactive)
   (let* ((config-dir (expand-file-name "~/.config/emacs/"))
-         (files (directory-files config-dir nil "\\.el\\'"))
-         (selected (completing-read "Open file: " files nil t)))
-    (find-file (expand-file-name selected config-dir)))
-  )
+         (files
+          (mapcar
+           (lambda (file)
+             (file-relative-name file config-dir))
+           (directory-files-recursively
+            config-dir
+            "\\.el\\'"
+            nil
+            (lambda (dir)
+              (not (string=(file-name-nondirectory (directory-file-name dir)) "straight"))))))
+         (selected
+          (completing-read "Open file: " files nil t)))
+    (find-file (expand-file-name selected config-dir))))
 
 (defun my/kill-other-buffers (&optional arg)
   "Kill other unmodified buffers.
