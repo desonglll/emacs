@@ -40,3 +40,4 @@
 .dap-breakpoints
 pyim
 transient/
+*.eld
