@@ -16,7 +16,7 @@
 
 (defconst my-modules-directory
   (expand-file-name "modules/" my-config-directory)
-  "Directory containing plugin configuration modules.")
+  "Directory containing personal configuration modules.")
 
 (make-directory my-state-directory t)
 
@@ -25,11 +25,12 @@
 (when (file-exists-p custom-file)
   (load custom-file nil 'nomessage))
 
-;; Keep package declarations separate from all package configuration.
+;; Install packages before loading native and third-party configuration.
 (load (expand-file-name "packages.el" my-config-directory) nil 'nomessage)
 (load (expand-file-name "config.el" my-config-directory) nil 'nomessage)
+(load (expand-file-name "plugins.el" my-config-directory) nil 'nomessage)
 
-(dolist (module '("ui.el" "completion.el" "editing.el" "dev.el" "rc.el" "keymaps.el"))
+(dolist (module '("rc.el" "keymaps.el"))
   (load (expand-file-name module my-modules-directory) nil 'nomessage))
 
 ;; Put personal, machine-specific settings in local.el.  It is gitignored.

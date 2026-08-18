@@ -1,6 +1,159 @@
-;;; dev.el --- Development package configuration -*- lexical-binding: t; -*-
+;;; plugins.el --- Central third-party package configuration -*- lexical-binding: t; -*-
 
-;;;; Environment and version control
+;;;; User interface
+
+(my-use-package! gruber-darker-theme
+  :demand t
+  :config
+  (mapc #'disable-theme custom-enabled-themes)
+  (load-theme 'gruber-darker t))
+
+(my-use-package! dirvish
+  :commands dirvish)
+
+(my-use-package! imenu-list
+  :commands imenu-list)
+
+(my-use-package! treemacs
+  :commands treemacs)
+
+;;;; Completion
+
+;;; Minibuffer
+
+(defun my-recentf ()
+  "Open a recent file while preserving recentf's MRU order."
+  (interactive)
+  (let ((vertico-sort-override-function #'identity))
+    (call-interactively #'recentf)))
+
+(my-use-package! vertico
+  :init
+  (vertico-mode 1)
+  :config
+  (require 'vertico-directory)
+  :bind
+  (:map vertico-map
+        ("RET" . vertico-directory-enter)
+        ("DEL" . vertico-directory-delete-char)
+        ("M-DEL" . vertico-directory-delete-word)))
+
+(my-use-package! orderless
+  :demand t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-defaults nil)
+  (completion-category-overrides
+   '((file (styles partial-completion)))))
+
+(my-use-package! marginalia
+  :init
+  (marginalia-mode 1))
+
+(my-use-package! consult
+  :bind
+  (("C-s" . consult-line)
+   ("C-x b" . consult-buffer)
+   ("M-y" . consult-yank-pop)
+   ("M-g g" . consult-goto-line)
+   ("M-g i" . consult-imenu))
+  :config
+  (consult-customize
+   consult-ripgrep consult-git-grep consult-grep consult-man
+   consult-bookmark consult-recent-file consult-xref
+   consult-source-bookmark consult-source-file-register
+   consult-source-recent-file consult-source-project-recent-file
+   :preview-key '(:debounce 0.4 any)))
+
+(my-use-package! embark
+  :bind
+  (("C-." . embark-act)
+   ("C-;" . embark-dwim)
+   ("C-h B" . embark-bindings))
+  :init
+  (setq prefix-help-command #'embark-prefix-help-command))
+
+(my-use-package! embark-consult
+  :after (embark consult)
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
+
+;;; In-buffer
+
+;; (my-use-package! corfu
+;;   :custom
+;;   (corfu-auto t)
+;;   (corfu-auto-delay 0.15)
+;;   (corfu-auto-prefix 2)
+;;   (corfu-cycle t)
+;;   (corfu-preselect 'prompt)
+;;   (corfu-preview-current nil)
+;;   :init
+;;   (global-corfu-mode 1)
+;;   :config
+;;   (corfu-popupinfo-mode 1))
+
+(my-use-package! company
+  :hook (after-init . global-company-mode)
+  :bind
+  (("M-<tab>" . #'company-complete))
+  :config
+  (setq company-idle-delay 0.01
+        company-minimum-prefix-length 2
+        company-selection-wrap-around t
+        company-tooltip-limit 12)
+  (with-eval-after-load 'company
+    (set-face-attribute 'company-tooltip-selection nil
+                        :background "#005f87"
+                        :foreground "white"
+                        :weight 'bold)))
+
+(my-use-package! cape
+  :bind
+  (("M-/" . cape-dabbrev)
+   ("C-c p f" . cape-file)
+   ("C-c p k" . cape-keyword))
+  :init
+  (add-hook 'completion-at-point-functions #'cape-dabbrev 90)
+  (add-hook 'completion-at-point-functions #'cape-file 100))
+
+;;;; Editing
+
+;;; Snippets
+
+(my-use-package! yasnippet
+  :demand t
+  :config
+  (yas-global-mode 1))
+
+;;; Navigation and buffers
+
+(my-use-package! ace-window
+  :commands ace-window)
+
+(my-use-package! avy
+  :commands avy-goto-char-2)
+
+;;; Input and text
+
+(my-use-package! pyim
+  :commands pyim-convert-string-at-point
+  :init
+  (setq default-input-method "pyim")
+  :config
+  (pyim-default-scheme 'quanpin))
+
+(my-use-package! pyim-basedict
+  :after pyim
+  :config
+  (pyim-basedict-enable))
+
+(my-use-package! translate
+  :commands (translate-trans translate-argo))
+
+;;;; Development
+
+;;; Environment and version control
 
 (my-use-package! exec-path-from-shell
   :demand t
@@ -17,7 +170,7 @@
   (("C-x g" . magit-status)
    ("C-x M-g" . magit-dispatch)))
 
-;;;; Language server core
+;;; Language server core
 
 (my-use-package! lsp-mode
   :commands (lsp lsp-deferred)
@@ -35,7 +188,7 @@
   (lsp-lens-enable nil)
   (lsp-log-io nil))
 
-;;;; Language modes
+;;; Language modes
 
 (my-use-package! rust-mode
   :mode "\\.rs\\'")
@@ -84,7 +237,7 @@
 
 (add-hook 'prog-mode-hook #'my-start-language-lsp)
 
-;;;; Language-specific clients
+;;; Language-specific clients
 
 (defun my-jdtls-server-directory ()
   "Return the JDTLS directory containing its plugins, when installed."
@@ -131,7 +284,7 @@
   (lsp-pyright-python-executable-cmd "python3")
   (lsp-pyright-type-checking-mode "standard"))
 
-;;;; Additional language tools
+;;; Additional language tools
 
 (my-use-package! just-mode
   :mode ("\\(?:^\\|/\\)[Jj]ustfile\\'" . just-mode))
@@ -229,8 +382,7 @@
 (my-use-package! pdf-tools
   :mode ("\\.pdf\\'" . pdf-view-mode)
   :config
-  (pdf-tools-install)
-  )
+  (pdf-tools-install))
 
 (my-use-package! projectile
   :init
@@ -238,5 +390,5 @@
   :bind-keymap
   ("C-c p" . projectile-command-map))
 
-(provide 'my-dev)
-;;; dev.el ends here
+(provide 'plugins)
+;;; plugins.el ends here

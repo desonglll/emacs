@@ -7,14 +7,11 @@ A small, Doom-style configuration using straight.el for package management.
 - `early-init.el`: startup and frame initialization.
 - `init.el`: state paths and deterministic load order.
 - `packages.el`: the only file that installs straight.el packages.
+- `plugins.el`: all third-party package configuration using `my-use-package!`.
 - `straight-versions.el`: reproducible straight.el package revisions.
-- `config.el`: native Emacs behavior, state, macOS, fonts, Tree-sitter, commands,
-  and global keys.
-- `modules/ui.el`: theme, directory browser, file tree, and sidebars.
-- `modules/completion.el`: Vertico, Consult, Embark, Corfu, and Cape settings.
-- `modules/editing.el`: navigation, buffer tools, Chinese input, and translation.
-- `modules/dev.el`: environment, Git, LSP, language modes, and language tools.
-- `modules/ai.el`: AI tools and model configuration.
+- `config.el`: native Emacs behavior, state, macOS, fonts, and Tree-sitter.
+- `modules/rc.el`: personal interactive commands.
+- `modules/keymaps.el`: global key bindings.
 - `local.el`: optional machine-specific settings; ignored by Git.
 
 The hand-written configuration lives in `~/.config/emacs`.  Downloaded
@@ -42,8 +39,8 @@ Use an explicit recipe for a package from a specific Git repository:
   :type git :host github :repo "owner/repository")
 ```
 
-Configure the package in the relevant module with `my-use-package!`.  This
-macro always sets `:straight nil`, so modules cannot install packages:
+Configure every package in `plugins.el` with `my-use-package!`.  This macro
+always sets `:straight nil`, so package configuration cannot install packages:
 
 ```elisp
 (my-use-package! example-package
@@ -76,7 +73,7 @@ Typst.
 PHPDoc and JSDoc are included because Emacs' PHP mode requires them. All parser
 revisions use ABI 14, matching this Emacs build. Until the required grammars are
 available, existing major-mode associations stay unchanged. Add grammar sources
-and mode mappings in `config.el`; add LSP clients in `modules/dev.el` when the
+and mode mappings in `config.el`; add LSP clients in `plugins.el` when the
 language should start LSP automatically.
 
 Typst support uses the `tinymist` language server and a compiled Tree-sitter
