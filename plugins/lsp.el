@@ -6,8 +6,10 @@
   (setq lsp-keymap-prefix "C-c l")
   :custom
   (lsp-session-file (expand-file-name "lsp-session-v1" my-state-directory))
-  ;; lsp-completion-mode still installs its CAPF; Corfu supplies the UI.
-  (lsp-completion-provider :none)
+  ;; Company consumes lsp-mode's completion-at-point function via company-capf.
+  (lsp-completion-provider :capf)
+  ;; Do not retain empty results returned while a language server is indexing.
+  (lsp-completion-no-cache t)
   (lsp-diagnostics-provider :flymake)
   (lsp-enable-snippet t)
   (lsp-headerline-breadcrumb-enable nil)
@@ -42,11 +44,17 @@
 (defun my-start-language-lsp ()
   "Start the configured language server for the current major mode."
   (when-let ((client (assq major-mode my-lsp-language-clients)))
+    (require 'lsp-mode)
     (when-let ((backend
                 (alist-get major-mode my-lsp-native-flymake-backends)))
       (remove-hook 'flymake-diagnostic-functions backend t))
     (when (cdr client)
       (require (cdr client)))
+    ;; Match project roots resolved through symlinks, as rust-analyzer treats
+    ;; different file URIs as different documents.
+    (when-let ((file buffer-file-name))
+      (setq-local lsp-buffer-uri
+                  (lsp--path-to-uri (file-truename file))))
     (lsp-deferred)))
 
 (add-hook 'prog-mode-hook #'my-start-language-lsp)
