@@ -29,6 +29,11 @@
   :config
   (pyim-basedict-enable))
 
+(my-use-package! pyim-tsinghua-dict
+  :after pyim
+  :config
+  (pyim-tsinghua-dict-enable))
+
 (my-use-package! translate
   :commands (translate-trans translate-argo))
 

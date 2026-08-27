@@ -21,5 +21,16 @@
   :bind-keymap
   ("C-c p" . projectile-command-map))
 
+(my-use-package! perspective
+  ;; :bind
+  ;; (("C-x C-b" . persp-list-buffers)
+  ;;  ("C-c w s" . persp-switch)
+  ;;  ("C-c w n" . persp-switch)
+  ;;  ("C-c w k" . persp-kill))
+  :custom
+  (persp-mode-prefix-key (kbd "C-c w"))
+  :init
+  (persp-mode))
+
 (provide 'my-plugins-development)
 ;;; development.el ends here

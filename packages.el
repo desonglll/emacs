@@ -76,6 +76,10 @@
   :repo "desonglll/translate.el")
 (package! pyim)
 (package! pyim-basedict)
+(package! pyim-tsinghua-dict
+  :type git
+  :host github
+  :repo "redguardtoo/pyim-tsinghua-dict")
 
 ;;;; Development
 
@@ -97,7 +101,7 @@
 (package! format-all)
 (package! pdf-tools)
 (package! projectile)
-
+(package! perspective)
 
 ;;;; AI
 
