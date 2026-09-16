@@ -68,6 +68,12 @@
 (add-hook 'before-save-hook #'my-delete-trailing-whitespace)
 (keymap-global-set "C-c w" #'whitespace-mode)
 
+(defun my-go-indent-settings ()
+  (setq-local tab-width 8
+              indent-tabs-mode t
+              go-ts-mode-indent-offset 8))
+
+(add-hook 'go-ts-mode-hook #'my-go-indent-settings)
 ;;;; Persistent state
 
 (defconst my-backup-directory
@@ -123,7 +129,7 @@
 (defconst my-serif-font
   (font-spec :family "Iosevka Curly Slab" :size 16 :weight 'regular))
 
-;; (add-to-list 'default-frame-alist '(font . "Iosevka Term SS15"))
+;; (add-to-list 'default-frame-alist '(font . "Maple Mono NF CN"))
 
 (defun my-set-cjk-font (&optional frame)
   "Use Sarasa Term SC for CJK characters in FRAME."
@@ -140,7 +146,8 @@
                (find-font my-latin-font frame))
       (dolist (face '(default fixed-pitch variable-pitch))
         (set-face-attribute face frame
-                            :family "Iosevka Term SS15"
+                            ;; :family "Iosevka Term SS15"
+                            :family "Maple Mono NF CN"
                             :height 160
                             :weight 'regular))
       (my-set-cjk-font frame))))
