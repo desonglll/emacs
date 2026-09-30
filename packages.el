@@ -107,6 +107,8 @@
 ;;;; AI
 
 (package! gptel)
+(package!
+    '(gptel-autocomplete :type git :host github :repo "JDNdeveloper/gptel-autocomplete"))
 
 (provide 'packages)
 ;;; packages.el ends here

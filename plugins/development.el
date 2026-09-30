@@ -32,5 +32,26 @@
   :init
   (persp-mode))
 
+(my-use-package! gptel
+  :config
+  (setq gptel-model 'gpt-6
+        gptel-stream t
+        gptel-backend
+        (gptel-make-openai "Sub2api"
+          :host "sub2api.minutex.cn"
+          :endpoint "/v1/chat/completions"
+          :stream t
+          :key (gptel-api-key-from-auth-source "sub2api.minutex.cn")
+          :models '(gpt-6))
+        )
+  )
+(setq gptel-autocomplete-debug t)
+(my-use-package! gptel-autocomplete
+  :after gptel
+  :bind
+  (("C-<return>" . gptel-complete)
+   :map gptel-autocomplete-completion-map
+   ("C-M-<return>" . gptel-accept-completion)))
+
 (provide 'my-plugins-development)
 ;;; development.el ends here
