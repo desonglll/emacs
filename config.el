@@ -46,7 +46,7 @@
                 special-mode-hook))
   (add-hook hook #'my-disable-line-numbers))
 
-(setq insert-directory-program "gls")
+(setq insert-directory-program (if (eq system-type 'darwin) "gls" "ls"))
 (setq dired-use-ls-dired t)
 
 ;;;; Editing
