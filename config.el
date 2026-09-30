@@ -46,6 +46,9 @@
                 special-mode-hook))
   (add-hook hook #'my-disable-line-numbers))
 
+(setq insert-directory-program "gls")
+(setq dired-use-ls-dired t)
+
 ;;;; Editing
 
 (delete-selection-mode 1)
@@ -146,8 +149,8 @@
                (find-font my-latin-font frame))
       (dolist (face '(default fixed-pitch variable-pitch))
         (set-face-attribute face frame
-                            ;; :family "Iosevka Term SS15"
-                            :family "Maple Mono NF CN"
+                            :family "Iosevka Term SS15"
+                            ;; :family "Maple Mono NF CN"
                             :height 160
                             :weight 'regular))
       (my-set-cjk-font frame))))

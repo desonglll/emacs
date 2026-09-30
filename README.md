@@ -2,6 +2,21 @@
 
 A small, Doom-style configuration using straight.el for package management.
 
+## Requirements
+
+For macOS, install GNU ls or dir...
+
+```shell
+brew install coreutils
+```
+
+then config the dired to use GNU gls.
+
+```elisp
+(setq insert-directory-program "gls")
+(setq dired-use-ls-dired t)
+```
+
 ## Structure
 
 - `early-init.el`: startup and frame initialization.
@@ -15,7 +30,7 @@ A small, Doom-style configuration using straight.el for package management.
 - `modules/keymaps.el`: global key bindings.
 - `local.el`: optional machine-specific settings; ignored by Git.
 
-The hand-written configuration lives in `~/.config/emacs`.  Downloaded
+The hand-written configuration lives in `~/.config/emacs`. Downloaded
 packages, Tree-sitter grammars, native compilation output, and generated state
 live under `~/.emacs.d`; persistent state is grouped in `~/.emacs.d/var`.
 
@@ -41,7 +56,7 @@ Use an explicit recipe for a package from a specific Git repository:
 ```
 
 Configure packages in a suitable file under `plugins/` with `my-use-package!`.
-Files are loaded automatically in filename order.  This macro always sets
+Files are loaded automatically in filename order. This macro always sets
 `:straight nil`, so package configuration cannot install packages:
 
 ```elisp
@@ -63,7 +78,7 @@ configuration uses these language servers:
 - Swift: Xcode's `sourcekit-lsp` through `lsp-sourcekit`
 
 Install those executables with the system package manager so they are on
-`PATH`.  On macOS with Homebrew, `jdtls` and `pyright` can be installed with:
+`PATH`. On macOS with Homebrew, `jdtls` and `pyright` can be installed with:
 
 ```sh
 brew install jdtls pyright
@@ -79,13 +94,13 @@ and mode mappings in `config.el`; add LSP clients in `plugins/lsp.el` when the
 language should start LSP automatically.
 
 Typst support uses the `tinymist` language server and a compiled Tree-sitter
-grammar.  The custom translation package uses the `trans` executable from
+grammar. The custom translation package uses the `trans` executable from
 translate-shell.
 
 Swift support requires Xcode or a Swift toolchain containing `sourcekit-lsp`.
 Optional format-on-save support uses SwiftFormat (`brew install swiftformat`).
 
-Nerd Icons is declared in `packages.el`.  Run `M-x nerd-icons-install-fonts`
+Nerd Icons is declared in `packages.el`. Run `M-x nerd-icons-install-fonts`
 once to install its symbol font.
 
 ## Key bindings

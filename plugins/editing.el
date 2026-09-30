@@ -37,5 +37,13 @@
 (my-use-package! translate
   :commands (translate-trans translate-argo))
 
+(my-use-package! diff-hl
+  :hook ((prog-mode . diff-hl-mode)
+         (text-mode . diff-hl-mode))
+  :config
+  (global-diff-hl-mode)
+  (diff-hl-flydiff-mode)
+  )
+
 (provide 'my-plugins-editing)
 ;;; editing.el ends here

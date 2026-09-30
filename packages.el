@@ -102,6 +102,7 @@
 (package! pdf-tools)
 (package! projectile)
 (package! perspective)
+(package! diff-hl)
 
 ;;;; AI
 
