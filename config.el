@@ -1,7 +1,7 @@
 ;;; config.el --- Native Emacs configuration -*- lexical-binding: t; -*-
 
 ;;;; Defaults
-
+(setq native-comp-async-report-warnings-errors 'silent)
 (setq inhibit-startup-screen t
       inhibit-startup-message t
       initial-scratch-message nil
