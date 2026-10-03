@@ -56,7 +56,7 @@
  ("swift-mode" . "610b2c24433c11c30a39a6799af69b10cd3bec97")
  ("swift-ts-mode" . "17806f6f56f09c86c5e70af239bea4313aaaf0b8")
  ("transient" . "9ba468bcbc7f6061c02a5319ff961f3e5ba6fa13")
- ("translate.el" . "467d3d7dbe58d0f91822e069e7a4ee28446ac5c8")
+ ("translate.el" . "364320c9b958e5df013f9bb4400cf35f213d329d")
  ("treemacs" . "2ab5a3c89fa01bbbd99de9b8986908b2bc5a7b49")
  ("typst-ts-mode" . "155bb36cff3afe701a0f6b57bd3fe5c9effaa314")
  ("use-package" . "4b3484b550431f74ab9cda060a8dc983fe482131")
