@@ -35,7 +35,14 @@
   (pyim-tsinghua-dict-enable))
 
 (my-use-package! translate
-  :commands (translate-trans translate-argo))
+  :commands (translate-trans translate-argo translate-volcengine translate-volcengine-ark)
+  :init
+  (setq translate-volcengine-api-key
+        (or (getenv "VOLCENGINE_TRANSLATE_API_KEY")
+            (getenv "VOLCENGINE_API_KEY")))
+  (setq translate-volcengine-ark-api-key
+        (or (getenv "ARK_API_KEY")
+            (getenv "VOLCENGINE_ARK_API_KEY"))))
 
 (my-use-package! diff-hl
   :hook ((prog-mode . diff-hl-mode)
