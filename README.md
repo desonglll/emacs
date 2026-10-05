@@ -67,8 +67,8 @@ Files are loaded automatically in filename order. This macro always sets
 Run `M-x straight-freeze-versions` after changing packages to update the
 reproducible lockfile.
 
-LSP starts automatically for Rust, C, C++, Java, Python, Go, and Swift. The
-configuration uses these language servers:
+LSP starts automatically for Rust, C, C++, Java, Python, Go, Swift, Typst,
+JavaScript, TypeScript, and TSX. The configuration uses these language servers:
 
 - Rust: `rust-analyzer`
 - C and C++: `clangd`
@@ -76,12 +76,61 @@ configuration uses these language servers:
 - Python: `pyright` through `lsp-pyright`
 - Go: `gopls`
 - Swift: Xcode's `sourcekit-lsp` through `lsp-sourcekit`
+- Typst: `tinymist`
+- JavaScript, TypeScript, and TSX: `typescript-language-server` through
+  `lsp-javascript`
 
 Install those executables with the system package manager so they are on
-`PATH`. On macOS with Homebrew, `jdtls` and `pyright` can be installed with:
+`PATH`. On Arch Linux:
 
 ```sh
-brew install jdtls pyright
+sudo pacman -S clang gopls jdtls pyright rust-analyzer tinymist \
+  typescript typescript-language-server
+```
+
+When `jdtls` is available on `PATH`, this configuration reuses the
+system-managed installation and disables `lsp-java`'s server downloader for that
+client. This avoids the slow Eclipse download used by `M-x lsp-java-update-server`.
+On macOS with Homebrew, install the language servers you use with:
+
+```sh
+brew install jdtls pyright rust-analyzer typescript-language-server
+```
+
+Use explicit LSP command settings when the language server should always come
+from `PATH`:
+
+```elisp
+(with-eval-after-load 'lsp-java
+  (setq lsp-java-jdt-ls-prefer-native-command t
+        lsp-java-jdt-ls-command "jdtls"))
+
+(with-eval-after-load 'lsp-go
+  (setq lsp-go-gopls-prefer-native-command t
+        lsp-go-gopls-command "gopls"))
+
+(with-eval-after-load 'lsp-rust
+  (setq lsp-rust-server 'rust-analyzer
+        lsp-rust-analyzer-server-command '("rust-analyzer")))
+
+(with-eval-after-load 'lsp-javascript
+  (setq lsp-clients-typescript-tls-path "typescript-language-server"
+        lsp-clients-typescript-server-args '("--stdio")
+        lsp-clients-typescript-prefer-use-project-ts-server t))
+```
+
+Rust does not have a `prefer-native-command` setting; `lsp-rust` already uses
+`rust-analyzer` by default, and `lsp-rust-analyzer-server-command` is the command
+override. TypeScript and JavaScript use the `lsp-javascript` client and
+`typescript-language-server`. They start automatically through these
+`my-lsp-language-clients` entries in `plugins/lsp.el`:
+
+```elisp
+(js-mode . lsp-javascript)
+(js-ts-mode . lsp-javascript)
+(typescript-mode . lsp-javascript)
+(typescript-ts-mode . lsp-javascript)
+(tsx-ts-mode . lsp-javascript)
 ```
 
 Run `M-x my-install-language-grammars` once to install the pinned grammars for
@@ -92,6 +141,15 @@ revisions use ABI 14, matching this Emacs build. Until the required grammars are
 available, existing major-mode associations stay unchanged. Add grammar sources
 and mode mappings in `config.el`; add LSP clients in `plugins/lsp.el` when the
 language should start LSP automatically.
+
+Current common-language coverage is good for Rust, C, C++, Java, Python, Go,
+Swift, Typst, JavaScript, TypeScript, and TSX: these have Tree-sitter modes plus
+automatic LSP, and most also have formatter integration through `format-all`.
+Bash, JSON, CSS, HTML, YAML, TOML, Dockerfile, CMake, Lua, Ruby, PHP, Elixir,
+HEEx, C#, and protobuf have syntax support through Tree-sitter or a dedicated
+major mode, but they do not currently start an LSP server automatically. Add the
+appropriate language server package and hook in `plugins/lsp.el` when one of
+those languages needs completion, diagnostics, and project-aware navigation.
 
 Typst support uses the `tinymist` language server and a compiled Tree-sitter
 grammar. The custom translation package uses the `trans` executable from

@@ -32,7 +32,12 @@
     (rust-mode . lsp-rust)
     (rust-ts-mode . lsp-rust)
     (swift-mode . lsp-sourcekit)
-    (swift-ts-mode . lsp-sourcekit))
+    (swift-ts-mode . lsp-sourcekit)
+    (js-mode . lsp-javascript)
+    (js-ts-mode . lsp-javascript)
+    (typescript-ts-mode . lsp-javascript)
+    (typescript-mode . lsp-javascript)
+    (tsx-ts-mode . lsp-javascript))
   "Major modes with automatic LSP and any external client feature.")
 
 (defconst my-lsp-native-flymake-backends
