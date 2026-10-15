@@ -20,10 +20,6 @@
         ("C-c E a" . envrc-allow)
         ("C-c E d" . envrc-deny)))
 
-(my-use-package! eat
-  :bind
-  ("C-c t t" . eat))
-
 (my-use-package! verb
   :after org
   :demand t

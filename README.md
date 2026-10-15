@@ -27,6 +27,9 @@ then config the dired to use GNU gls.
 - `straight-versions.el`: reproducible straight.el package revisions.
 - `config.el`: native Emacs behavior, state, macOS, fonts, and Tree-sitter.
 - `modules/buffer-performance.el`: shared size limit for automatic editing extras.
+- `modules/frame-title.el`: concise window titles with cached project labels.
+- `plugins/terminal.el`: project-scoped Eat sessions and bottom-panel behavior.
+- `plugins/dired.el`: asynchronous Git status for Dired and Dirvish.
 - `modules/rc.el`: personal interactive commands.
 - `modules/keymaps.el`: global key bindings.
 - `local.el`: optional machine-specific settings; ignored by Git.
@@ -103,6 +106,18 @@ lighter charcoal modeline and an accent bar; other windows use a darker
 background and softer, regular-weight text. Filename backgrounds blend into
 the surrounding modeline.
 
+Treemacs, Dirvish, Dired, and Imenu List share muted directory colors and a
+consistent selection background. Treemacs and Imenu List use 32-column
+sidebars; Treemacs follows the current file after a short idle delay. Search
+highlights distinguish the active match in amber from other matches in a
+subtle background. Selection, matching parentheses, and Flymake diagnostics
+use the same palette. ANSI and Eat's standard 16 terminal colors are also
+coordinated; programs that emit explicit RGB colors retain their own colors.
+
+Window titles show a filename or a short sidebar label followed by the project
+name, such as `init.el · emacs` or `Terminal · emacs`. Project labels are cached
+when entering a buffer, so redisplay does not run project detection.
+
 Indent Bars adds faint guides in programming buffers with a stronger current
 indent level. macOS uses character bars for compatibility with Emacs 30's NS
 build (see the [upstream compatibility notes](https://github.com/jdtsmith/indent-bars#compatibility));
@@ -174,6 +189,20 @@ emacs -Q --batch \
 
 ## Editing and help
 
+Dired and Dirvish show Git changes in the left gutter: green for added or
+untracked files, blue-gray for modified files, and red on directories containing
+deleted files. Directories aggregate changes in their descendants; mixed
+changes use blue-gray. Ignored and unchanged files have no marker. The colors
+come from the same palette as the in-file Diff-Hl gutter. Dirvish reserves an
+8 px left fringe so the markers fit.
+
+Status refreshes asynchronously after saving a file, returning to a directory
+window, or pressing `g` to refresh the listing. External changes are picked up
+when returning or refreshing; there is no polling timer or per-file Git log
+lookup. Remote directories skip these scans. Focused checks are in
+`tests/dired-tests.el` and include nested folders, staged/untracked/ignored
+files, save/commit refreshes, and Dirvish rendering.
+
 Emacs 30's built-in Which-Key shows available keys after a prefix such as
 `C-c p` or `C-c l`. Winner restores window layouts with `C-c <left>` and
 `C-c <right>`; Repeat mode lets supported commands repeat with a single key.
@@ -205,10 +234,68 @@ forward / backward, and `C-c t o` lists the current buffer's markers.
 
 ## Terminal, HTTP requests, and project environments
 
-Open an Eat terminal with `C-c t t` or `M-x eat`. Use `C-u C-c t t` to
-create another terminal. `C-c C-e` switches to Emacs navigation and
-selection, and `C-c C-j` resumes terminal input. Eat buffers hide line
-numbers. The package recipe includes its terminfo and shell integration files.
+`C-c t t` toggles an Eat panel along the bottom, using about 30% of the frame
+height. The panel reuses the most recent terminal for the current project,
+starting in its root directory; outside a project it uses the current
+directory. Sessions are identified by the full root path, so projects with
+the same name remain separate. Hiding the panel preserves the shell and any
+running jobs and returns focus to the editor. Switching projects can replace
+the visible panel while keeping the previous project's session running.
+
+Use `C-u C-c t t` to create another session for the current project.
+`M-x eat` retains Eat's ordinary full-window command. `C-c C-e` switches
+to Emacs navigation and selection; `C-c C-j` resumes terminal input.
+The panel toggle works in both of these modes. In raw char mode, use
+`M-RET` to return to semi-char mode first. Terminal buffers have no line
+numbers, extra line spacing, current-line overlay, or automatic Company popup.
+
+Select output with the mouse, then use `M-w` or `s-c` (Command-C) to copy.
+These bindings work in semi-char mode as well as Emacs mode; copied Chinese
+text is stripped of Eat's invisible grid padding. For keyboard selection,
+enter Emacs mode with `C-c C-e`, select and copy, then use `C-c C-j` to resume
+terminal input. `C-y` or Command-V pastes in semi-char mode; `C-c C-c` sends
+the terminal interrupt. `C-l` goes to the shell for normal clear/redraw.
+
+On macOS, the first Eat load compiles `eat.ti` with `/usr/bin/tic` into
+`var/eat-terminfo/` and supplies that directory through `TERMINFO` to new
+shells. The bundled 32-bit entries are incompatible with Apple's older
+ncurses: they caused `eat-truecolor: unknown terminal type`, broken clear/
+redraw, and extra `?` characters around the zsh prompt's `➜` / `✗` symbols.
+The native entries preserve Eat's terminal capabilities and fix the prompt
+without changing fonts. They are rebuilt only if missing or older than the
+source; package files remain untouched. Restart Emacs and start a new Eat
+session to apply this to the shell environment.
+
+The package recipe includes its terminfo and shell integration files. For
+directory tracking, command status markers, and prompt navigation, add this
+guarded snippet to the end of `~/.zshrc` (already installed on this Mac):
+
+```sh
+if [[ -n "${EAT_SHELL_INTEGRATION_DIR:-}" && -r "$EAT_SHELL_INTEGRATION_DIR/zsh" ]]; then
+  source "$EAT_SHELL_INTEGRATION_DIR/zsh"
+fi
+```
+
+It is active only inside Eat; start a new terminal session after adding it.
+`C-c C-p` and `C-c C-n` move between shell prompts. After `cd`, file-opening
+commands in the terminal buffer use the shell's updated directory. The
+terminal's project identity stays unchanged, so it can still be found by
+the panel shortcut. The prior local zsh configuration was backed up under
+`var/backups/zshrc-before-eat-*` before appending the integration block.
+
+Verified on 2026-10-15 with isolated Emacs 30.2 processes: panel sizing and
+focus restoration, live-process reuse after hiding, same-name project
+isolation, extra sessions, directory tracking, and command exit status.
+The follow-up checks also cover Unicode copying without sending shell input,
+all four native terminfo entries, the cache, `/usr/bin/clear`, and actual
+`C-l` input with `TERM=eat-truecolor`. A separate real-zsh comparison reproduced
+the `?➜` / `?✗` prompt with the bundled entries and clean symbols with native
+entries.
+An additional check started the actual configured zsh and confirmed automatic
+shell integration with Treemacs and the terminal panel visible together.
+Run the focused checks with the startup command above, replacing its test
+file with `tests/terminal-tests.el`. Graphical appearance still needs visual
+confirmation in the normal Emacs window.
 
 Verb uses Org files for HTTP requests. For example, save this in an `.org`
 file and put point in the request before pressing `C-c C-r C-r`:
@@ -349,7 +436,8 @@ once to install its symbol font.
 - `C-=` / `C-M-=`: expand / contract the selection.
 - `C-x u`: visual undo history.
 - `C-c e`: toggle simultaneous editing with Iedit.
-- `C-c t t`: open an Eat terminal.
+- `C-c t t`: show / hide the current project's terminal panel.
+- `C-u C-c t t`: create another project terminal session.
 - `C-c t n` / `C-c t p` / `C-c t o`: next / previous / list TODO markers.
 - `C-c E a` / `C-c E r` / `C-c E d`: allow / reload / deny a project environment.
 - `C-c C-r C-r`: send the HTTP request at point in an Org buffer.

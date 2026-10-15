@@ -18,8 +18,14 @@
     (cool . "#9ca9b6")
     (accent . "#c4b68d")
     (danger . "#d28b82")
-    (success . "#95a99f"))
+    (success . "#95a99f")
+    (magenta . "#b19aac")
+    (cyan . "#94b4b0"))
   "Shared interface colors complementing Gruber Darker.")
+
+(defface my-sidebar-selection '((t (:inherit hl-line)))
+  "Shared selection face for directory and outline sidebars."
+  :group 'faces)
 
 ;; User theme specs also apply to faces defined by deferred packages.
 (let-alist my-ui-palette
@@ -30,6 +36,21 @@
    `(line-number-current-line
      ((t (:background ,.background :foreground ,.muted :weight normal))))
    `(hl-line ((t (:background ,.surface))))
+   `(region ((t (:background ,.selection :foreground unspecified :extend t))))
+   `(match ((t (:background ,.selection :foreground ,.accent :weight bold))))
+   `(isearch ((t (:background ,.accent :foreground ,.background :weight bold))))
+   `(lazy-highlight ((t (:background ,.selection :foreground ,.foreground))))
+   `(isearch-fail ((t (:background ,.danger :foreground ,.background))))
+   `(show-paren-match
+     ((t (:background ,.selection :foreground ,.accent :weight bold))))
+   `(show-paren-mismatch
+     ((t (:background ,.selection :foreground ,.danger :weight bold))))
+   `(flymake-error ((t (:underline (:style wave :color ,.danger)))))
+   `(flymake-warning ((t (:underline (:style wave :color ,.accent)))))
+   `(flymake-note ((t (:underline (:style wave :color ,.cool)))))
+   `(flymake-error-echo ((t (:foreground ,.danger))))
+   `(flymake-warning-echo ((t (:foreground ,.accent))))
+   `(flymake-note-echo ((t (:foreground ,.cool))))
    `(vertical-border ((t (:foreground ,.border))))
    `(window-divider ((t (:foreground ,.border))))
    `(window-divider-first-pixel ((t (:foreground ,.border))))
@@ -68,6 +89,43 @@
    `(company-tooltip-scrollbar-track ((t (:background ,.surface))))
    `(company-tooltip-scrollbar-thumb ((t (:background ,.subtle))))
    `(company-preview-common ((t (:foreground ,.muted))))
+   `(treemacs-window-background-face ((t (:background ,.background))))
+   `(treemacs-hl-line-face ((t (:background ,.selection :extend t))))
+   `(treemacs-root-face
+     ((t (:foreground ,.cool :weight bold :height 1.0 :underline nil))))
+   `(treemacs-directory-face ((t (:foreground ,.cool :weight normal))))
+   `(treemacs-directory-collapsed-face ((t (:foreground ,.muted))))
+   `(treemacs-file-face ((t (:foreground ,.foreground))))
+   `(treemacs-git-unmodified-face ((t (:foreground ,.foreground))))
+   `(treemacs-git-modified-face ((t (:foreground ,.accent))))
+   `(treemacs-git-renamed-face ((t (:foreground ,.cool))))
+   `(treemacs-git-ignored-face ((t (:foreground ,.subtle))))
+   `(treemacs-git-untracked-face ((t (:foreground ,.success))))
+   `(treemacs-git-added-face ((t (:foreground ,.success))))
+   `(treemacs-git-conflict-face ((t (:foreground ,.danger :weight bold))))
+   `(treemacs-fringe-indicator-face ((t (:foreground ,.accent))))
+   `(treemacs-header-button-face ((t (:foreground ,.muted))))
+   `(treemacs-on-success-pulse-face ((t (:background ,.selection :extend t))))
+   `(treemacs-on-failure-pulse-face
+     ((t (:background ,.selection :foreground ,.danger :extend t))))
+   `(dired-directory ((t (:foreground ,.cool :weight normal))))
+   `(dired-symlink ((t (:foreground ,.cyan))))
+   `(dired-marked ((t (:foreground ,.accent :weight bold))))
+   `(dired-flagged ((t (:foreground ,.danger :weight bold))))
+   `(diff-hl-insert ((t (:foreground ,.success :background ,.success))))
+   `(diff-hl-change ((t (:foreground ,.cool :background ,.cool))))
+   `(diff-hl-delete ((t (:foreground ,.danger :background ,.danger))))
+   `(diff-hl-dired-unknown ((t (:inherit diff-hl-dired-insert))))
+   `(dirvish-hl-line ((t (:background ,.selection :extend t))))
+   `(dirvish-hl-line-inactive ((t (:background ,.surface :extend t))))
+   `(dirvish-proc-running ((t (:foreground ,.accent))))
+   `(dirvish-proc-finished ((t (:foreground ,.success))))
+   `(dirvish-proc-failed ((t (:foreground ,.danger))))
+   `(my-sidebar-selection ((t (:background ,.selection :extend t))))
+   `(imenu-list-entry-face ((t (:foreground ,.foreground))))
+   `(eat-shell-prompt-annotation-running ((t (:foreground ,.muted))))
+   `(eat-shell-prompt-annotation-success ((t (:foreground ,.success))))
+   `(eat-shell-prompt-annotation-failure ((t (:foreground ,.danger))))
    `(pulsar-generic ((t (:background ,.selection :extend t))))
    `(org-modern-label ((t (:inherit fixed-pitch :height 0.9 :weight normal))))
    `(org-modern-todo
@@ -76,6 +134,35 @@
      ((t (:background ,.surface :foreground ,.success :inherit org-modern-label))))
    `(org-modern-tag
      ((t (:background ,.surface :foreground ,.muted :inherit org-modern-label))))))
+
+;; Keep the outline hierarchy readable without a different bright color per level.
+(dotimes (depth 4)
+  (custom-theme-set-faces
+   'user
+   `(,(intern (format "imenu-list-entry-face-%d" depth))
+     ((t (:foreground ,(alist-get (if (zerop depth) 'cool 'foreground)
+                                  my-ui-palette)))))
+   `(,(intern (format "imenu-list-entry-subalist-face-%d" depth))
+     ((t (:foreground ,(alist-get 'cool my-ui-palette)
+          :weight bold :underline nil))))))
+
+;; Emacs 28+ Eat inherits ANSI faces; term.el uses the older term-color faces.
+(require 'color)
+(dolist (entry '((black . background) (red . danger) (green . success)
+                 (yellow . accent) (blue . cool) (magenta . magenta)
+                 (cyan . cyan) (white . foreground)))
+  (let* ((name (symbol-name (car entry)))
+         (normal (alist-get (cdr entry) my-ui-palette))
+         (bright (if (eq (car entry) 'black)
+                     (alist-get 'subtle my-ui-palette)
+                   (color-lighten-name normal 12))))
+    (dolist (prefix '("ansi-color-" "term-color-"))
+      (custom-theme-set-faces
+       'user `(,(intern (concat prefix name))
+               ((t (:foreground ,normal :background ,normal))))))
+    (custom-theme-set-faces
+     'user `(,(intern (concat "ansi-color-bright-" name))
+             ((t (:foreground ,bright :background ,bright)))))))
 
 (defconst my-ui-frame-spacing
   '((internal-border-width . 10)

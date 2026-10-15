@@ -1,0 +1,173 @@
+;;; terminal-tests.el --- Project panel regression checks -*- lexical-binding: t; -*-
+
+(require 'ert)
+(require 'cl-lib)
+(require 'eat)
+(require 'project)
+
+(defun my-terminal-test-wait (predicate)
+  "Wait briefly for asynchronous terminal output to satisfy PREDICATE."
+  (let ((deadline (+ (float-time) 5)))
+    (while (and (not (funcall predicate)) (< (float-time) deadline))
+      (accept-process-output nil 0.05))
+    (should (funcall predicate))))
+
+(defmacro my-terminal-test-sandbox (&rest body)
+  "Run BODY with temporary directories and clean up only its new terminals."
+  (declare (indent 0))
+  `(let* ((sandbox (make-temp-file "emacs-terminal-test-" t))
+          (existing-buffers (buffer-list))
+          (eat-shell "/bin/zsh -f")
+          (project-list-file (expand-file-name "projects" sandbox))
+          (project--list nil)
+          (origin (generate-new-buffer "terminal-test-source")))
+     (unwind-protect
+         (save-window-excursion
+           (delete-other-windows)
+           (switch-to-buffer origin)
+           (setq-local default-directory (file-name-as-directory sandbox))
+           ,@body)
+       (dolist (buffer (cl-set-difference (buffer-list) existing-buffers))
+         (when (buffer-live-p buffer)
+           (with-current-buffer buffer
+             (when (derived-mode-p 'eat-mode)
+               (when-let ((process (get-buffer-process buffer)))
+                 (set-process-query-on-exit-flag process nil)
+                 (delete-process process))
+               (kill-buffer buffer)))))
+       (when (buffer-live-p origin) (kill-buffer origin))
+       (delete-directory sandbox t))))
+
+(ert-deftest my-terminal-panel-preserves-process-and-focus ()
+  (my-terminal-test-sandbox
+    (let ((editor-window (selected-window)))
+      (my-terminal-toggle)
+      (let ((terminal (current-buffer))
+            (process (get-buffer-process (current-buffer))))
+        (should (process-live-p process))
+        (should (eq (window-parameter nil 'window-side) 'bottom))
+        (should (< (window-total-height) (* (frame-height) 0.5)))
+        (should-not display-line-numbers)
+        (should-not line-spacing)
+        (should-not global-hl-line-mode)
+        (should-not company-idle-delay)
+        (should (eq (key-binding (kbd "C-c t t")) #'my-terminal-toggle))
+        (eat-emacs-mode)
+        (should (eq (key-binding (kbd "C-c t t")) #'my-terminal-toggle))
+        (eat-semi-char-mode)
+        (my-terminal-toggle)
+        (should (eq (selected-window) editor-window))
+        (should-not (get-buffer-window terminal))
+        (should (process-live-p process))
+        (my-terminal-toggle)
+        (should (eq (current-buffer) terminal))
+        (should (eq (get-buffer-process terminal) process))))))
+
+(ert-deftest my-terminal-isolates-same-named-projects-and-extra-sessions ()
+  (my-terminal-test-sandbox
+    (let ((first (expand-file-name "one/app/" sandbox))
+          (second (expand-file-name "two/app/" sandbox)))
+      (dolist (directory (list first second))
+        (make-directory (concat directory "src") t)
+        (should (zerop (call-process "git" nil nil nil "init" "-q" directory))))
+      (setq-local default-directory (concat first "src/"))
+      (my-terminal-toggle)
+      (let* ((first-buffer (current-buffer))
+             (root my-terminal-project-root)
+             (process (get-buffer-process first-buffer)))
+        (should (equal root (file-truename first)))
+        (my-terminal-toggle t)
+        (should-not (eq (current-buffer) first-buffer))
+        (should (equal my-terminal-project-root root))
+        (should (process-live-p process))
+        (my-terminal-toggle)
+        (setq-local default-directory second)
+        (my-terminal-toggle)
+        (should (equal my-terminal-project-root (file-truename second)))
+        (should-not (eq (current-buffer) first-buffer))
+        (should (process-live-p process))))))
+
+(ert-deftest my-terminal-shell-integration-tracks-directory-and-status ()
+  (my-terminal-test-sandbox
+    (let ((child (expand-file-name "child" sandbox)))
+      (make-directory child)
+      (my-terminal-toggle)
+      (eat-term-send-string
+       eat-terminal
+       "source \"$EAT_SHELL_INTEGRATION_DIR/zsh\"\n")
+      (my-terminal-test-wait (lambda () eat--shell-prompt-mark-overlays))
+      (eat-term-send-string eat-terminal "cd child\n")
+      (my-terminal-test-wait
+       (lambda () (equal (file-truename default-directory)
+                         (file-name-as-directory (file-truename child)))))
+      ;; Changing directory must not change the session's project identity.
+      (should (equal my-terminal-project-root
+                     (file-name-as-directory (file-truename sandbox))))
+      (eat-term-send-string eat-terminal "false\n")
+      (my-terminal-test-wait (lambda () (equal eat--shell-command-status 1)))
+      (should eat--shell-prompt-mark-overlays))))
+
+(ert-deftest my-terminal-copy-keeps-unicode-output-and-shell-input-separate ()
+  (my-terminal-test-sandbox
+    (let ((kill-ring nil)
+          (interprogram-cut-function nil)
+          (select-enable-clipboard nil))
+      (my-terminal-toggle)
+      (eat-term-send-string eat-terminal "printf '\\n复制 ➜ ✗\\n'\n")
+      (my-terminal-test-wait
+       (lambda () (string-match-p "复.*制 ➜ ✗\n" (buffer-string))))
+      (dolist (key '("M-w" "s-c"))
+        (goto-char (point-min))
+        (search-forward "➜ ✗\n")
+        (let ((end (1- (point))))
+          (beginning-of-line 0)
+          (set-mark (point))
+          (goto-char end)
+          (activate-mark)
+          (cl-letf (((symbol-function 'eat-term-send-string)
+                     (lambda (&rest _) (ert-fail "Copy sent terminal input"))))
+            (call-interactively (key-binding (kbd key))))
+          (should (equal (substring-no-properties (car kill-ring)) "复制 ➜ ✗")))))))
+
+(ert-deftest my-terminal-truecolor-clear-and-control-l-work ()
+  (my-terminal-test-sandbox
+    ;; A batch display would otherwise choose eat-mono and miss the GUI bug.
+    (let ((eat-term-name "eat-truecolor"))
+      (my-terminal-toggle)
+      (eat-term-send-string
+       eat-terminal "PROMPT='READY> '; /usr/bin/clear && printf '\\nCLEAR_OK\\n'\n")
+      (my-terminal-test-wait
+       (lambda () (string-match-p "\nCLEAR_OK\nREADY> " (buffer-string))))
+      (should-not (string-match-p "unknown terminal" (buffer-string)))
+      (should (eq (key-binding (kbd "C-l")) #'eat-self-input))
+      (let ((last-command-event ?\C-l))
+        (call-interactively (key-binding (kbd "C-l"))))
+      (my-terminal-test-wait
+       (lambda ()
+         (let ((screen (buffer-substring-no-properties
+                        (eat-term-display-beginning eat-terminal) (point-max))))
+           (and (string-prefix-p "READY> " screen)
+                (not (string-match-p "CLEAR_OK" screen)))))))))
+
+(ert-deftest my-terminal-native-terminfo-is-readable-and-cached ()
+  (skip-unless (eq system-type 'darwin))
+  (dolist (term '("eat-mono" "eat-color" "eat-256color" "eat-truecolor"))
+    (should (zerop (call-process "/usr/bin/infocmp" nil nil nil
+                                "-A" eat-term-terminfo-directory term))))
+  (cl-letf (((symbol-function 'call-process)
+             (lambda (&rest _) (ert-fail "Unnecessary terminfo rebuild"))))
+    (my-terminal-prepare-terminfo)))
+
+(ert-deftest my-frame-title-does-not-query-projects-on-redisplay ()
+  (let ((buffer (generate-new-buffer "*Treemacs-Buffer-#frame private-details*")))
+    (unwind-protect
+        (save-window-excursion
+          (switch-to-buffer buffer)
+          (setq major-mode 'treemacs-mode
+                my-ui-title-project "demo")
+          (cl-letf (((symbol-function 'project-current)
+                     (lambda (&rest _) (error "Project lookup during redisplay"))))
+            (should (equal (my-ui-frame-title) "Files · demo"))))
+      (kill-buffer buffer))))
+
+;;; terminal-tests.el ends here

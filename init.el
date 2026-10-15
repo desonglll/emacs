@@ -39,7 +39,7 @@
   (when (file-regular-p plugin-file)
     (load plugin-file nil 'nomessage)))
 
-(dolist (module '("rc.el" "keymaps.el"))
+(dolist (module '("frame-title.el" "rc.el" "keymaps.el"))
   (load (expand-file-name module my-modules-directory) nil 'nomessage))
 
 ;; Put personal, machine-specific settings in local.el.  It is gitignored.

@@ -24,9 +24,7 @@
 
 ;;;; Interface
 
-(setq frame-title-format '("%b - GNU Emacs on Mike Shinoda")
-      icon-title-format frame-title-format
-      visible-bell nil
+(setq visible-bell nil
       cursor-in-non-selected-windows nil)
 
 (column-number-mode 1)
