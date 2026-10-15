@@ -67,6 +67,23 @@ Files are loaded automatically in filename order. This macro always sets
 Run `M-x straight-freeze-versions` after changing packages to update the
 reproducible lockfile.
 
+## Completion
+
+Vertico displays minibuffer candidates and Orderless matches space-separated
+search terms. Prescient learns recent and frequent selections to sort Vertico
+and Company candidates. Selectrum and selectrum-prescient are not used.
+
+Restart Emacs after changing the configuration. Use `M-x` as usual, and use
+`M-TAB` or `M-x company-complete` to trigger in-buffer completion manually.
+Company also offers automatic completion after two characters. Use
+`M-x prescient-forget` to forget an individual candidate.
+
+Prescient saves its history to `prescient-save.el` under `my-state-directory`.
+Orderless remains responsible for matching, Company does not apply an extra
+length-based sort, and `my-recentf` retains its most-recently-used ordering.
+
+## Language support
+
 LSP starts automatically for Rust, C, C++, Java, Python, Go, and Swift. The
 configuration uses these language servers:
 

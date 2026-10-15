@@ -65,6 +65,9 @@
 ;; (package! corfu)
 (package! company)
 (package! cape)
+(package! prescient)
+(package! company-prescient)
+(package! vertico-prescient)
 
 ;;;; Editing
 

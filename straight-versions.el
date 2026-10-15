@@ -46,6 +46,7 @@
  ("orderless" . "0ffd9d6903714c1f6d8fcbb6a20941fb33dd7ae5")
  ("pfuture" . "19b53aebbc0f2da31de6326c495038901bffb73c")
  ("posframe" . "74c8c56131ed866db47ae4191364b72dd4852456")
+ ("prescient.el" . "ae52777d6b6b856b54c85441c7a713949f1720de")
  ("pyim" . "a56c8d992c872addcfc295c409a7bae70d00af87")
  ("pyim-basedict" . "55d9b324831b0fc79ff62f1c6f21aad72341a114")
  ("rust-mode" . "0058837c048cc031ca1a13f598a6a6604777458b")

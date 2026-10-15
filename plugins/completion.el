@@ -1,5 +1,15 @@
 ;;; completion.el --- Completion package configuration -*- lexical-binding: t; -*-
 
+;;;; Completion history
+
+(my-use-package! prescient
+  :demand t
+  :custom
+  (prescient-save-file
+   (expand-file-name "prescient-save.el" my-state-directory))
+  :config
+  (prescient-persist-mode 1))
+
 ;;;; Minibuffer
 
 (defun my-recentf ()
@@ -26,6 +36,16 @@
   (completion-category-defaults nil)
   (completion-category-overrides
    '((file (styles partial-completion)))))
+
+(my-use-package! vertico-prescient
+  :after vertico
+  :demand t
+  :custom
+  ;; Keep Orderless matching; learn only the candidate order.
+  (vertico-prescient-enable-filtering nil)
+  (vertico-prescient-enable-sorting t)
+  :config
+  (vertico-prescient-mode 1))
 
 (my-use-package! marginalia
   :init
@@ -88,6 +108,15 @@
                         :background "#005f87"
                         :foreground "white"
                         :weight 'bold)))
+
+(my-use-package! company-prescient
+  :after company
+  :demand t
+  :custom
+  ;; Keep the backend's order for candidates without usage history.
+  (company-prescient-sort-length-enable nil)
+  :config
+  (company-prescient-mode 1))
 
 (my-use-package! cape
   :bind
