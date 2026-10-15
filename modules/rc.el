@@ -116,13 +116,11 @@ should start searching."
           (file-name-as-directory dir))
     (message "Directory: %s" default-directory)))
 
-(defun my/toggle-auto-completion()
+(defun my/toggle-auto-completion ()
+  "Toggle automatic completion using the configured idle delay."
   (interactive)
-  (if company-idle-delay
-      (setq company-idle-delay nil)
-    (setq company-idle-delay 0.01)
-    )
-  )
+  (setq company-idle-delay
+        (unless company-idle-delay my-company-idle-delay)))
 
 (defvar my/proxy-default "http://127.0.0.1:7897"
   "Default proxy URL used by `my/proxy-on'.")

@@ -79,7 +79,17 @@
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
+(my-use-package! wgrep
+  :after grep
+  :demand t
+  :custom
+  ;; Review the edited file buffers before saving them.
+  (wgrep-auto-save-buffer nil))
+
 ;;;; In-buffer
+
+(defvar my-company-idle-delay 0.15
+  "Idle delay used when automatic Company completion is enabled.")
 
 ;; (my-use-package! corfu
 ;;   :custom
@@ -99,15 +109,10 @@
   :bind
   (("M-<tab>" . #'company-complete))
   :config
-  (setq company-idle-delay 0.01
+  (setq company-idle-delay my-company-idle-delay
         company-minimum-prefix-length 2
         company-selection-wrap-around t
-        company-tooltip-limit 12)
-  (with-eval-after-load 'company
-    (set-face-attribute 'company-tooltip-selection nil
-                        :background "#005f87"
-                        :foreground "white"
-                        :weight 'bold)))
+        company-tooltip-limit 12))
 
 (my-use-package! company-prescient
   :after company
@@ -121,8 +126,8 @@
 (my-use-package! cape
   :bind
   (("M-/" . cape-dabbrev)
-   ("C-c p f" . cape-file)
-   ("C-c p k" . cape-keyword))
+   ("C-c c f" . cape-file)
+   ("C-c c k" . cape-keyword))
   :init
   (add-hook 'completion-at-point-functions #'cape-dabbrev 90)
   (add-hook 'completion-at-point-functions #'cape-file 100))

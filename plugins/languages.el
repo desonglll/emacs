@@ -27,9 +27,10 @@
 
 (defun my-typst-start-lsp ()
   "Start Tinymist for the current Typst buffer when it is installed."
-  (if (executable-find "tinymist")
-      (lsp-deferred)
-    (message "Tinymist is not installed; skipping Typst LSP")))
+  (unless (my-large-buffer-p)
+    (if (executable-find "tinymist")
+        (lsp-deferred)
+      (message "Tinymist is not installed; skipping Typst LSP"))))
 
 (my-use-package! typst-ts-mode
   :mode ("\\.typ\\'" . typst-ts-mode)

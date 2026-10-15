@@ -26,6 +26,7 @@ then config the dired to use GNU gls.
   feature with complex packages in dedicated files.
 - `straight-versions.el`: reproducible straight.el package revisions.
 - `config.el`: native Emacs behavior, state, macOS, fonts, and Tree-sitter.
+- `modules/buffer-performance.el`: shared size limit for automatic editing extras.
 - `modules/rc.el`: personal interactive commands.
 - `modules/keymaps.el`: global key bindings.
 - `local.el`: optional machine-specific settings; ignored by Git.
@@ -81,6 +82,161 @@ Company also offers automatic completion after two characters. Use
 Prescient saves its history to `prescient-save.el` under `my-state-directory`.
 Orderless remains responsible for matching, Company does not apply an extra
 length-based sort, and `my-recentf` retains its most-recently-used ordering.
+
+## Appearance
+
+`plugins/appearance.el` keeps the Gruber Darker theme and shared interface
+colors in `my-ui-palette`. Fonts remain Iosevka Term SS15 at 16 pt with Sarasa
+Term SC for Chinese. Frames have 10 px of inner padding, 8 px fringes, and
+subtle 1 px window dividers. Source and text buffers get 0.1 line spacing;
+terminal grids retain their normal spacing.
+
+Company and Vertico share a muted selection color. Nerd Icons adds monochrome
+file and buffer icons to completion alongside Marginalia annotations. The
+Doom Modeline emphasizes the file, cursor position, Git branch, and Flymake
+diagnostic count, while retaining input method and process indicators.
+Branch names have no fixed character limit; narrow windows still use Doom
+Modeline's compact layout.
+Project and branch labels use muted blue-gray, with amber for unsaved/warning
+indicators and muted red for conflicts/errors. The selected window has a
+lighter charcoal modeline and an accent bar; other windows use a darker
+background and softer, regular-weight text. Filename backgrounds blend into
+the surrounding modeline.
+
+Indent Bars adds faint guides in programming buffers with a stronger current
+indent level. macOS uses character bars for compatibility with Emacs 30's NS
+build (see the [upstream compatibility notes](https://github.com/jdtsmith/indent-bars#compatibility));
+other graphical builds use thin stipple bars. Pulsar briefly highlights
+the destination after navigation, including Consult, Imenu, and Xref jumps.
+Org Modern styles headings, lists, checkboxes, TODO labels, tables, and agenda
+entries, using the Org version bundled with Emacs.
+
+Restart Emacs to activate the complete setup. If icons appear as boxes, run
+`M-x nerd-icons-install-fonts` once and restart. To disable an effect temporarily,
+use `M-x indent-bars-mode`, `M-x pulsar-global-mode`, or `M-x org-modern-mode`.
+
+Treemacs (`s-e`) initializes an empty workspace from the current project, or
+the current directory outside a project. This also recovers a blank sidebar
+left by cancelling the initial directory prompt. Existing workspace projects
+and the normal show/hide toggle are preserved; `C-u s-e` selects a workspace.
+In an already-running session, `M-x treemacs-add-and-display-current-project`
+can populate the empty sidebar immediately.
+
+Verified on 2026-10-15 with Emacs 30.2: batch startup, terminal modeline
+rendering, completion icon generation, selection colors after theme reload,
+code/Org hooks, unchanged Org text, terminal spacing isolation, and full branch
+labels with active/inactive modeline styling after switching between split
+windows. The latest colors have not yet been checked in a graphical screenshot.
+
+## Startup and file performance
+
+Straight checks package changes on saves instead of scanning every checkout
+at startup. After editing a package outside Emacs, run `M-x straight-check-all`
+to detect and rebuild modified packages. This tradeoff follows
+[Straight's startup guidance](https://github.com/radian-software/straight.el#my-init-time-got-slower).
+Yasnippet registers its bundled collection before initialization, avoiding a
+second directory scan while retaining just-in-time snippet loading.
+
+Format-All loads and checks formatter executables on the first save, including
+formatting that save. Later saves use its normal hook. Manually disabling
+`format-all-mode` also cancels pending automatic setup. The first save may
+therefore take longer than later saves.
+
+Buffers larger than 2 MiB skip automatic LSP, format-on-save, indentation
+guides, Org Modern, line numbers, TODO highlighting, Git gutter updates, and
+automatic Company popups. Syntax highlighting and manual completion remain
+available. The size check runs before major-mode hooks; adjust
+`my-large-buffer-threshold` in `local.el` to change the limit for newly opened
+buffers. Individual tools such as `lsp`, `format-all-mode`, and
+`indent-bars-mode` can still be started manually.
+
+Company waits 0.15 seconds of idle time; its toggle uses the same setting.
+Diff-Hl waits 0.8 seconds before refreshing while typing, and GPTel
+autocomplete debug logging is disabled. Runtime GC remains at 16 MiB.
+
+On this Mac with Emacs 30.2, three fresh batch processes with warm package
+caches measured a median 1.11 seconds for configuration plus startup hooks,
+0.35 seconds to open the first small Emacs Lisp file, and 0.064 seconds to
+open a subsequent 2.4 MiB Emacs Lisp file. These are configuration/file-open
+measurements, not GUI launch times, and exclude language-server startup.
+
+Focused regression checks cover large-buffer exclusions, normal-buffer
+behavior, snippet availability, completion toggling, and formatting on the
+first and later saves:
+
+```sh
+emacs -Q --batch \
+  --eval '(setq debug-on-error t use-package-expand-minimally t)' \
+  -l early-init.el -l init.el \
+  --eval "(progn (run-hooks 'after-init-hook 'emacs-startup-hook) (straight--transaction-finalize) (setq kill-emacs-hook nil))" \
+  -l tests/buffer-performance-tests.el -f ert-run-tests-batch-and-exit
+```
+
+## Editing and help
+
+Emacs 30's built-in Which-Key shows available keys after a prefix such as
+`C-c p` or `C-c l`. Winner restores window layouts with `C-c <left>` and
+`C-c <right>`; Repeat mode lets supported commands repeat with a single key.
+
+Use `C-=` to expand a selection with Expreg, and `C-M-=` to contract it.
+Expreg uses Tree-sitter when available. `C-x u` opens Vundo's visual undo
+history: use `f`/`b` to move forward/backward, `n`/`p` to switch branches,
+`RET` to keep the selected state, or `q` to return to the original state.
+
+Helpful handles `C-h f`, `C-h v`, `C-h k`, and `C-h x` for functions,
+variables, keys, and commands. The official `yasnippet-snippets` collection
+loads with Yasnippet; use `M-x yas-insert-snippet` to choose a template or
+`M-x yas-describe-tables` to see snippets for the current mode.
+
+To edit search results across files, start `C-c f g` (Consult ripgrep),
+then press `C-. E` to export the results through Embark. In the exported
+buffer, press `C-c C-p` to edit, then `C-c C-e` to apply changes to the file
+buffers. Review and save them with `C-x s`; `C-c C-k` cancels Wgrep editing.
+Wgrep does not save files automatically. For semantic symbol renaming,
+use `M-x lsp-rename` instead.
+
+Use `C-c e` to start Iedit on the symbol at point, or select text first to
+match that text. To limit editing to a block, start Iedit, select the block,
+then press `C-c e` again. Changes to one occurrence are mirrored to the
+others; press `C-c e` with no active region to finish. `C-;` remains bound
+to Embark. TODO and FIXME comments are highlighted in programming and text
+buffers (Org keeps its own TODO highlighting): `C-c t n` / `C-c t p` jump
+forward / backward, and `C-c t o` lists the current buffer's markers.
+
+## Terminal, HTTP requests, and project environments
+
+Open an Eat terminal with `C-c t t` or `M-x eat`. Use `C-u C-c t t` to
+create another terminal. `C-c C-e` switches to Emacs navigation and
+selection, and `C-c C-j` resumes terminal input. Eat buffers hide line
+numbers. The package recipe includes its terminfo and shell integration files.
+
+Verb uses Org files for HTTP requests. For example, save this in an `.org`
+file and put point in the request before pressing `C-c C-r C-r`:
+
+```org
+* Local health check :verb:
+GET http://localhost:8080/health
+Accept: application/json
+```
+
+`C-c C-r C-r` sends the request and displays its response; `C-c C-r C-e`
+exports the request, including to curl. These bindings are local to Org mode.
+
+Envrc loads per-project environments using the external `direnv` executable.
+Install it with `brew install direnv` on macOS or `sudo pacman -S direnv`
+on Arch Linux. In a project, create an `.envrc`, for example:
+
+```sh
+export APP_ENV=development
+PATH_add bin
+```
+
+Review the file, then use `C-c E a` (`envrc-allow`) from a project buffer
+to authorize it. Repeat this after changing `.envrc`. Use `C-c E r` to
+reload the environment, or `C-c E d` to revoke authorization. Environments
+are buffer-local; Envrc starts late during initialization so newly launched
+project tools can use the appropriate environment. Restart an existing LSP
+workspace after changing its toolchain or environment.
 
 ## Language support
 
@@ -180,11 +336,24 @@ once to install its symbol font.
 
 ## Key bindings
 
-- `M-<f1>`: Magit status.
+- `C-x g`: Magit status.
 - `M-<f2>`: Dirvish.
 - `C-:` or `s-\`: Avy jump.
-- `M-#`: find files with Consult and fd.
-- `C-c r`: search text with Consult and ripgrep.
+- `C-c f f`: find files with Consult and fd.
+- `C-c f g`: search text with Consult and ripgrep.
+- `C-c p`: Projectile commands.
+- `C-c w`: Perspective workspace commands.
+- `C-c c f` / `C-c c k`: Cape file / keyword completion.
+- `C-c t w`: toggle whitespace display.
+- `C-c <left>` / `C-c <right>`: restore / redo window layouts.
+- `C-=` / `C-M-=`: expand / contract the selection.
+- `C-x u`: visual undo history.
+- `C-c e`: toggle simultaneous editing with Iedit.
+- `C-c t t`: open an Eat terminal.
+- `C-c t n` / `C-c t p` / `C-c t o`: next / previous / list TODO markers.
+- `C-c E a` / `C-c E r` / `C-c E d`: allow / reload / deny a project environment.
+- `C-c C-r C-r`: send the HTTP request at point in an Org buffer.
+- `C-h f` / `C-h v` / `C-h k` / `C-h x`: enhanced help.
 - `s-i`: Imenu List.
 - `s-e`: Treemacs.
 - `M-o`: Ace Window.

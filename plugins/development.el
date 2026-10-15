@@ -9,6 +9,27 @@
              (or (daemonp) (display-graphic-p)))
     (exec-path-from-shell-initialize)))
 
+(my-use-package! envrc
+  :commands envrc-global-mode
+  :init
+  ;; Initialize after other global modes so project environments load first.
+  (add-hook 'after-init-hook #'envrc-global-mode 90)
+  :bind
+  (:map envrc-mode-map
+        ("C-c E r" . envrc-reload)
+        ("C-c E a" . envrc-allow)
+        ("C-c E d" . envrc-deny)))
+
+(my-use-package! eat
+  :bind
+  ("C-c t t" . eat))
+
+(my-use-package! verb
+  :after org
+  :demand t
+  :config
+  (keymap-set org-mode-map "C-c C-r" verb-command-map))
+
 (my-use-package! magit
   :commands (magit-status magit-dispatch)
   :bind
@@ -45,7 +66,7 @@
           :models '(gpt-6))
         )
   )
-(setq gptel-autocomplete-debug t)
+(setq gptel-autocomplete-debug nil)
 (my-use-package! gptel-autocomplete
   :after gptel
   :bind

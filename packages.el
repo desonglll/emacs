@@ -6,6 +6,10 @@
                                   my-config-directory)))
       straight-recipe-overrides nil)
 
+;; Track package edits on save instead of scanning every checkout at startup.
+;; External edits can be detected with `straight-check-all'.
+(setq straight-check-for-modifications '(check-on-save find-when-checking))
+
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name
@@ -48,11 +52,19 @@
 
 ;;;; User interface
 
+;; Emacs 30's Org satisfies org-modern; keep using the bundled version.
+(package! org :type built-in)
 (package! gruber-darker-theme)
 (package! dirvish)
 (package! imenu-list)
 (package! treemacs)
 (package! nerd-icons)
+(package! nerd-icons-completion)
+(package! doom-modeline)
+(package! indent-bars)
+(package! pulsar)
+(package! org-modern)
+(package! helpful)
 
 ;;;; Completion
 
@@ -62,6 +74,7 @@
 (package! consult)
 (package! embark)
 (package! embark-consult)
+(package! wgrep)
 ;; (package! corfu)
 (package! company)
 (package! cape)
@@ -72,6 +85,11 @@
 ;;;; Editing
 
 (package! yasnippet)
+(package! yasnippet-snippets)
+(package! expreg)
+(package! vundo)
+(package! iedit)
+(package! hl-todo)
 (package! ace-window)
 (package! avy)
 (package! translate
@@ -87,6 +105,16 @@
 ;;;; Development
 
 (package! exec-path-from-shell)
+(package! envrc)
+(package! eat
+  :type git :host codeberg :repo "akib/emacs-eat"
+  :local-repo "eat"
+  :files ("*.el" ("term" "term/*.el") "*.texi" "*.ti"
+          ("terminfo/e" "terminfo/e/*")
+          ("terminfo/65" "terminfo/65/*")
+          ("integration" "integration/*")
+          (:exclude ".dir-locals.el" "*-tests.el")))
+(package! verb)
 (package! magit)
 (package! lsp-mode)
 (package! rust-mode)

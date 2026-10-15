@@ -34,11 +34,17 @@
 (global-hl-line-mode 1)
 (show-paren-mode 1)
 
+(setq which-key-idle-delay 0.5)
+(which-key-mode 1)
+(winner-mode 1)
+(repeat-mode 1)
+
 (defun my-disable-line-numbers ()
   "Disable line numbers in the current non-source buffer."
   (display-line-numbers-mode -1))
 
 (dolist (hook '(eshell-mode-hook
+                eat-mode-hook
                 shell-mode-hook
                 term-mode-hook
                 vterm-mode-hook
@@ -69,7 +75,7 @@
     (delete-trailing-whitespace)))
 
 (add-hook 'before-save-hook #'my-delete-trailing-whitespace)
-(keymap-global-set "C-c w" #'whitespace-mode)
+(keymap-global-set "C-c t w" #'whitespace-mode)
 
 (defun my-go-indent-settings ()
   (setq-local tab-width 8

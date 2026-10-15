@@ -26,14 +26,33 @@
               ((cl-every #'format/formatter-available-p chain)))
     (format-all-mode 1)))
 
+(defun format/cancel-pending-setup ()
+  "Cancel lazy setup, including when the user toggles `format-all-mode'."
+  (remove-hook 'before-save-hook #'format/initialize-on-first-save t))
+
+(defun format/initialize-on-first-save ()
+  "Load the formatter on first save and format that save exactly once."
+  (format/cancel-pending-setup)
+  (unless (my-large-buffer-p)
+    (format/enable-on-save)
+    (when (bound-and-true-p format-all-mode)
+      (format-all--buffer-from-hook))))
+
+(defun format/prepare-on-save ()
+  "Defer formatter loading and executable lookup until the first save."
+  (unless (my-large-buffer-p)
+    (add-hook 'before-save-hook #'format/initialize-on-first-save nil t)))
+
 (my-use-package! format-all
+  :commands format-all-mode
   :diminish format-all-mode
   :bind
   ("C-M-\\" . format-all-region-or-buffer)
   :hook
-  (prog-mode . format/enable-on-save)
-  (text-mode . format/enable-on-save)
+  (prog-mode . format/prepare-on-save)
+  (text-mode . format/prepare-on-save)
   :init
+  (add-hook 'format-all-mode-hook #'format/cancel-pending-setup)
   (add-to-list 'auto-mode-alist '("\\.jsonc\\'" . js-json-mode))
   (with-eval-after-load 'language-id
     (format/register-mode "JSON" 'js-json-mode)

@@ -31,6 +31,7 @@
 
 ;; Install packages before loading native and third-party configuration.
 (load (expand-file-name "packages.el" my-config-directory) nil 'nomessage)
+(load (expand-file-name "buffer-performance.el" my-modules-directory) nil 'nomessage)
 (load (expand-file-name "config.el" my-config-directory) nil 'nomessage)
 
 (dolist (plugin-file

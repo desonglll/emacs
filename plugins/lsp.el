@@ -48,7 +48,8 @@
 
 (defun my-start-language-lsp ()
   "Start the configured language server for the current major mode."
-  (when-let ((client (assq major-mode my-lsp-language-clients)))
+  (when-let* (((not (my-large-buffer-p)))
+              (client (assq major-mode my-lsp-language-clients)))
     (require 'lsp-mode)
     (when-let ((backend
                 (alist-get major-mode my-lsp-native-flymake-backends)))
