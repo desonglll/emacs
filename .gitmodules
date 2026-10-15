@@ -1,0 +1,3 @@
+[submodule "plugins/translate.el"]
+	path = plugins/translate.el
+	url = git@github.com:desonglll/translate.el

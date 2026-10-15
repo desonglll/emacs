@@ -1,7 +1,7 @@
 ;;; config.el --- Native Emacs configuration -*- lexical-binding: t; -*-
 
 ;;;; Defaults
-
+(setq native-comp-async-report-warnings-errors 'silent)
 (setq inhibit-startup-screen t
       inhibit-startup-message t
       initial-scratch-message nil
@@ -46,7 +46,7 @@
                 special-mode-hook))
   (add-hook hook #'my-disable-line-numbers))
 
-(setq insert-directory-program "gls")
+(setq insert-directory-program (if (eq system-type 'darwin) "gls" "ls"))
 (setq dired-use-ls-dired t)
 
 ;;;; Editing
@@ -296,6 +296,23 @@
                     (mapconcat #'symbol-name
                                (nreverse failed-languages) ", "))
       (message "Configured Tree-sitter grammars are installed"))))
+
+(with-eval-after-load 'lsp-java
+  (setq lsp-java-jdt-ls-prefer-native-command t
+        lsp-java-jdt-ls-command "jdtls"))
+
+(with-eval-after-load 'lsp-go
+  (setq lsp-go-gopls-prefer-native-command t
+        lsp-go-gopls-command "gopls"))
+
+(with-eval-after-load 'lsp-javascript
+  (setq lsp-clients-typescript-tls-path "typescript-language-server"
+        lsp-clients-typescript-server-args '("--stdio")
+        lsp-clients-typescript-prefer-use-project-ts-server t))
+
+(with-eval-after-load 'lsp-rust
+  (setq lsp-rust-server 'rust-analyzer
+        lsp-rust-analyzer-server-command '("rust-analyzer")))
 
 (my-refresh-treesit-mode-remaps)
 

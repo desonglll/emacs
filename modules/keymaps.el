@@ -1,4 +1,3 @@
-
 ;;; keymaps.el --- keymap configuration -*- lexical-binding: t; -*-
 
 ;;;; Global key bindings

@@ -124,6 +124,65 @@ should start searching."
     )
   )
 
+(defvar my/proxy-default "http://127.0.0.1:7897"
+  "Default proxy URL used by `my/proxy-on'.")
+
+(defvar my/proxy-enabled nil
+  "Non-nil when `my/proxy-on' has enabled proxy settings.")
+
+(defun my/proxy--url (proxy)
+  "Return PROXY as a URL string."
+  (let ((proxy (or proxy my/proxy-default)))
+    (if (string-match-p "\\`[[:alpha:]][[:alnum:]+.-]*://" proxy)
+        proxy
+      (concat "http://" proxy))))
+
+(defun my/proxy--hostport (proxy)
+  "Return PROXY without its URL scheme."
+  (replace-regexp-in-string
+   "/\\'" ""
+   (replace-regexp-in-string
+    "\\`[[:alpha:]][[:alnum:]+.-]*://" ""
+    (my/proxy--url proxy))))
+
+(defun my/proxy-on (&optional proxy)
+  "Enable Emacs and subprocess proxy settings.
+
+When called interactively, use `my/proxy-default' if the prompt is
+left empty."
+  (interactive
+   (list
+    (let ((input (read-string
+                  (format "Proxy URL [%s]: " my/proxy-default))))
+      (unless (string-empty-p input) input))))
+  (let ((proxy-url (my/proxy--url proxy))
+        (proxy-hostport (my/proxy--hostport proxy)))
+    (setq url-proxy-services
+          `(("http" . ,proxy-hostport)
+            ("https" . ,proxy-hostport)))
+    (setenv "http_proxy" proxy-url)
+    (setenv "https_proxy" proxy-url)
+    (setenv "all_proxy" proxy-url)
+    (setq my/proxy-enabled t)
+    (message "Proxy enabled: %s" proxy-url)))
+
+(defun my/proxy-off ()
+  "Disable Emacs and subprocess proxy settings."
+  (interactive)
+  (setq url-proxy-services nil)
+  (dolist (variable '("http_proxy" "https_proxy" "all_proxy"
+                      "HTTP_PROXY" "HTTPS_PROXY" "ALL_PROXY"))
+    (setenv variable nil))
+  (setq my/proxy-enabled nil)
+  (message "Proxy disabled"))
+
+(defun my/proxy-toggle ()
+  "Toggle Emacs proxy settings."
+  (interactive)
+  (if my/proxy-enabled
+      (my/proxy-off)
+    (my/proxy-on)))
+
 (defun my/user-buffer-p (buffer)
   (with-current-buffer buffer
     (and
