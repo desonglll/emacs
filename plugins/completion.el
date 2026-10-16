@@ -1,5 +1,7 @@
 ;;; completion.el --- Completion package configuration -*- lexical-binding: t; -*-
 
+(require 'cl-lib)
+
 ;;;; Completion history
 
 (my-use-package! prescient
@@ -47,8 +49,27 @@
   :config
   (vertico-prescient-mode 1))
 
+(defun my-marginalia-affixate-with-window (original &rest args)
+  "Keep ORIGINAL annotation working when its buffer has no visible window."
+  (if (get-buffer-window-list)
+      (apply original args)
+    (let ((buffer (current-buffer))
+          (windows (or (get-buffer-window-list nil nil t)
+                       (list (or (active-minibuffer-window) (selected-window)))))
+          (get-windows (symbol-function 'get-buffer-window-list)))
+      ;; Marginalia divides the minimum window width by two.  An empty list
+      ;; produces nil; supply a window only for its current-buffer query.
+      (cl-letf (((symbol-function 'get-buffer-window-list)
+                 (lambda (&rest window-args)
+                   (if (and (null window-args) (eq (current-buffer) buffer))
+                       windows
+                     (apply get-windows window-args)))))
+        (apply original args)))))
+
 (my-use-package! marginalia
-  :init
+  :demand t
+  :config
+  (advice-add 'marginalia--affixate :around #'my-marginalia-affixate-with-window)
   (marginalia-mode 1))
 
 (my-use-package! consult
@@ -56,8 +77,13 @@
   (("C-s" . consult-line)
    ("C-x b" . consult-buffer)
    ("M-y" . consult-yank-pop)
+   ("M-g e" . consult-compile-error)
+   ("M-g f" . consult-flymake)
    ("M-g g" . consult-goto-line)
    ("M-g i" . consult-imenu))
+  :init
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
   :config
   (consult-customize
    consult-ripgrep consult-git-grep consult-grep consult-man

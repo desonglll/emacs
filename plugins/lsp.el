@@ -1,5 +1,18 @@
 ;;; lsp.el --- Language server package configuration -*- lexical-binding: t; -*-
 
+(load (expand-file-name "language-tools.el" my-modules-directory) nil 'nomessage)
+(with-eval-after-load 'lsp-mode
+  (load (expand-file-name "lsp-compat.el" my-modules-directory) nil 'nomessage))
+
+;; Set these before lsp-mode loads its clients, including Volar's TS plugin.
+(setq lsp-volar-location-for-typescript-plugin my-language-tools-directory
+      lsp-toml-cache-path (expand-file-name "taplo/" my-state-directory))
+
+(my-use-package! flymake
+  :bind
+  (("C-c d b" . flymake-show-buffer-diagnostics)
+   ("C-c d p" . flymake-show-project-diagnostics)))
+
 (my-use-package! lsp-mode
   :commands (lsp lsp-deferred)
   :init
@@ -19,10 +32,10 @@
   (lsp-log-io nil))
 
 (defconst my-lsp-language-clients
-  '((c-mode)
-    (c-ts-mode)
-    (c++-mode)
-    (c++-ts-mode)
+  '((c-mode . lsp-clangd)
+    (c-ts-mode . lsp-clangd)
+    (c++-mode . lsp-clangd)
+    (c++-ts-mode . lsp-clangd)
     (go-mode . lsp-go)
     (go-ts-mode . lsp-go)
     (java-mode . lsp-java)
@@ -37,7 +50,14 @@
     (js-ts-mode . lsp-javascript)
     (typescript-ts-mode . lsp-javascript)
     (typescript-mode . lsp-javascript)
-    (tsx-ts-mode . lsp-javascript))
+    (tsx-ts-mode . lsp-javascript)
+    (web-mode . lsp-volar)
+    (yaml-mode . lsp-yaml)
+    (yaml-ts-mode . lsp-yaml)
+    (toml-mode . lsp-toml)
+    (toml-ts-mode . lsp-toml)
+    (sh-mode . lsp-bash)
+    (bash-ts-mode . lsp-bash))
   "Major modes with automatic LSP and any external client feature.")
 
 (defconst my-lsp-native-flymake-backends
@@ -48,22 +68,30 @@
 
 (defun my-start-language-lsp ()
   "Start the configured language server for the current major mode."
-  (when-let* (((not (my-large-buffer-p)))
-              (client (assq major-mode my-lsp-language-clients)))
-    (require 'lsp-mode)
-    (when-let ((backend
-                (alist-get major-mode my-lsp-native-flymake-backends)))
-      (remove-hook 'flymake-diagnostic-functions backend t))
-    (when (cdr client)
-      (require (cdr client)))
-    ;; Match project roots resolved through symlinks, as rust-analyzer treats
-    ;; different file URIs as different documents.
-    (when-let ((file buffer-file-name))
-      (setq-local lsp-buffer-uri
-                  (lsp--path-to-uri (file-truename file))))
-    (lsp-deferred)))
+  (when-let* ((buffer-file-name)
+              ((not (or (file-remote-p buffer-file-name) (my-large-buffer-p))))
+              (client (alist-get major-mode my-lsp-language-clients))
+              ((or (not (eq client 'lsp-volar))
+                   (string-suffix-p ".vue" buffer-file-name)))
+              (tools (alist-get client my-language-client-tools)))
+    (let ((missing (seq-remove #'executable-find (plist-get tools :commands))))
+      (if missing
+          (message "LSP: missing %s; M-x my-language-tools-check for details"
+                   (string-join missing ", "))
+        (require 'lsp-mode)
+        (require client)
+        (unless (and (eq client 'lsp-bash) (not (lsp-bash-check-sh-shell)))
+          (setq-local lsp-enabled-clients (plist-get tools :servers))
+          (when-let ((backend
+                      (alist-get major-mode my-lsp-native-flymake-backends)))
+            (remove-hook 'flymake-diagnostic-functions backend t))
+          (setq-local lsp-buffer-uri (lsp--path-to-uri (file-truename buffer-file-name)))
+          (lsp-deferred))))))
 
-(add-hook 'prog-mode-hook #'my-start-language-lsp)
+;; YAML/TOML and mixed Vue buffers are not all derived from prog-mode.
+;; After local variables also gives EditorConfig and envrc time to run.
+(add-hook 'hack-local-variables-hook #'my-start-language-lsp 90)
+(remove-hook 'prog-mode-hook #'my-start-language-lsp)
 
 (defun my-jdtls-server-directory ()
   "Return the JDTLS directory containing its plugins, when installed."
@@ -82,6 +110,15 @@
 (defvar my-jdtls-external-server-directory nil
   "External JDTLS directory detected for the current Emacs session.")
 
+(defun my-jdtls-native-workspace (command)
+  "Keep the native launcher's data in the configured workspace directory."
+  (if (and lsp-java-jdt-ls-prefer-native-command
+           my-jdtls-external-server-directory)
+      (progn
+        (make-directory lsp-java-workspace-dir t)
+        (append command (list "-data" lsp-java-workspace-dir)))
+    command))
+
 (my-use-package! lsp-java
   :after lsp-mode
   :init
@@ -92,8 +129,10 @@
   (when-let ((server-directory (my-jdtls-server-directory)))
     (setq my-jdtls-external-server-directory server-directory
           lsp-java-server-install-dir server-directory
-          lsp-java-jdt-ls-prefer-native-command nil))
+          lsp-java-jdt-ls-prefer-native-command t
+          lsp-java-jdt-ls-command "jdtls"))
   :config
+  (advice-add 'lsp-java--ls-command :filter-return #'my-jdtls-native-workspace)
   ;; Do not let lsp-java replace or delete a system-managed installation.
   (when-let ((client (and my-jdtls-external-server-directory
                           (gethash 'jdtls lsp-clients))))

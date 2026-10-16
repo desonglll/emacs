@@ -24,7 +24,8 @@
                   (t (string-trim (buffer-name) "\\*+" "\\*+")))))
       (format "%s · %s" label (or my-ui-title-project "Emacs")))))
 
-(dolist (hook '(find-file-hook dired-mode-hook treemacs-mode-hook
+(dolist (hook '(find-file-hook after-set-visited-file-name-hook
+                dired-mode-hook treemacs-mode-hook
                 imenu-list-major-mode-hook eat-mode-hook))
   (add-hook hook #'my-ui-cache-title-project))
 

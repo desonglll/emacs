@@ -125,6 +125,13 @@
 (package! lsp-pyright)
 (package! lsp-sourcekit)
 (package! just-mode)
+(package! web-mode)
+(package! typescript-mode)
+(package! yaml-mode)
+(package! toml-mode)
+(package! protobuf-mode
+  :type git :host github :repo "protocolbuffers/protobuf"
+  :depth 1 :files ("editors/protobuf-mode.el"))
 (package! typst-ts-mode
   :type git :host codeberg
   :repo "meow_king/typst-ts-mode")

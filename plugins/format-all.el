@@ -41,13 +41,43 @@
 (defun format/prepare-on-save ()
   "Defer formatter loading and executable lookup until the first save."
   (unless (my-large-buffer-p)
-    (add-hook 'before-save-hook #'format/initialize-on-first-save nil t)))
+    (if (format/use-lsp-p)
+        (add-hook 'before-save-hook #'format/lsp-before-save nil t)
+      (add-hook 'before-save-hook #'format/initialize-on-first-save nil t))))
+
+(defun format/use-lsp-p ()
+  "Whether formatting needs the language server's project metadata."
+  (derived-mode-p 'java-mode 'java-ts-mode 'rust-mode 'rust-ts-mode))
+
+(defun format/lsp-before-save ()
+  "Honor Java formatter settings and Rust's Cargo edition through LSP."
+  (when (and (not (my-large-buffer-p))
+             (bound-and-true-p lsp-mode)
+             (lsp-feature? "textDocument/formatting"))
+    (lsp-format-buffer)))
+
+(defun format/region-or-buffer ()
+  "Format the region or buffer with its language's configured formatter."
+  (interactive)
+  (if (format/use-lsp-p)
+      (format/lsp-region-or-buffer)
+    (call-interactively #'format-all-region-or-buffer)))
+
+(defun format/with-project-tools (original &rest args)
+  "Run ORIGINAL with nearby Node tools taking precedence over fallback tools."
+  (let* ((root (and buffer-file-name
+                    (locate-dominating-file buffer-file-name "node_modules/.bin")))
+         (bin (and root (expand-file-name "node_modules/.bin" root)))
+         (exec-path (if bin (cons bin exec-path) exec-path))
+         (process-environment (copy-sequence process-environment)))
+    (when bin (setenv "PATH" (concat bin path-separator (getenv "PATH"))))
+    (apply original args)))
 
 (my-use-package! format-all
   :commands format-all-mode
   :diminish format-all-mode
   :bind
-  ("C-M-\\" . format-all-region-or-buffer)
+  ("C-M-\\" . format/region-or-buffer)
   :hook
   (prog-mode . format/prepare-on-save)
   (text-mode . format/prepare-on-save)
@@ -56,34 +86,49 @@
   (add-to-list 'auto-mode-alist '("\\.jsonc\\'" . js-json-mode))
   (with-eval-after-load 'language-id
     (format/register-mode "JSON" 'js-json-mode)
+    (format/register-mode "Shell" 'bash-ts-mode)
+    (format/register-mode "TOML" 'toml-ts-mode)
+    (format/register-mode "YAML" 'yaml-ts-mode)
     (format/register-mode "Swift" 'swift-ts-mode)
     (format/register-mode "Typst" 'typst-ts-mode))
   :config
+  ;; Upstream shfmt appends .bash to filenames, which breaks [*.sh]
+  ;; EditorConfig sections.  Preserve the real filename and shebang detection.
+  (define-format-all-formatter project-shfmt
+    (:executable "shfmt")
+    (:install (macos "brew install shfmt"))
+    (:languages "Shell")
+    (:features)
+    (:format (format-all--buffer-easy
+              executable
+              (when buffer-file-name (list "--filename" buffer-file-name)))))
   (setq-default format-all-formatters
-                '(("C" (clang-format "--style=LLVM"))
-                  ("C++" (clang-format "--style=LLVM"))
+                '(("C" clang-format)
+                  ("C++" clang-format)
                   ("CSS" prettier)
                   ("Dockerfile" dockfmt)
                   ("Emacs Lisp" emacs-lisp)
                   ("Go" gofmt)
                   ("HTML" prettier)
-                  ("Java" google-java-format)
                   ("JavaScript" prettier)
                   ("JSON" prettier)
                   ("JSON5" prettier)
                   ("JSX" prettier)
                   ("Markdown" prettier)
-                  ("Python" (black "--line-length" "88"))
+                  ("Python" black)
                   ("Rust" rustfmt)
                   ("SCSS" prettier)
-                  ("Shell" (shfmt "-i" "2"))
+                  ("Shell" project-shfmt)
                   ("Swift" swiftformat)
                   ("TSX" prettier)
                   ("TypeScript" prettier)
+                  ("TOML" taplo-fmt)
                   ("Vue" prettier)
                   ("XML" html-tidy)
                   ("YAML" prettier)))
-  (setq format-all-show-errors 'errors))
+  (setq format-all-show-errors 'errors)
+  (advice-add 'format-all--command-args :around #'format/with-project-tools)
+  (advice-add 'format-all--run-chain :around #'format/with-project-tools))
 
 (provide 'my-plugins-format-all)
 ;;; format-all.el ends here

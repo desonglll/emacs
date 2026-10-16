@@ -1,11 +1,5 @@
 ;;; ui.el --- User interface package configuration -*- lexical-binding: t; -*-
 
-(my-use-package! dirvish
-  :commands dirvish
-  :custom
-  ;; Dirvish adds one pixel; keep enough room for the shared Git gutter.
-  (dirvish-window-fringe (1- (alist-get 'left-fringe my-ui-frame-spacing))))
-
 (defun my-sidebar-highlight ()
   "Use the shared selection color in directory and outline buffers."
   (setq-local hl-line-face 'my-sidebar-selection))

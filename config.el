@@ -28,7 +28,7 @@
       cursor-in-non-selected-windows nil)
 
 (column-number-mode 1)
-(global-display-line-numbers-mode 1)
+(global-display-line-numbers-mode -1)
 (global-hl-line-mode 1)
 (show-paren-mode 1)
 
@@ -36,6 +36,24 @@
 (which-key-mode 1)
 (winner-mode 1)
 (repeat-mode 1)
+
+(defun my-code-line-numbers ()
+  "Show line numbers in ordinary-sized code buffers."
+  (unless (my-large-buffer-p)
+    (display-line-numbers-mode 1)))
+
+(dolist (hook '(prog-mode-hook conf-mode-hook yaml-mode-hook yaml-ts-mode-hook
+                toml-mode-hook toml-ts-mode-hook))
+  (add-hook hook #'my-code-line-numbers))
+
+(defun my-prose-layout ()
+  "Use natural wrapping in prose without adding source-code decorations."
+  (unless (derived-mode-p 'prog-mode 'conf-mode 'yaml-mode 'yaml-ts-mode
+                          'toml-mode 'toml-ts-mode)
+    (visual-line-mode 1)))
+
+(add-hook 'text-mode-hook #'my-prose-layout)
+(add-hook 'org-mode-hook #'my-prose-layout)
 
 (defun my-disable-line-numbers ()
   "Disable line numbers in the current non-source buffer."
@@ -67,12 +85,10 @@
       scroll-conservatively 101
       mouse-wheel-progressive-speed nil)
 
-(defun my-delete-trailing-whitespace ()
-  "Delete trailing whitespace in programming and text buffers."
-  (when (derived-mode-p 'prog-mode 'text-mode)
-    (delete-trailing-whitespace)))
-
-(add-hook 'before-save-hook #'my-delete-trailing-whitespace)
+;; Whitespace can be significant in Markdown and multiline strings.  Let
+;; each project's .editorconfig opt into trimming, instead of trimming all files.
+(remove-hook 'before-save-hook #'my-delete-trailing-whitespace)
+(editorconfig-mode 1)
 (keymap-global-set "C-c t w" #'whitespace-mode)
 
 (defun my-go-indent-settings ()
@@ -161,7 +177,6 @@
 
 (add-hook 'Info-mode-hook
           (lambda ()
-            (message "invoke!!!")
             (face-remap-add-relative 'default :family "Iosevka Curly Slab" :height 160 :weight 'regular)))
 
 (add-hook 'after-setting-font-hook #'my-set-cjk-font)
@@ -252,7 +267,7 @@
       "/\\.php_cs\\(?:\\.dist\\)?\\'")
      php-ts-mode)
     ((toml) ("\\.toml\\'") toml-ts-mode)
-    ((typescript) ("\\.ts\\'") typescript-ts-mode)
+    ((typescript) ("\\.[cm]?ts\\'") typescript-ts-mode)
     ((tsx) ("\\.tsx\\'") tsx-ts-mode)
     ((yaml) ("\\.ya?ml\\'") yaml-ts-mode))
   "File patterns for modes that require an installed Tree-sitter grammar.")
@@ -300,10 +315,6 @@
                     (mapconcat #'symbol-name
                                (nreverse failed-languages) ", "))
       (message "Configured Tree-sitter grammars are installed"))))
-
-(with-eval-after-load 'lsp-java
-  (setq lsp-java-jdt-ls-prefer-native-command t
-        lsp-java-jdt-ls-command "jdtls"))
 
 (with-eval-after-load 'lsp-go
   (setq lsp-go-gopls-prefer-native-command t

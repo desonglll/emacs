@@ -39,15 +39,18 @@
   ("C-c p" . projectile-command-map))
 
 (my-use-package! perspective
-  ;; :bind
-  ;; (("C-x C-b" . persp-list-buffers)
-  ;;  ("C-c w s" . persp-switch)
-  ;;  ("C-c w n" . persp-switch)
-  ;;  ("C-c w k" . persp-kill))
   :custom
   (persp-mode-prefix-key (kbd "C-c w"))
   :init
-  (persp-mode))
+  (persp-mode 1)
+  :config
+  (load (expand-file-name "workspace-state.el" my-modules-directory) nil 'nomessage)
+  (with-eval-after-load 'consult
+    ;; Global buffers and recent files remain available through b/f narrowing.
+    (consult-customize consult-source-buffer :hidden t :default nil)
+    (consult-customize consult-source-recent-file :hidden t)
+    (plist-put persp-consult-source :name "Workspace")
+    (add-to-list 'consult-buffer-sources persp-consult-source)))
 
 (my-use-package! gptel
   :config

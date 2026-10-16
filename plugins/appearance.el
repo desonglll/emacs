@@ -1,5 +1,25 @@
 ;;; appearance.el --- Shared interface styling -*- lexical-binding: t; -*-
 
+(defun my-gruber-darker-valid-colors (args)
+  "Replace obsolete nil color values in Gruber Darker's face ARGS."
+  (when (eq (car args) 'gruber-darker)
+    (setq args (copy-tree args))
+    (dolist (entry (cdr args))
+      (dolist (spec (cadr entry))
+        (let ((attributes (cdr spec)))
+          ;; Accept both (DISPLAY PLIST) and (DISPLAY . PLIST) face specs.
+          (when (listp (car attributes))
+            (setq attributes (car attributes)))
+          (while attributes
+            (when (and (memq (car attributes) '(:foreground :background))
+                       (null (cadr attributes)))
+              (setcar (cdr attributes) 'unspecified))
+            (setq attributes (cddr attributes)))))))
+  args)
+
+;; Normalize before theme activation, including faces from deferred packages.
+(advice-add 'custom-theme-set-faces :filter-args #'my-gruber-darker-valid-colors)
+
 (my-use-package! gruber-darker-theme
   :demand t
   :config
@@ -70,6 +90,7 @@
    `(doom-modeline-project-dir ((t (:foreground ,.cool :weight normal))))
    `(doom-modeline-project-root-dir ((t (:foreground ,.cool :weight normal))))
    `(doom-modeline-project-name ((t (:foreground ,.cool :weight normal :slant normal))))
+   `(doom-modeline-workspace-name ((t (:foreground ,.cool :weight normal))))
    `(doom-modeline-vcs-default ((t (:foreground ,.cool :weight normal))))
    `(doom-modeline-info ((t (:foreground ,.cool :weight normal))))
    `(doom-modeline-warning ((t (:foreground ,.accent :weight normal))))
@@ -198,8 +219,17 @@
   (doom-modeline-minor-modes nil)
   (doom-modeline-check 'simple)
   :config
+  ;; Doom's built-in persp-name segment supports persp-mode, not perspective.el.
+  (doom-modeline-def-segment my-workspace
+    (when (bound-and-true-p persp-mode)
+      (let* ((window (or (bound-and-true-p mode-line-window) (selected-window)))
+             (perspective (persp-curr (window-frame window))))
+        (when perspective
+          (propertize (format " %s " (persp-name perspective))
+                      'face (doom-modeline-face 'doom-modeline-workspace-name)
+                      'help-echo "Workspace — C-c w s to switch")))))
   (doom-modeline-def-modeline 'main
-    '(bar matches buffer-info remote-host buffer-position selection-info)
+    '(bar my-workspace matches buffer-info remote-host buffer-position selection-info)
     '(input-method major-mode process vcs check)))
 
 (my-use-package! nerd-icons

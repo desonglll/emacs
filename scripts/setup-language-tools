@@ -1,0 +1,10 @@
+#!/bin/sh
+# Install pinned Node language tools without changing global npm packages.
+set -eu
+config_root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
+tools_root="$config_root/var/language-tools"
+mkdir -p "$tools_root"
+cp "$config_root/tools/language-tools/package.json" "$tools_root/package.json"
+cp "$config_root/tools/language-tools/package-lock.json" "$tools_root/package-lock.json"
+npm ci --prefix "$tools_root" --no-audit --no-fund "$@"
+printf '%s\n' 'Installed. Restart Emacs, then run M-x my-language-tools-check.'

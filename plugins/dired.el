@@ -1,5 +1,28 @@
 ;;; dired.el --- Git status in directory listings -*- lexical-binding: t; -*-
 
+(setq dired-listing-switches
+      "-l --almost-all --human-readable --group-directories-first --no-group"
+      dired-dwim-target t)
+
+(my-use-package! dirvish
+  :commands (dirvish dirvish-dwim dirvish-layout-toggle dirvish-dispatch)
+  :init
+  ;; Keep native Dired as the default, including when reloading this file.
+  (when (bound-and-true-p dirvish-override-dired-mode)
+    (dirvish-override-dired-mode -1))
+  :custom
+  (dirvish-default-layout nil)
+  (dirvish-hide-details t)
+  ;; Keep character-level movement and selection in directory listings.
+  (dirvish-hide-cursor nil)
+  (dirvish-attributes '(nerd-icons file-size))
+  (dirvish-nerd-icons-palette 'dired-directory)
+  ;; Dirvish adds one pixel to this value.
+  (dirvish-window-fringe (1- (alist-get 'left-fringe my-ui-frame-spacing)))
+  :config
+  (keymap-set dirvish-mode-map "C-c C-p" #'dirvish-layout-toggle)
+  (keymap-set dirvish-mode-map "?" #'dirvish-dispatch))
+
 (defun my-dired-git-setup ()
   "Show asynchronous Git indicators in local Dired and Dirvish buffers."
   (unless (file-remote-p default-directory)

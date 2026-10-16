@@ -18,6 +18,22 @@
 (my-use-package! protobuf-mode
   :mode ("\\.proto\\'" . protobuf-mode))
 
+;; Native Tree-sitter associations take precedence when grammars are ready.
+(my-use-package! typescript-mode :mode "\\.[cm]?ts\\'")
+(my-use-package! yaml-mode :mode "\\.ya?ml\\'")
+(my-use-package! toml-mode :mode "\\.toml\\'")
+
+(my-use-package! web-mode
+  :mode "\\.vue\\'"
+  :custom
+  (web-mode-markup-indent-offset 2)
+  (web-mode-code-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  ;; LSP supplies embedded TypeScript diagnostics and completion.
+  (web-mode-enable-auto-quoting nil))
+
+(my-refresh-treesit-mode-remaps)
+
 (defun format/lsp-region-or-buffer ()
   "Format the active region or current buffer through LSP."
   (interactive)

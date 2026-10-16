@@ -28,6 +28,12 @@ then config the dired to use GNU gls.
 - `config.el`: native Emacs behavior, state, macOS, fonts, and Tree-sitter.
 - `modules/buffer-performance.el`: shared size limit for automatic editing extras.
 - `modules/frame-title.el`: concise window titles with cached project labels.
+- `modules/window-layout.el`: shared bottom panels for help and diagnostics.
+- `modules/file-actions.el`: copy file paths and reveal files in Finder.
+- `modules/workspace-state.el`: restore file workspaces and save snapshots safely.
+- `modules/language-tools.el`: discover language tools and report missing binaries.
+- `modules/lsp-compat.el`: TypeScript and Vue server compatibility.
+- `tools/language-tools/`: pinned npm manifest and lockfile for language tools.
 - `plugins/terminal.el`: project-scoped Eat sessions and bottom-panel behavior.
 - `plugins/dired.el`: asynchronous Git status for Dired and Dirvish.
 - `modules/rc.el`: personal interactive commands.
@@ -36,7 +42,7 @@ then config the dired to use GNU gls.
 
 The hand-written configuration lives in `~/.config/emacs`. Downloaded
 packages, Tree-sitter grammars, native compilation output, and generated state
-live under `~/.emacs.d`; persistent state is grouped in `~/.emacs.d/var`.
+live under this configuration directory; persistent state is grouped in `var/`.
 
 Because Emacs prefers an existing `~/.emacs.d` over the XDG configuration
 directory, these startup links connect the data directory to this repository:
@@ -76,6 +82,15 @@ reproducible lockfile.
 Vertico displays minibuffer candidates and Orderless matches space-separated
 search terms. Prescient learns recent and frequent selections to sort Vertico
 and Company candidates. Selectrum and selectrum-prescient are not used.
+
+Marginalia uses the active minibuffer or selected window as a width fallback
+when the completion buffer has no visible window. This prevents the
+`wrong-type-argument number-or-marker-p nil` error while keeping annotations.
+
+`C-x b` shows buffers from the current Perspective workspace. Type `b SPC`
+to include buffers from all workspaces, or `f SPC` for global recent files.
+`C-c w s` switches/creates a workspace; `C-c w r` renames it. The modeline
+shows the current workspace name, including after switching or renaming it.
 
 Restart Emacs after changing the configuration. Use `M-x` as usual, and use
 `M-TAB` or `M-x company-complete` to trigger in-buffer completion manually.
@@ -145,6 +160,12 @@ windows. The latest colors have not yet been checked in a graphical screenshot.
 
 ## Startup and file performance
 
+Gruber Darker's legacy nil foreground/background values are normalized to
+`unspecified` before applying its faces, including after theme reloads and
+when deferred packages load. Other face attributes keep their original values.
+The theme and annotation regressions are covered by `tests/startup-ui-tests.el`;
+use that file in the focused test command below to run those checks.
+
 Straight checks package changes on saves instead of scanning every checkout
 at startup. After editing a package outside Emacs, run `M-x straight-check-all`
 to detect and rebuild modified packages. This tradeoff follows
@@ -156,6 +177,19 @@ Format-All loads and checks formatter executables on the first save, including
 formatting that save. Later saves use its normal hook. Manually disabling
 `format-all-mode` also cancels pending automatic setup. The first save may
 therefore take longer than later saves.
+Java and Rust instead format through their language server, preserving project
+formatter settings and the Cargo edition; automatic formatting waits until the
+server is ready.
+
+EditorConfig is enabled. There is no global trailing-whitespace deletion:
+Markdown's two-space line breaks are preserved. A project's `.editorconfig`
+can opt into trimming with `trim_trailing_whitespace = true`, with an override
+for `[*.md]` where needed. Formatters use project configuration files, and a
+nearby `node_modules/.bin` takes priority for tools such as Prettier.
+
+Line numbers are enabled for code and configuration files. Prose, Org, help,
+terminals, and directory listings stay free of line numbers; prose and Org use
+visual wrapping without inserting line breaks into the file.
 
 Buffers larger than 2 MiB skip automatic LSP, format-on-save, indentation
 guides, Org Modern, line numbers, TODO highlighting, Git gutter updates, and
@@ -189,6 +223,27 @@ emacs -Q --batch \
 
 ## Editing and help
 
+Workspaces save their visited files and window layouts on normal interactive
+exit to `var/workspaces.el`; the previous snapshot is kept as `.bak`. A fresh
+interactive startup restores them unless a file was explicitly opened on the
+command line. Batch processes and daemon startup do not restore or overwrite
+the snapshot. Unsaved text and running terminal processes are not serialized.
+Use `C-c w C-s` / `C-c w C-l` to save / restore a snapshot manually.
+
+Native Dired is the default directory browser. `M-<f2>` runs `dired-jump`,
+opening the current file's directory with point on that file, or moving to
+the parent directory when already in Dired. `C-x C-f` on a directory also
+opens native Dired. Listings show file details and put directories first;
+`(` toggles details. Standard bindings apply: `RET` opens, `^` goes up,
+`m` marks, `u` unmarks, `C` copies, `R` renames/moves, and `d` then `x`
+deletes marked files. With two directory windows, copy/move prompts suggest
+the other directory as the destination. Use `C-f` / `C-b` to move within
+a filename, `C-SPC` to start a selection, and `M-w` to copy it.
+
+Dirvish remains available explicitly through `M-x dirvish`, with `C-c C-p`
+for previews and `?` for its menu. Its global Dired override is disabled.
+Restart Emacs to replace any existing Dirvish buffers with native listings.
+
 Dired and Dirvish show Git changes in the left gutter: green for added or
 untracked files, blue-gray for modified files, and red on directories containing
 deleted files. Directories aggregate changes in their descendants; mixed
@@ -206,6 +261,22 @@ files, save/commit refreshes, and Dirvish rendering.
 Emacs 30's built-in Which-Key shows available keys after a prefix such as
 `C-c p` or `C-c l`. Winner restores window layouts with `C-c <left>` and
 `C-c <right>`; Repeat mode lets supported commands repeat with a single key.
+Prefix groups use English labels such as `Files`, `Workspace`, `Diagnostics`,
+and `Terminal / Toggles`; the latter also retains the existing TODO and
+whitespace commands.
+
+Help, Flymake diagnostic lists, grep results, and compilation output use the
+same bottom panel slot as Eat, at about 30% of frame height. They preserve the
+editor's split windows and any hidden terminal process. `q` closes/restores
+the auxiliary view using Emacs's normal window history. `M-g f` searches
+Flymake diagnostics with preview; `M-g e` searches compilation errors.
+`C-c d b` / `C-c d p` opens the buffer/project diagnostic list. Definition and
+reference results use Consult through Xref, retaining `M-.`, `M-?`, and `M-,`.
+
+`C-c f y` copies the absolute path of the current file or Dired entry;
+`C-c f Y` copies its project-relative path. `C-c f o` reveals a local file in
+Finder. `C-c f R` uses Emacs's native `rename-visited-file`, updating the visited
+filename and frame title while preserving unsaved edits.
 
 Use `C-=` to expand a selection with Expreg, and `C-M-=` to contract it.
 Expreg uses Tree-sitter when available. `C-x u` opens Vundo's visual undo
@@ -243,6 +314,12 @@ running jobs and returns focus to the editor. Switching projects can replace
 the visible panel while keeping the previous project's session running.
 
 Use `C-u C-c t t` to create another session for the current project.
+`C-c t s` selects a project terminal, with its process status and shell
+directory shown alongside its name; `C-u C-c t s` lists all projects.
+Inside a terminal, `C-c t r` renames the session without changing its project.
+Finished sessions remain selectable for reading their output; selecting one
+does not restart the shell. The panel toggle reuses a live session or starts
+a new one when none is running.
 `M-x eat` retains Eat's ordinary full-window command. `C-c C-e` switches
 to Emacs navigation and selection; `C-c C-j` resumes terminal input.
 The panel toggle works in both of these modes. In raw char mode, use
@@ -297,6 +374,14 @@ Run the focused checks with the startup command above, replacing its test
 file with `tests/terminal-tests.el`. Graphical appearance still needs visual
 confirmation in the normal Emacs window.
 
+Workflow checks in `tests/workflow-tests.el` cover workspace filtering and
+modeline updates, auxiliary-window focus, file rename/path handling, and
+Finder command arguments (without opening Finder). The terminal and Dired
+checks also cover session selection/renaming, finished-session output,
+shared-panel reuse, and Git markers across preview toggles. Run these three
+focused files with `-l tests/workflow-tests.el -l tests/dired-tests.el
+-l tests/terminal-tests.el` before `-f ert-run-tests-batch-and-exit`.
+
 Verb uses Org files for HTTP requests. For example, save this in an `.org`
 file and put point in the request before pressing `C-c C-r C-r`:
 
@@ -327,107 +412,62 @@ workspace after changing its toolchain or environment.
 
 ## Language support
 
-LSP starts automatically for Rust, C, C++, Java, Python, Go, Swift, Typst,
-JavaScript, TypeScript, and TSX. The configuration uses these language servers:
+Opening a local source file starts the matching language server after project
+settings and Envrc have loaded. Completion uses Company/CAPF, navigation uses
+Xref, and diagnostics use Flymake. Missing tools produce a message instead of
+an install prompt; `M-x my-language-tools-check` reports the available paths.
 
-- Rust: `rust-analyzer`
-- C and C++: `clangd`
-- Java: `jdtls` through `lsp-java`
-- Python: `pyright` through `lsp-pyright`
-- Go: `gopls`
-- Swift: Xcode's `sourcekit-lsp` through `lsp-sourcekit`
-- Typst: `tinymist`
-- JavaScript, TypeScript, and TSX: `typescript-language-server` through
-  `lsp-javascript`
+| Files | Mode | Language server | Format on save |
+| --- | --- | --- | --- |
+| Go | go-ts-mode | gopls | gofmt |
+| Java | java-ts-mode | JDTLS | JDTLS |
+| Rust | rust-ts-mode | rust-analyzer | rust-analyzer / rustfmt |
+| C / C++ | c-ts-mode / c++-ts-mode | clangd | clang-format |
+| JS / TS / TSX | native Tree-sitter modes | typescript-language-server | Prettier |
+| Vue 3 SFC | web-mode | Vue language server + TypeScript | Prettier |
+| YAML | yaml-ts-mode | yaml-language-server | Prettier |
+| TOML | toml-ts-mode | Taplo | taplo fmt |
+| sh / Bash | bash-ts-mode | bash-language-server + ShellCheck | shfmt |
 
-Install those executables with the system package manager so they are on
-`PATH`. On Arch Linux:
+Traditional modes remain as fallbacks where grammars are unavailable. Protobuf
+has a dedicated mode. Python (Pyright), Swift (SourceKit), and Typst (Tinymist)
+retain their existing integrations. Bash LSP is not started for zsh buffers.
+
+The listed servers and formatters are installed on this Mac. For a new machine,
+setup commands, project requirements, and focused verification, see
+[Language setup](docs/languages.md). Node tools are local to `var/language-tools`
+and reproducible from the checked-in npm lockfile:
 
 ```sh
-sudo pacman -S clang gopls jdtls pyright rust-analyzer tinymist \
-  typescript typescript-language-server
+./scripts/setup-language-tools
 ```
 
-When `jdtls` is available on `PATH`, this configuration reuses the
-system-managed installation and disables `lsp-java`'s server downloader for that
-client. This avoids the slow Eclipse download used by `M-x lsp-java-update-server`.
-On macOS with Homebrew, install the language servers you use with:
+This bundle pins TypeScript 6.0.3 because typescript-language-server requires
+its tsserver API. Compatible project TypeScript versions take precedence;
+projects using the TypeScript 7 native compiler use this fallback for editing.
+Vue's request forwarding accepts both the older nested messages and Volar
+3.3's flat messages. The current Vue tooling targets Vue 3.
 
-```sh
-brew install jdtls pyright rust-analyzer typescript-language-server
-```
-
-Use explicit LSP command settings when the language server should always come
-from `PATH`:
-
-```elisp
-(with-eval-after-load 'lsp-java
-  (setq lsp-java-jdt-ls-prefer-native-command t
-        lsp-java-jdt-ls-command "jdtls"))
-
-(with-eval-after-load 'lsp-go
-  (setq lsp-go-gopls-prefer-native-command t
-        lsp-go-gopls-command "gopls"))
-
-(with-eval-after-load 'lsp-rust
-  (setq lsp-rust-server 'rust-analyzer
-        lsp-rust-analyzer-server-command '("rust-analyzer")))
-
-(with-eval-after-load 'lsp-javascript
-  (setq lsp-clients-typescript-tls-path "typescript-language-server"
-        lsp-clients-typescript-server-args '("--stdio")
-        lsp-clients-typescript-prefer-use-project-ts-server t))
-```
-
-Rust does not have a `prefer-native-command` setting; `lsp-rust` already uses
-`rust-analyzer` by default, and `lsp-rust-analyzer-server-command` is the command
-override. TypeScript and JavaScript use the `lsp-javascript` client and
-`typescript-language-server`. They start automatically through these
-`my-lsp-language-clients` entries in `plugins/lsp.el`:
-
-```elisp
-(js-mode . lsp-javascript)
-(js-ts-mode . lsp-javascript)
-(typescript-mode . lsp-javascript)
-(typescript-ts-mode . lsp-javascript)
-(tsx-ts-mode . lsp-javascript)
-```
-
-Run `M-x my-install-language-grammars` once to install the pinned grammars for
-all 25 file-editing Tree-sitter modes bundled with Emacs 30.2, plus Swift and
-Typst.
-PHPDoc and JSDoc are included because Emacs' PHP mode requires them. All parser
-revisions use ABI 14, matching this Emacs build. Until the required grammars are
-available, existing major-mode associations stay unchanged. Add grammar sources
-and mode mappings in `config.el`; add LSP clients in `plugins/lsp.el` when the
-language should start LSP automatically.
-
-Current common-language coverage is good for Rust, C, C++, Java, Python, Go,
-Swift, Typst, JavaScript, TypeScript, and TSX: these have Tree-sitter modes plus
-automatic LSP, and most also have formatter integration through `format-all`.
-Bash, JSON, CSS, HTML, YAML, TOML, Dockerfile, CMake, Lua, Ruby, PHP, Elixir,
-HEEx, C#, and protobuf have syntax support through Tree-sitter or a dedicated
-major mode, but they do not currently start an LSP server automatically. Add the
-appropriate language server package and hook in `plugins/lsp.el` when one of
-those languages needs completion, diagnostics, and project-aware navigation.
-
-Typst support uses the `tinymist` language server and a compiled Tree-sitter
-grammar. The custom translation package uses the `trans` executable from
-translate-shell.
-
-Swift support requires Xcode or a Swift toolchain containing `sourcekit-lsp`.
-Optional format-on-save support uses SwiftFormat (`brew install swiftformat`).
-
-Nerd Icons is declared in `packages.el`. Run `M-x nerd-icons-install-fonts`
-once to install its symbol font.
+Use `M-x my-install-language-grammars` to install missing pinned grammars.
+Sources and file associations live in `config.el`; LSP routing lives in
+`plugins/lsp.el`. Nerd Icons fonts can be installed with
+`M-x nerd-icons-install-fonts` if missing.
 
 ## Key bindings
 
 - `C-x g`: Magit status.
-- `M-<f2>`: Dirvish.
+- `M-<f2>`: native Dired, jumping to the current file or parent directory.
 - `C-:` or `s-\`: Avy jump.
 - `C-c f f`: find files with Consult and fd.
 - `C-c f g`: search text with Consult and ripgrep.
+- `C-c f y` / `C-c f Y`: copy absolute / project-relative file path.
+- `C-c f o` / `C-c f R`: reveal in Finder / rename the visited file.
+- `M-g f` / `M-g e`: search Flymake diagnostics / compilation errors.
+- `C-c d b` / `C-c d p`: show buffer / project diagnostics.
+- `C-M-\`: format the active region or buffer.
+- `M-.` / `M-,` / `M-?`: definition / back / references.
+- `C-c l r r` / `C-c l a a`: semantic rename / code actions.
+- `C-c w C-s` / `C-c w C-l`: save / restore a workspace snapshot.
 - `C-c p`: Projectile commands.
 - `C-c w`: Perspective workspace commands.
 - `C-c c f` / `C-c c k`: Cape file / keyword completion.
@@ -438,6 +478,7 @@ once to install its symbol font.
 - `C-c e`: toggle simultaneous editing with Iedit.
 - `C-c t t`: show / hide the current project's terminal panel.
 - `C-u C-c t t`: create another project terminal session.
+- `C-c t s` / `C-c t r`: select / rename a terminal; prefix selects all projects.
 - `C-c t n` / `C-c t p` / `C-c t o`: next / previous / list TODO markers.
 - `C-c E a` / `C-c E r` / `C-c E d`: allow / reload / deny a project environment.
 - `C-c C-r C-r`: send the HTTP request at point in an Org buffer.

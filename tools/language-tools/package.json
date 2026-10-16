@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "@vue/language-server": "3.3.13",
+    "@vue/typescript-plugin": "3.3.13",
+    "bash-language-server": "5.8.1",
+    "prettier": "3.9.10",
+    "typescript": "6.0.3",
+    "typescript-language-server": "6.0.2",
+    "yaml-language-server": "2.0.0"
+  },
+  "name": "emacs-language-tools",
+  "private": true,
+  "engines": {
+    "node": ">=22.22.2"
+  }
+}
