@@ -1,5 +1,24 @@
 ;;; format-all.el --- Format-all package configuration -*- lexical-binding: t; -*-
 
+(defvar-local my-format-on-save t
+  "Whether to format this buffer on save, with Format-All or LSP.
+Set to nil in file or directory locals to disable automatic formatting.
+Manual formatting with `C-M-\\' is unaffected.")
+(put 'my-format-on-save 'safe-local-variable #'booleanp)
+
+(defun my-toggle-format-on-save ()
+  "Toggle automatic formatting for the current buffer in every language."
+  (interactive)
+  (if my-format-on-save
+      (progn
+        (setq my-format-on-save nil)
+        (format/cancel-pending-setup)
+        (remove-hook 'before-save-hook #'format/lsp-before-save t)
+        (when (featurep 'format-all) (format-all-mode -1)))
+    (setq my-format-on-save t)
+    (format/prepare-on-save))
+  (message "Format on save: %s" (if my-format-on-save "on" "off")))
+
 (defun format/register-mode (language mode)
   "Register MODE as LANGUAGE in language-id's mode table."
   (if-let ((definition (assoc language language-id--definitions)))
@@ -30,10 +49,25 @@
   "Cancel lazy setup, including when the user toggles `format-all-mode'."
   (remove-hook 'before-save-hook #'format/initialize-on-first-save t))
 
+(defun format/sync-on-save ()
+  "Make explicit Format-All mode changes control both formatting backends."
+  (format/cancel-pending-setup)
+  (setq my-format-on-save format-all-mode)
+  (when (format/use-lsp-p)
+    (remove-hook 'before-save-hook #'format-all--buffer-from-hook t)
+    (if format-all-mode
+        (add-hook 'before-save-hook #'format/lsp-before-save nil t)
+      (remove-hook 'before-save-hook #'format/lsp-before-save t))))
+
+(defun format/guard-on-save (original &rest args)
+  "Run ORIGINAL with ARGS only when this buffer allows automatic formatting."
+  (when (and my-format-on-save (not (my-large-buffer-p)))
+    (apply original args)))
+
 (defun format/initialize-on-first-save ()
   "Load the formatter on first save and format that save exactly once."
-  (format/cancel-pending-setup)
-  (unless (my-large-buffer-p)
+  (when (and my-format-on-save (not (my-large-buffer-p)))
+    (format/cancel-pending-setup)
     (format/enable-on-save)
     (when (bound-and-true-p format-all-mode)
       (format-all--buffer-from-hook))))
@@ -51,7 +85,7 @@
 
 (defun format/lsp-before-save ()
   "Honor Java formatter settings and Rust's Cargo edition through LSP."
-  (when (and (not (my-large-buffer-p))
+  (when (and my-format-on-save (not (my-large-buffer-p))
              (bound-and-true-p lsp-mode)
              (lsp-feature? "textDocument/formatting"))
     (lsp-format-buffer)))
@@ -77,12 +111,13 @@
   :commands format-all-mode
   :diminish format-all-mode
   :bind
-  ("C-M-\\" . format/region-or-buffer)
+  (("C-M-\\" . format/region-or-buffer)
+   ("C-c t f" . my-toggle-format-on-save))
   :hook
   (prog-mode . format/prepare-on-save)
   (text-mode . format/prepare-on-save)
   :init
-  (add-hook 'format-all-mode-hook #'format/cancel-pending-setup)
+  (add-hook 'format-all-mode-hook #'format/sync-on-save)
   (add-to-list 'auto-mode-alist '("\\.jsonc\\'" . js-json-mode))
   (with-eval-after-load 'language-id
     (format/register-mode "JSON" 'js-json-mode)
@@ -127,6 +162,7 @@
                   ("XML" html-tidy)
                   ("YAML" prettier)))
   (setq format-all-show-errors 'errors)
+  (advice-add 'format-all--buffer-from-hook :around #'format/guard-on-save)
   (advice-add 'format-all--command-args :around #'format/with-project-tools)
   (advice-add 'format-all--run-chain :around #'format/with-project-tools))
 

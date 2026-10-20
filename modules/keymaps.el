@@ -24,6 +24,7 @@
            ("C-S-<tab>" . previous-buffer)
            ("C-<iso-lefttab>" . previous-buffer)
            ("C-c b" . my/list-buffers-focus)
+           ("C-x C-b" . my/list-buffers-focus)
            ("M-<return>" . delete-other-windows)
            ))
   (keymap-global-set (car binding) (cdr binding)))

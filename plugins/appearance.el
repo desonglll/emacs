@@ -212,7 +212,7 @@
   (doom-modeline-height 28)
   (doom-modeline-bar-width 2)
   (doom-modeline-buffer-file-name-style 'relative-from-project)
-  (doom-modeline-vcs-max-length most-positive-fixnum)
+  (doom-modeline-vcs-max-length 24)
   (doom-modeline-major-mode-color-icon nil)
   (doom-modeline-buffer-encoding nil)
   (doom-modeline-env-version nil)

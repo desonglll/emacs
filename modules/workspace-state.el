@@ -9,15 +9,27 @@
 (defun my-workspace-restore ()
   "Restore saved workspaces when startup did not explicitly visit a file."
   (unless (or noninteractive (daemonp))
+    (setq my-workspace-state-ready nil)
     (condition-case err
-        (progn
-          (when (and (file-readable-p persp-state-default-file)
-                     (not (seq-some #'buffer-file-name (buffer-list))))
-            (persp-state-load persp-state-default-file))
+        (cond
+         ((not (file-exists-p persp-state-default-file))
           (setq my-workspace-state-ready t))
+         ((not (seq-some #'buffer-file-name (buffer-list)))
+          (persp-state-load persp-state-default-file)
+          (setq my-workspace-state-ready t)))
       (error
        ;; Preserve the last saved session if it could not be restored.
        (display-warning 'workspace (error-message-string err))))))
+
+(defun my-workspace-adopt-snapshot (&optional file &rest _)
+  "Resume autosaving after explicitly loading or saving the default FILE."
+  (when (and (not noninteractive)
+             (equal (expand-file-name (or file persp-state-default-file))
+                    (expand-file-name persp-state-default-file)))
+    (setq my-workspace-state-ready t)))
+
+(advice-add 'persp-state-load :after #'my-workspace-adopt-snapshot)
+(advice-add 'persp-state-save :after #'my-workspace-adopt-snapshot)
 
 (defun my-workspace-save ()
   "Atomically save interactive workspaces, preserving the previous snapshot."

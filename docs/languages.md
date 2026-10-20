@@ -69,6 +69,17 @@ plugins and configuration. `.prettierrc`, `.prettierignore`, `.editorconfig`,
 `.clang-format`, and Taplo settings are not overridden by fixed indentation
 flags. Java and Rust format on save only after their language server is ready.
 
+`C-c t f` toggles save formatting for the current buffer across all languages,
+including Java and Rust. Manual formatting still works when the switch is off.
+To disable save formatting for a project, put this in its `.dir-locals.el`:
+
+```elisp
+((nil . ((my-format-on-save . nil))))
+```
+
+Reopen existing project buffers or run `M-x normal-mode` to reread local settings.
+Explicitly disabling `format-all-mode` also stops the Java/Rust save hook.
+
 ## Daily commands
 
 | Action | Binding |
@@ -81,6 +92,7 @@ flags. Java and Rust format on save only after their language server is ready.
 | Buffer / project diagnostics | `C-c d b` / `C-c d p` |
 | Format region or buffer | `C-M-\` |
 | Server commands | `C-c l` |
+| Toggle automatic formatting | `C-c t f` |
 
 Use `M-x lsp-workspace-restart` after changing a project's environment or SDK.
 Buffers larger than 2 MiB skip automatic LSP and formatting, as before.

@@ -1,0 +1,68 @@
+;;; directory-search-tests.el --- Live asynchronous directory search -*- lexical-binding: t; -*-
+
+(require 'ert)
+(require 'cl-lib)
+(require 'consult)
+
+(ert-deftest my-directory-search-streams-results-and-cleans-up ()
+  (let* ((directory (file-name-as-directory (file-truename (make-temp-file "fd-search-" t))))
+         (default-directory directory)
+         (first (expand-file-name "first 空格/" directory))
+         (second (expand-file-name "second directory/" directory))
+         (make-process-original (symbol-function 'make-process))
+         processes)
+    (unwind-protect
+        (progn
+          (mapc (lambda (path) (make-directory path t))
+                (list first second (expand-file-name ".git/hidden/" directory)))
+          (cl-letf (((symbol-function 'process-file)
+                     (lambda (&rest _) (ert-fail "Synchronous directory search")))
+                    ((symbol-function 'make-process)
+                     (lambda (&rest args)
+                       (let ((process (apply make-process-original args)))
+                         (push process processes) process)))
+                    ((symbol-function 'consult--read)
+                     (lambda (collection &rest _)
+                       (let* ((sink (consult--async-sink))
+                              (async (funcall collection
+                                              (lambda (action)
+                                                (unless (vectorp action)
+                                                  (funcall sink action))))))
+                         (unwind-protect
+                             (progn
+                               (funcall async 'setup)
+                               (funcall async "")
+                               (should (member directory (funcall async nil)))
+                               (should-not processes)
+                               (dolist (query '("." "second"))
+                                 (funcall async query)
+                                 (let ((deadline (+ (float-time) 5)))
+                                   (while (and (< (float-time) deadline)
+                                               (or (not (member second (funcall async nil)))
+                                                   (and (equal query "second")
+                                                        (member first (funcall async nil)))))
+                                     (accept-process-output nil 0.02)))
+                                 (should (member second (funcall async nil)))
+                                 (if (equal query ".")
+                                     (should (member first (funcall async nil)))
+                                   (should-not (member first (funcall async nil))))
+                                 (should-not (seq-some
+                                              (lambda (path) (string-match-p "/\\.git/" path))
+                                              (funcall async nil))))
+                               second)
+                           (funcall async 'destroy))))))
+            (fd-cd))
+          (should (equal default-directory second))
+          (should processes)
+          (dolist (process processes) (should-not (process-live-p process))))
+      (dolist (process processes)
+        (when (process-live-p process) (delete-process process)))
+      (delete-directory directory t))))
+
+(ert-deftest my-directory-search-cancel-keeps-original-directory ()
+  (let ((original default-directory))
+    (cl-letf (((symbol-function 'consult--read) (lambda (&rest _) (signal 'quit nil))))
+      (should (eq (condition-case nil (fd-cd) (quit 'cancelled)) 'cancelled)))
+    (should (equal default-directory original))))
+
+;;; directory-search-tests.el ends here

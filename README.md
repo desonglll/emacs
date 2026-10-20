@@ -31,6 +31,8 @@ then config the dired to use GNU gls.
 - `modules/window-layout.el`: shared bottom panels for help and diagnostics.
 - `modules/file-actions.el`: copy file paths and reveal files in Finder.
 - `modules/workspace-state.el`: restore file workspaces and save snapshots safely.
+- `modules/buffer-management.el`: workspace-safe cleanup and project-grouped Ibuffer.
+- `modules/directory-search.el`: asynchronous `fd-cd` through Consult.
 - `modules/language-tools.el`: discover language tools and report missing binaries.
 - `modules/lsp-compat.el`: TypeScript and Vue server compatibility.
 - `tools/language-tools/`: pinned npm manifest and lockfile for language tools.
@@ -113,8 +115,8 @@ Company and Vertico share a muted selection color. Nerd Icons adds monochrome
 file and buffer icons to completion alongside Marginalia annotations. The
 Doom Modeline emphasizes the file, cursor position, Git branch, and Flymake
 diagnostic count, while retaining input method and process indicators.
-Branch names have no fixed character limit; narrow windows still use Doom
-Modeline's compact layout.
+Long branch names are abbreviated to a 24-character budget; narrow windows
+also use Doom Modeline's compact layout.
 Project and branch labels use muted blue-gray, with amber for unsaved/warning
 indicators and muted red for conflicts/errors. The selected window has a
 lighter charcoal modeline and an accent bar; other windows use a darker
@@ -122,8 +124,9 @@ background and softer, regular-weight text. Filename backgrounds blend into
 the surrounding modeline.
 
 Treemacs, Dirvish, Dired, and Imenu List share muted directory colors and a
-consistent selection background. Treemacs and Imenu List use 32-column
-sidebars; Treemacs follows the current file after a short idle delay. Search
+consistent selection background. Treemacs and Imenu List use about 18% of the
+frame width, capped at 32 columns; they adapt when the frame width changes.
+Treemacs follows the current file after a short idle delay. Search
 highlights distinguish the active match in amber from other matches in a
 subtle background. Selection, matching parentheses, and Flymake diagnostics
 use the same palette. ANSI and Eat's standard 16 terminal colors are also
@@ -179,7 +182,7 @@ formatting that save. Later saves use its normal hook. Manually disabling
 therefore take longer than later saves.
 Java and Rust instead format through their language server, preserving project
 formatter settings and the Cargo edition; automatic formatting waits until the
-server is ready.
+server is ready. `C-c t f` toggles either backend; project locals can opt out.
 
 EditorConfig is enabled. There is no global trailing-whitespace deletion:
 Markdown's two-space line breaks are preserved. A project's `.editorconfig`
@@ -196,8 +199,8 @@ guides, Org Modern, line numbers, TODO highlighting, Git gutter updates, and
 automatic Company popups. Syntax highlighting and manual completion remain
 available. The size check runs before major-mode hooks; adjust
 `my-large-buffer-threshold` in `local.el` to change the limit for newly opened
-buffers. Individual tools such as `lsp`, `format-all-mode`, and
-`indent-bars-mode` can still be started manually.
+buffers. `lsp` and `indent-bars-mode` can still be started manually;
+manual region/buffer formatting also remains available.
 
 Company waits 0.15 seconds of idle time; its toggle uses the same setting.
 Diff-Hl waits 0.8 seconds before refreshing while typing, and GPTel
@@ -226,9 +229,14 @@ emacs -Q --batch \
 Workspaces save their visited files and window layouts on normal interactive
 exit to `var/workspaces.el`; the previous snapshot is kept as `.bak`. A fresh
 interactive startup restores them unless a file was explicitly opened on the
-command line. Batch processes and daemon startup do not restore or overwrite
-the snapshot. Unsaved text and running terminal processes are not serialized.
-Use `C-c w C-s` / `C-c w C-l` to save / restore a snapshot manually.
+command line. Such temporary sessions also preserve the existing snapshot on
+exit. Batch processes and daemon startup do not restore or overwrite it.
+Unsaved text and running terminal processes are not serialized. Use
+`C-c w C-s` / `C-c w C-l` to save / restore a snapshot manually.
+
+`C-x C-b` / `C-c b` open project-grouped Ibuffer. `fd-cd` searches directories
+asynchronously. See [workflow controls](docs/workflows.md) for cleanup safety,
+formatting switches, snapshot handling, and focused checks.
 
 Native Dired is the default directory browser. `M-<f2>` runs `dired-jump`,
 opening the current file's directory with point on that file, or moving to

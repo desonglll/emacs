@@ -34,7 +34,9 @@
           (persp-kill one)
           (persp-kill two)
           (mapc #'kill-buffer buffers)
-          (persp-state-load persp-state-default-file)
+          (setq my-workspace-state-ready nil)
+          (let ((noninteractive nil)) (persp-state-load persp-state-default-file))
+          (should my-workspace-state-ready)
           (persp-switch one)
           (should (= (length (window-list)) 2))
           (should (equal (sort (mapcar (lambda (win) (buffer-file-name (window-buffer win)))
@@ -76,5 +78,38 @@
               ((symbol-function 'persp-state-load) (lambda (&rest _) (ert-fail "Batch restore"))))
       (my-workspace-restore)
       (my-workspace-save))))
+
+(ert-deftest my-workspace-explicit-file-session-preserves-snapshot ()
+  (let* ((directory (file-name-as-directory (make-temp-file "emacs-workspace-" t)))
+         (my-state-directory directory)
+         (persp-state-default-file (expand-file-name "workspaces.el" directory))
+         (my-workspace-state-ready nil))
+    (unwind-protect
+        (progn
+          (with-temp-file persp-state-default-file (insert "original snapshot"))
+          (with-temp-buffer
+            (setq buffer-file-name (expand-file-name "explicit.txt" directory))
+            (cl-letf (((symbol-function 'persp-state-load)
+                       (lambda (&rest _) (ert-fail "Unexpected restore")))
+                      ((symbol-function 'persp-state-save)
+                       (lambda (&rest _) (ert-fail "Unexpected snapshot overwrite"))))
+              (let ((noninteractive nil))
+                (my-workspace-restore)
+                (should-not my-workspace-state-ready)
+                (my-workspace-save))))
+          (should (equal (with-temp-buffer
+                           (insert-file-contents persp-state-default-file)
+                           (buffer-string)) "original snapshot")))
+      (delete-directory directory t))))
+
+(ert-deftest my-workspace-restore-failure-disables-autosaving ()
+  (let ((my-workspace-state-ready t)
+        (noninteractive nil))
+    (cl-letf (((symbol-function 'buffer-list) (lambda (&rest _) nil))
+              ((symbol-function 'file-exists-p) (lambda (_) t))
+              ((symbol-function 'persp-state-load) (lambda (_) (error "Broken snapshot")))
+              ((symbol-function 'display-warning) #'ignore))
+      (my-workspace-restore)
+      (should-not my-workspace-state-ready))))
 
 ;;; workspace-state-tests.el ends here
