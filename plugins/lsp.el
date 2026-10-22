@@ -44,6 +44,7 @@
     (python-ts-mode . lsp-pyright)
     (rust-mode . lsp-rust)
     (rust-ts-mode . lsp-rust)
+    (zig-mode . lsp-zig)
     (swift-mode . lsp-sourcekit)
     (swift-ts-mode . lsp-sourcekit)
     (js-mode . lsp-javascript)

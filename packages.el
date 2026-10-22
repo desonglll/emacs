@@ -119,6 +119,7 @@
 (package! lsp-mode)
 (package! rust-mode)
 (package! go-mode)
+(package! zig-mode)
 (package! swift-mode)
 (package! swift-ts-mode)
 (package! lsp-java)

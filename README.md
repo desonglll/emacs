@@ -430,6 +430,7 @@ an install prompt; `M-x my-language-tools-check` reports the available paths.
 | Go | go-ts-mode | gopls | gofmt |
 | Java | java-ts-mode | JDTLS | JDTLS |
 | Rust | rust-ts-mode | rust-analyzer | rust-analyzer / rustfmt |
+| Zig / ZON | zig-mode | ZLS | zig fmt |
 | C / C++ | c-ts-mode / c++-ts-mode | clangd | clang-format |
 | JS / TS / TSX | native Tree-sitter modes | typescript-language-server | Prettier |
 | Vue 3 SFC | web-mode | Vue language server + TypeScript | Prettier |

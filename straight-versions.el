@@ -22,6 +22,7 @@
  ("emacs-async" . "4fdcb061a166e0d6ccc27d3829a28e04415ae825")
  ("emacs-format-all-the-code" . "0dbe9c70eaf8b92dca1a42552761eaa13c3139cf")
  ("emacs-language-id" . "dbfbc4903ffb042552b458fac76ee9f67a022036")
+ ("emacs-reformatter" . "2bd8818f3f2119a3876e574a437495214c87bc81")
  ("emacs-request" . "c22e3c23a6dd90f64be536e176ea0ed6113a5ba6")
  ("emacsmirror-mirror" . "58068e9d0b159c5252764e402be6fad349cd6330")
  ("embark" . "350ca86924c5027e80875943fba7b912a71e5791")
@@ -96,5 +97,6 @@
  ("yaml-mode" . "93dba98c050e9abfc623ec66aa499dbbb46b2fe1")
  ("yaml.el" . "5546f36bde24a9a8c1934e0f6ce205cd41d72537")
  ("yasnippet" . "c1e6ff23e9af16b856c88dfaab9d3ad7b746ad37")
- ("yasnippet-snippets" . "606ee926df6839243098de6d71332a697518cb86"))
+ ("yasnippet-snippets" . "606ee926df6839243098de6d71332a697518cb86")
+ ("zig-mode" . "62bfbaced0222e2bfbc086fa8556adf6b3298476"))
 :epsilon

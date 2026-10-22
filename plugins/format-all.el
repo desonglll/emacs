@@ -137,6 +137,17 @@ Manual formatting with `C-M-\\' is unaffected.")
     (:format (format-all--buffer-easy
               executable
               (when buffer-file-name (list "--filename" buffer-file-name)))))
+  ;; Zig package manifests need --zon while source files use the default parser.
+  (define-format-all-formatter project-zig
+    (:executable "zig")
+    (:install (macos "brew install zig"))
+    (:languages "Zig")
+    (:features)
+    (:format (format-all--buffer-easy
+              executable "fmt" "--stdin"
+              (when (and buffer-file-name
+                         (string-suffix-p ".zon" buffer-file-name))
+                "--zon"))))
   (setq-default format-all-formatters
                 '(("C" clang-format)
                   ("C++" clang-format)
@@ -160,7 +171,8 @@ Manual formatting with `C-M-\\' is unaffected.")
                   ("TOML" taplo-fmt)
                   ("Vue" prettier)
                   ("XML" html-tidy)
-                  ("YAML" prettier)))
+                  ("YAML" prettier)
+                  ("Zig" project-zig)))
   (setq format-all-show-errors 'errors)
   (advice-add 'format-all--buffer-from-hook :around #'format/guard-on-save)
   (advice-add 'format-all--command-args :around #'format/with-project-tools)

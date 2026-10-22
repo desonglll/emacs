@@ -28,6 +28,9 @@
 
 (defconst my-test-language-cases
   '(("main.go" "package main\nfunc main() {}\n" go-ts-mode "Go" (gopls))
+    ("main.zig" "pub fn main() void {}\n" zig-mode "Zig" (zls))
+    ("build.zig.zon" ".{ .name = .example, .version = \"0.0.0\" }\n"
+     zig-mode "Zig" (zls))
     ("Main.java" "class Main {}\n" java-ts-mode "Java" (jdtls))
     ("main.rs" "fn main() {}\n" rust-ts-mode "Rust" (rust-analyzer))
     ("main.c" "int main(void) { return 0; }\n" c-ts-mode "C" (clangd))
@@ -102,6 +105,10 @@
     (my-test-language-file ".prettierrc.json" "{\"singleQuote\": true, \"tabWidth\": 4}")
     (my-test-language-file ".editorconfig" "root = true\n[*.sh]\nindent_style = space\nindent_size = 4\n")
     (dolist (entry '(("main.c" "int main(){\nreturn 0;\n}\n" "    return 0;")
+                     ("main.zig" "pub fn main() void {\nconst count:u8=1;\n_ = count;\n}\n"
+                      "    const count: u8 = 1;")
+                     ("build.zig.zon" ".{.name=.example,.version=\"0.0.0\"}\n"
+                      ".{ .name = .example, .version = \"0.0.0\" }")
                      ("main.ts" "function greet(){\nconsole.log(\"hello\")\n}\n" "    console.log('hello');")
                      ("main.sh" "#!/bin/bash\nif true; then\necho hello\nfi\n" "    echo hello")
                      ("main.toml" "name=\"test\"\n" "name = \"test\"")))

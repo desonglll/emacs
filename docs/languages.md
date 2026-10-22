@@ -1,6 +1,6 @@
 # Language setup
 
-The current Mac has all tools for Go, Java, Rust, C/C++, JS/TS/TSX, Vue 3,
+The current Mac has all tools for Go, Java, Rust, Zig, C/C++, JS/TS/TSX, Vue 3,
 YAML, TOML, and shell editing. Restart Emacs after setup, then run
 `M-x my-language-tools-check` to see the resolved executable paths.
 
@@ -18,7 +18,7 @@ They do not replace project packages or global npm installations.
 ./scripts/setup-language-tools --https-proxy=http://127.0.0.1:7897
 
 # macOS tools; clangd comes with the Xcode Command Line Tools.
-brew install jdtls taplo shfmt shellcheck clang-format
+brew install zig zls jdtls taplo shfmt shellcheck clang-format
 go install golang.org/x/tools/gopls@latest
 rustup component add rust-analyzer rustfmt rust-src
 ```
@@ -45,6 +45,9 @@ Emacs's tool path when present. Envrc can supply a project's own environment.
 - **Rust:** open a Cargo project. Rust-analyzer supplies semantic features and
   invokes rustfmt using the Cargo edition, including async syntax in edition
   2024. `rustfmt.toml` remains authoritative.
+- **Zig:** `zig-mode` handles `.zig` source and `.zon` package manifests. ZLS
+  supplies completion, navigation, diagnostics, rename, inlay hints, and code
+  actions. `zig fmt` formats saves; manifests are passed its `--zon` flag.
 - **C/C++:** provide `compile_commands.json` for accurate includes and compiler
   flags. For CMake, configure with `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`; clangd
   searches the project and conventional build directories. `.clangd` can
@@ -112,7 +115,7 @@ emacs -Q --batch \
 
 The checks cover all requested file associations, formatter discovery, LSP
 routing, Markdown hard breaks, EditorConfig, project-local Prettier on first
-and subsequent saves, actual C/TS/shell/TOML formatting, and workspace snapshot
+and subsequent saves, actual C/Zig/TS/shell/TOML formatting, and workspace snapshot
 restoration and failure safety.
 
 For explicit real-server smoke checks, add `-l tests/language-server-tests.el`

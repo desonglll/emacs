@@ -17,6 +17,7 @@
     (lsp-go :servers (gopls) :commands ("gopls"))
     (lsp-java :servers (jdtls) :commands ("jdtls"))
     (lsp-rust :servers (rust-analyzer) :commands ("rust-analyzer"))
+    (lsp-zig :servers (zls) :commands ("zls"))
     (lsp-javascript :servers (ts-ls) :commands ("typescript-language-server"))
     (lsp-volar :servers (ts-ls vue-semantic-server)
                :commands ("typescript-language-server" "vue-language-server"))
@@ -37,7 +38,7 @@
         (princ (format "%-28s %s\n" command
                        (or (executable-find command) "MISSING")))))
     (princ "\nFormatters and shell diagnostics\n\n")
-    (dolist (command '("gofmt" "rustfmt" "clang-format" "prettier"
+    (dolist (command '("gofmt" "rustfmt" "zig" "clang-format" "prettier"
                        "taplo" "shfmt" "shellcheck"))
       (princ (format "%-28s %s\n" command
                      (or (executable-find command) "MISSING"))))

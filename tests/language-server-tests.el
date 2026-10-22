@@ -4,7 +4,7 @@
 ;; projects.  No user project is opened or built.  Load language-tests.el first.
 (require 'my-language-tests)
 (require 'lsp-mode)
-(dolist (client '(lsp-java lsp-rust lsp-yaml lsp-toml))
+(dolist (client '(lsp-java lsp-rust lsp-zig lsp-yaml lsp-toml))
   (require client))
 
 (defun my-test-await (predicate seconds)
@@ -16,6 +16,7 @@
 
 (defconst my-test-server-cases
   '(("main.go" "package main\nfunc main() { var count int = \"wrong\"; println(count) }\n" (gopls))
+    ("main.zig" "pub fn main() void { const count = ; }\n" (zls))
     ("Main.java" "class Main { int count = \"wrong\"; }\n" (jdtls))
     ("src/main.rs" "async fn task(){}\nfn main(){let count: i32 = \"wrong\"; println!(\"{}\",count);}\n" (rust-analyzer))
     ("main.c" "int main(void) { return missing; }\n" (clangd))

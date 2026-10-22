@@ -6,6 +6,12 @@
 (my-use-package! go-mode
   :mode "\\.go\\'")
 
+(my-use-package! zig-mode
+  :mode "\\.\\(?:zig\\|zon\\)\\'"
+  :custom
+  ;; The shared Format-All policy owns save formatting for every language.
+  (zig-format-on-save nil))
+
 (my-use-package! swift-mode
   :mode "\\.swift\\(?:interface\\)?\\'")
 
