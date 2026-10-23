@@ -3,6 +3,18 @@
 (my-use-package! rust-mode
   :mode "\\.rs\\'")
 
+(with-eval-after-load 'rust-ts-mode
+  ;; rust-ts-mode supplies syntax support; rust-cargo supplies project commands.
+  (require 'rust-cargo)
+  (dolist (binding '(("C-c C-c C-u" . rust-compile)
+                     ("C-c C-c C-k" . rust-check)
+                     ("C-c C-c C-t" . rust-test)
+                     ("C-c C-c C-r" . rust-run)
+                     ("C-c C-c C-l" . rust-run-clippy)))
+    (keymap-set rust-ts-mode-map (car binding) (cdr binding)))
+  (which-key-add-keymap-based-replacements
+    rust-ts-mode-map "C-c C-c" "Cargo"))
+
 (my-use-package! go-mode
   :mode "\\.go\\'")
 

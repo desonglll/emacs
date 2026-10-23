@@ -483,6 +483,8 @@ Sources and file associations live in `config.el`; LSP routing lives in
 - `C-c t w`: toggle whitespace display.
 - `C-c <left>` / `C-c <right>`: restore / redo window layouts.
 - `C-=` / `C-M-=`: expand / contract the selection.
+- `C->` / `C-<`: add the next / previous matching occurrence as a cursor.
+- `C-c m a` / `C-c m l`: add all matches / add a cursor to each selected line.
 - `C-x u`: visual undo history.
 - `C-c e`: toggle simultaneous editing with Iedit.
 - `C-c t t`: show / hide the current project's terminal panel.

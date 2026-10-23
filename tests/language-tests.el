@@ -73,6 +73,34 @@
                 (dolist (server lsp-enabled-clients)
                   (should (gethash server lsp-clients)))))))))))
 
+(ert-deftest my-rust-tree-sitter-mode-retains-cargo-commands ()
+  (my-test-with-language-project
+    (let ((manifest (my-test-language-file
+                     "Cargo.toml"
+                     "[package]\nname = \"example\"\nversion = \"0.1.0\"\n"))
+          (bindings '(("C-c C-c C-u" . rust-compile)
+                      ("C-c C-c C-k" . rust-check)
+                      ("C-c C-c C-t" . rust-test)
+                      ("C-c C-c C-r" . rust-run)
+                      ("C-c C-c C-l" . rust-run-clippy))))
+      (with-current-buffer
+          (find-file-noselect (my-test-language-file "src/main.rs" "fn main() {}\n"))
+        (should (eq major-mode 'rust-ts-mode))
+        (dolist (binding bindings)
+          (should (commandp (cdr binding)))
+          (should (eq (key-binding (kbd (car binding))) (cdr binding))))
+        (let (actual-command actual-directory)
+          (setq-local rust-buffer-project nil)
+          (cl-letf (((symbol-function 'rust-buffer-project)
+                     (lambda () manifest))
+                    ((symbol-function 'compile)
+                     (lambda (command &optional _comint)
+                       (setq actual-command command
+                             actual-directory default-directory))))
+            (rust-check))
+          (should (equal (string-trim actual-command) "cargo check"))
+          (should (equal actual-directory directory)))))))
+
 (ert-deftest my-prose-layout-and-markdown-hard-breaks ()
   (my-test-with-language-project
     (with-current-buffer (find-file-noselect

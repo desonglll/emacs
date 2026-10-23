@@ -37,6 +37,7 @@
   "C-c d" "Diagnostics"
   "C-c l" "Language"
   "C-c c" "Completion"
+  "C-c m" "Multiple cursors"
   "C-c E" "Environment")
 
 ;;; keymaps.el ends here.

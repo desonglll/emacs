@@ -44,7 +44,8 @@ Emacs's tool path when present. Envrc can supply a project's own environment.
   Standalone Java files have less project information available.
 - **Rust:** open a Cargo project. Rust-analyzer supplies semantic features and
   invokes rustfmt using the Cargo edition, including async syntax in edition
-  2024. `rustfmt.toml` remains authoritative.
+  2024. `rustfmt.toml` remains authoritative. The `rust-mode` Cargo commands
+  remain available in `rust-ts-mode` for build, check, test, run, and Clippy.
 - **Zig:** `zig-mode` handles `.zig` source and `.zon` package manifests. ZLS
   supplies completion, navigation, diagnostics, rename, inlay hints, and code
   actions. `zig fmt` formats saves; manifests are passed its `--zon` flag.
@@ -94,6 +95,8 @@ Explicitly disabling `format-all-mode` also stops the Java/Rust save hook.
 | Code actions | `C-c l a a` |
 | Buffer / project diagnostics | `C-c d b` / `C-c d p` |
 | Format region or buffer | `C-M-\` |
+| Cargo build / check | `C-c C-c C-u` / `C-c C-c C-k` |
+| Cargo test / run / Clippy | `C-c C-c C-t` / `C-c C-c C-r` / `C-c C-c C-l` |
 | Server commands | `C-c l` |
 | Toggle automatic formatting | `C-c t f` |
 

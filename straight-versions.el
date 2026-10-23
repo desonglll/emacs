@@ -56,6 +56,7 @@
  ("marginalia" . "10b170ad8006bad535599e5b3e007e643e34345a")
  ("markdown-mode" . "f441e8bc9951e73b12c61e9198658488dd8e86e1")
  ("melpa" . "4ef6d1d3728343529c3295b803368de4285552e9")
+ ("multiple-cursors.el" . "6086e34e86cc9c305c693f440e648588335669c9")
  ("nerd-icons-completion" . "f924dd490c8c4c1066fd97a76e0dc31e303fca30")
  ("nerd-icons.el" . "674909974637ff0ec2b5ebf43f9a8aefa35d93e9")
  ("nongnu-elpa" . "f9994e234b4fc9978eb8458e2237be4603d96f89")

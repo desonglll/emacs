@@ -87,6 +87,7 @@
 (package! yasnippet)
 (package! yasnippet-snippets)
 (package! expreg)
+(package! multiple-cursors)
 (package! vundo)
 (package! iedit)
 (package! hl-todo)

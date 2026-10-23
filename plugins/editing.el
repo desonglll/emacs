@@ -25,6 +25,15 @@
   (("C-=" . expreg-expand)
    ("C-M-=" . expreg-contract)))
 
+(my-use-package! multiple-cursors
+  :bind
+  (("C->" . mc/mark-next-like-this)
+   ("C-<" . mc/mark-previous-like-this)
+   ("C-c m a" . mc/mark-all-like-this)
+   ("C-c m l" . mc/edit-lines))
+  :custom
+  (mc/list-file (expand-file-name "mc-lists.el" my-state-directory)))
+
 (my-use-package! vundo
   :bind
   ("C-x u" . vundo))
