@@ -72,6 +72,30 @@ Keep prefix ARG's workspace selection and the usual toggle for populated trees."
    ("C-h k" . helpful-key)
    ("C-h x" . helpful-command)))
 
+(defvar-local my-writeroom--line-numbers-were-enabled nil)
+
+(defun my-writeroom-line-numbers (arg)
+  "Hide line numbers when ARG enables Writeroom and restore them on exit."
+  (if (> arg 0)
+      (progn
+        (setq my-writeroom--line-numbers-were-enabled
+              (bound-and-true-p display-line-numbers-mode))
+        (display-line-numbers-mode -1))
+    (when my-writeroom--line-numbers-were-enabled
+      (display-line-numbers-mode 1))
+    (kill-local-variable 'my-writeroom--line-numbers-were-enabled)))
+
+(my-use-package! writeroom-mode
+  :commands writeroom-mode
+  :bind
+  ("C-c t z" . writeroom-mode)
+  :custom
+  (writeroom-width 100)
+  (writeroom-fullscreen-effect 'maximized)
+  (writeroom-restore-window-config t)
+  (writeroom-mode-line nil)
+  (writeroom-local-effects '(my-writeroom-line-numbers)))
+
 (my-use-package! pdf-tools
   :mode ("\\.pdf\\'" . pdf-view-mode)
   :config

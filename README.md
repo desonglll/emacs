@@ -481,6 +481,7 @@ Sources and file associations live in `config.el`; LSP routing lives in
 - `C-c w`: Perspective workspace commands.
 - `C-c c f` / `C-c c k`: Cape file / keyword completion.
 - `C-c t w`: toggle whitespace display.
+- `C-c t z`: toggle a centered, distraction-free Zen editing layout.
 - `C-c <left>` / `C-c <right>`: restore / redo window layouts.
 - `C-=` / `C-M-=`: expand / contract the selection.
 - `C->` / `C-<`: add the next / previous matching occurrence as a cursor.

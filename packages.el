@@ -65,6 +65,7 @@
 (package! pulsar)
 (package! org-modern)
 (package! helpful)
+(package! writeroom-mode)
 
 ;;;; Completion
 
