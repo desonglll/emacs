@@ -46,6 +46,10 @@ Emacs's tool path when present. Envrc can supply a project's own environment.
   invokes rustfmt using the Cargo edition, including async syntax in edition
   2024. `rustfmt.toml` remains authoritative. The `rust-mode` Cargo commands
   remain available in `rust-ts-mode` for build, check, test, run, and Clippy.
+  Local file aliases are resolved before visiting so LSP and Flymake use the
+  same canonical path.
+  In Cargo compilation output, `RET` on a rustc location jumps to the source;
+  `M-g e` searches all recognized compilation errors.
 - **Zig:** `zig-mode` handles `.zig` source and `.zon` package manifests. ZLS
   supplies completion, navigation, diagnostics, rename, inlay hints, and code
   actions. `zig fmt` formats saves; manifests are passed its `--zon` flag.

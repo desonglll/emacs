@@ -4,8 +4,10 @@
   :mode "\\.rs\\'")
 
 (with-eval-after-load 'rust-ts-mode
-  ;; rust-ts-mode supplies syntax support; rust-cargo supplies project commands.
+  ;; rust-ts-mode supplies syntax support; rust-mode supplies Cargo commands
+  ;; and teaches compilation-mode how to navigate rustc source locations.
   (require 'rust-cargo)
+  (require 'rust-compile)
   (dolist (binding '(("C-c C-c C-u" . rust-compile)
                      ("C-c C-c C-k" . rust-check)
                      ("C-c C-c C-t" . rust-test)

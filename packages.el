@@ -144,6 +144,7 @@
 (package! projectile)
 (package! perspective)
 (package! diff-hl)
+(package! crux)
 
 ;;;; AI
 

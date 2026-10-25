@@ -5,6 +5,7 @@
 (setq inhibit-startup-screen t
       inhibit-startup-message t
       initial-scratch-message nil
+      find-file-visit-truename t
       ring-bell-function #'ignore
       use-short-answers t
       confirm-kill-emacs #'yes-or-no-p

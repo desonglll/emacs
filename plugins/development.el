@@ -72,6 +72,7 @@
   (("C-<return>" . gptel-complete)
    :map gptel-autocomplete-completion-map
    ("C-M-<return>" . gptel-accept-completion)))
+(my-use-package! crux)
 
 (provide 'my-plugins-development)
 ;;; development.el ends here

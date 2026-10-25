@@ -73,6 +73,18 @@
                 (dolist (server lsp-enabled-clients)
                   (should (gethash server lsp-clients)))))))))))
 
+(ert-deftest my-language-file-visits-resolve-true-paths ()
+  (my-test-with-language-project
+    (let* ((real-directory (expand-file-name "real" default-directory))
+           (alias-directory (expand-file-name "alias" default-directory))
+           (real-file (expand-file-name "main.rs" real-directory))
+           (alias-file (expand-file-name "main.rs" alias-directory)))
+      (make-directory real-directory)
+      (make-symbolic-link real-directory alias-directory)
+      (with-temp-file real-file (insert "fn main() {}\n"))
+      (with-current-buffer (find-file-noselect alias-file)
+        (should (equal buffer-file-name (file-truename real-file)))))))
+
 (ert-deftest my-rust-tree-sitter-mode-retains-cargo-commands ()
   (my-test-with-language-project
     (let ((manifest (my-test-language-file
@@ -100,6 +112,18 @@
             (rust-check))
           (should (equal (string-trim actual-command) "cargo check"))
           (should (equal actual-directory directory)))))))
+
+(ert-deftest my-rust-compilation-output-supports-error-navigation ()
+  (require 'rust-ts-mode)
+  (should (memq 'rustc compilation-error-regexp-alist))
+  (with-temp-buffer
+    (compilation-mode)
+    (let ((inhibit-read-only t))
+      (insert "error[E0277]: example\n  --> src/main.rs:49:10\n")
+      (compilation--parse-region (point-min) (point-max)))
+    (goto-char (point-min))
+    (search-forward "src/main.rs")
+    (should (get-text-property (1- (point)) 'compilation-message))))
 
 (ert-deftest my-prose-layout-and-markdown-hard-breaks ()
   (my-test-with-language-project
