@@ -7,6 +7,7 @@
 
 # Runtime state and caches
 /var/
+/notes/
 /auto-save-list/
 /tramp
 /places

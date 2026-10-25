@@ -76,6 +76,8 @@
                              (lsp-workspaces)))
                           (nth 2 entry)))
                        90))
+              (when (derived-mode-p 'rust-ts-mode)
+                (should lsp-inlay-hints-mode))
               (should (lsp-feature? "textDocument/documentSymbol"))
               (let ((symbols (lsp-request "textDocument/documentSymbol"
                                           (list :textDocument (lsp--text-document-identifier)))))

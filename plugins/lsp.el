@@ -83,6 +83,8 @@
         (require client)
         (unless (and (eq client 'lsp-bash) (not (lsp-bash-check-sh-shell)))
           (setq-local lsp-enabled-clients (plist-get tools :servers))
+          (when (eq client 'lsp-rust)
+            (setq-local lsp-inlay-hint-enable t))
           (when-let ((backend
                       (alist-get major-mode my-lsp-native-flymake-backends)))
             (remove-hook 'flymake-diagnostic-functions backend t))

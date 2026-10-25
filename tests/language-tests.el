@@ -70,6 +70,8 @@
                 (find-file-noselect (my-test-language-file (car entry) (cadr entry)))
               (ert-info ((format "File: %s" (car entry)))
                 (should (equal lsp-enabled-clients (nth 4 entry)))
+                (should (eq lsp-inlay-hint-enable
+                            (eq (alist-get major-mode clients) 'lsp-rust)))
                 (dolist (server lsp-enabled-clients)
                   (should (gethash server lsp-clients)))))))))))
 

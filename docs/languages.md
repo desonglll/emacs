@@ -46,6 +46,8 @@ Emacs's tool path when present. Envrc can supply a project's own environment.
   invokes rustfmt using the Cargo edition, including async syntax in edition
   2024. `rustfmt.toml` remains authoritative. The `rust-mode` Cargo commands
   remain available in `rust-ts-mode` for build, check, test, run, and Clippy.
+  Rust buffers show inferred variable types as inlay hints; toggle them for the
+  current buffer with `M-x lsp-inlay-hints-mode`.
   Local file aliases are resolved before visiting so LSP and Flymake use the
   same canonical path.
   In Cargo compilation output, `RET` on a rustc location jumps to the source;
