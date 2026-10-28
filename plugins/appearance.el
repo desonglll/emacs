@@ -1,5 +1,7 @@
 ;;; appearance.el --- Shared interface styling -*- lexical-binding: t; -*-
 
+(load (expand-file-name "theme-selection.el" my-modules-directory) nil 'nomessage)
+
 (defun my-gruber-darker-valid-colors (args)
   "Replace obsolete nil color values in Gruber Darker's face ARGS."
   (when (eq (car args) 'gruber-darker)
@@ -21,10 +23,10 @@
 (advice-add 'custom-theme-set-faces :filter-args #'my-gruber-darker-valid-colors)
 
 (my-use-package! gruber-darker-theme
-  :demand t
-  :config
-  (mapc #'disable-theme custom-enabled-themes)
-  (load-theme 'gruber-darker t))
+  :demand t)
+
+(my-use-package! doom-themes
+  :demand t)
 
 (defconst my-ui-palette
   '((background . "#181818")
@@ -47,10 +49,13 @@
   "Shared selection face for directory and outline sidebars."
   :group 'faces)
 
-;; User theme specs also apply to faces defined by deferred packages.
+(deftheme my-gruber-ui
+  "Shared interface colors used only with Gruber Darker.")
+
+;; Theme specs also apply to faces defined by deferred packages.
 (let-alist my-ui-palette
   (custom-theme-set-faces
-   'user
+   'my-gruber-ui
    `(fringe ((t (:background ,.background :foreground ,.subtle))))
    `(line-number ((t (:background ,.background :foreground ,.subtle))))
    `(line-number-current-line
@@ -159,7 +164,7 @@
 ;; Keep the outline hierarchy readable without a different bright color per level.
 (dotimes (depth 4)
   (custom-theme-set-faces
-   'user
+   'my-gruber-ui
    `(,(intern (format "imenu-list-entry-face-%d" depth))
      ((t (:foreground ,(alist-get (if (zerop depth) 'cool 'foreground)
                                   my-ui-palette)))))
@@ -179,11 +184,13 @@
                    (color-lighten-name normal 12))))
     (dolist (prefix '("ansi-color-" "term-color-"))
       (custom-theme-set-faces
-       'user `(,(intern (concat prefix name))
+       'my-gruber-ui `(,(intern (concat prefix name))
                ((t (:foreground ,normal :background ,normal))))))
     (custom-theme-set-faces
-     'user `(,(intern (concat "ansi-color-bright-" name))
+     'my-gruber-ui `(,(intern (concat "ansi-color-bright-" name))
              ((t (:foreground ,bright :background ,bright)))))))
+
+(my-load-theme my-preferred-theme)
 
 (defconst my-ui-frame-spacing
   '((internal-border-width . 10)

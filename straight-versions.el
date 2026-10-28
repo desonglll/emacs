@@ -82,6 +82,7 @@
  ("swift-mode" . "610b2c24433c11c30a39a6799af69b10cd3bec97")
  ("swift-ts-mode" . "17806f6f56f09c86c5e70af239bea4313aaaf0b8")
  ("tablist" . "01f065e387ffe6b7a41f180f257cd12551c7a9c2")
+ ("themes" . "a59202912ad55014e53a685eee6cd94130bdd4fd")
  ("toml-mode.el" . "f6c61817b00f9c4a3cab1bae9c309e0fc45cdd06")
  ("transient" . "9ba468bcbc7f6061c02a5319ff961f3e5ba6fa13")
  ("translate.el" . "364320c9b958e5df013f9bb4400cf35f213d329d")

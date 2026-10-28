@@ -19,6 +19,7 @@
            ("C-c f Y" . my-copy-project-file-path)
            ("C-c f o" . my-reveal-in-finder)
            ("C-c f R" . rename-visited-file)
+           ("C-c u t" . my-select-theme)
            ("s-<return>" . my/new-buffer)
            ("C-<tab>" . next-buffer)
            ("C-S-<tab>" . previous-buffer)
@@ -34,6 +35,7 @@
   "C-c w" "Workspace"
   "C-c p" "Project"
   "C-c t" "Terminal / Toggles"
+  "C-c u" "Appearance"
   "C-c d" "Diagnostics"
   "C-c l" "Language"
   "C-c c" "Completion"

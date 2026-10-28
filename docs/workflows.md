@@ -4,19 +4,17 @@ Restart Emacs to load these changes. Native Dired remains the directory browser.
 
 ## Workspaces and buffer cleanup
 
-Normal interactive startup restores `var/workspaces.el`; exit saves atomically
-and keeps the previous snapshot as `var/workspaces.el.bak`. If Emacs starts by
-opening a file while a snapshot already exists, that temporary session skips
-both restoration and autosaving, so it cannot replace the saved workspaces.
-A first session without an existing snapshot can still create one on exit.
-An unreadable or broken snapshot disables automatic saving for that session.
+Startup begins with a fresh workspace. No workspace snapshot is restored at
+startup or written on exit, including after manually saving or restoring one.
+Existing snapshots remain available for explicit restoration.
 
-`C-c w C-l` explicitly restores a snapshot. Restoring the default snapshot
-resumes automatic saving, even in a temporary file session. `C-c w C-s` can
-explicitly save the current layout instead; saving to the default snapshot
-also opts the session into autosaving. Saving/loading another file does not.
-Batch processes and daemon startup remain excluded from automatic persistence.
-Snapshots include file buffers and layouts, not unsaved text or running jobs.
+`C-c w C-s` manually saves the current file buffers and layouts atomically to
+`var/workspaces.el`, keeping the previous snapshot as `var/workspaces.el.bak`.
+`C-c w C-l` explicitly restores a snapshot. After deleting a workspace, save
+manually if the stored snapshot should also reflect that deletion. Use
+`M-x persp-state-save` to choose another snapshot file. Snapshots do not include
+unsaved text or running jobs. Reloading `modules/workspace-state.el` also removes
+the old startup/exit hooks and automatic-saving advice in an existing session.
 
 `M-x my/kill-other-buffers` closes other unmodified user buffers in the current
 workspace. A buffer shared with another workspace is only removed from the
@@ -74,8 +72,13 @@ emacs -Q --batch \
   -l tests/sidebar-layout-tests.el -f ert-run-tests-batch-and-exit
 ```
 
-They cover snapshot protection and explicit restoration, formatting opt-outs
-and toggles, cross-workspace cleanup, process preservation, project grouping,
+They cover manual snapshots and removal of automatic persistence, formatting
+opt-outs and toggles, cross-workspace cleanup, process preservation, project grouping,
 live asynchronous fd searches and cancellation, and sidebar sizing/focus.
 Sidebar checks exercise real Emacs windows in batch mode; graphical appearance
 still needs a check in the regular GUI session.
+
+Verified on 2026-10-27 with Emacs 30.2: the seven workspace/workflow checks
+passed, including manual snapshot round trips, failed-save protection, and
+removal of the old persistence hooks/advice on reload. Fresh startup hooks
+also ran with workspace loading/saving blocked, without attempting either.

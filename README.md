@@ -30,11 +30,12 @@ then config the dired to use GNU gls.
 - `modules/frame-title.el`: concise window titles with cached project labels.
 - `modules/window-layout.el`: shared bottom panels for help and diagnostics.
 - `modules/file-actions.el`: copy file paths and reveal files in Finder.
-- `modules/workspace-state.el`: restore file workspaces and save snapshots safely.
+- `modules/workspace-state.el`: manually restore and atomically save workspace snapshots.
 - `modules/buffer-management.el`: workspace-safe cleanup and project-grouped Ibuffer.
 - `modules/directory-search.el`: asynchronous `fd-cd` through Consult.
 - `modules/language-tools.el`: discover language tools and report missing binaries.
 - `modules/lsp-compat.el`: TypeScript and Vue server compatibility.
+- `modules/theme-selection.el`: switch color themes and remember the selection.
 - `tools/language-tools/`: pinned npm manifest and lockfile for language tools.
 - `plugins/terminal.el`: project-scoped Eat sessions and bottom-panel behavior.
 - `plugins/dired.el`: asynchronous Git status for Dired and Dirvish.
@@ -105,14 +106,37 @@ length-based sort, and `my-recentf` retains its most-recently-used ordering.
 
 ## Appearance
 
-`plugins/appearance.el` keeps the Gruber Darker theme and shared interface
-colors in `my-ui-palette`. Fonts remain Iosevka Term SS15 at 16 pt with Sarasa
+Use `C-c u t` or `M-x my-select-theme` to switch themes. The choice is saved
+in `var/custom.el` and restored at the next startup. Terminal shortcuts under
+`C-c t` retain their existing bindings.
+
+| Theme | Style |
+| --- | --- |
+| `gruber-darker` | Original muted charcoal interface (default) |
+| `doom-one` | One Dark, with balanced syntax colors |
+| `doom-nord` | Cool blue-gray dark theme |
+| `doom-gruvbox` | Warm, earthy dark theme |
+| `doom-tokyo-night` | Blue-purple dark theme |
+| `modus-vivendi` | High-contrast dark theme, bundled with Emacs |
+| `modus-operandi` | High-contrast light theme, bundled with Emacs |
+
+The Doom variants come from [Doom Themes](https://github.com/doomemacs/themes).
+Verified on 2026-10-27 with Emacs 30.2: all seven focused theme/completion
+checks passed, including switching every listed theme and reloading the saved
+preference. A fresh batch startup with Modus Operandi also preserved terminal
+bindings and loaded completion faces without Gruber's dark backgrounds.
+
+`plugins/appearance.el` keeps Gruber Darker's shared interface colors in
+`my-ui-palette`, scoped to the `my-gruber-ui` companion theme. Switching away
+disables those colors, allowing each theme to style selections, sidebars,
+modelines, and terminal colors. Fonts remain Iosevka Term SS15 at 16 pt with Sarasa
 Term SC for Chinese. Frames have 10 px of inner padding, 8 px fringes, and
 subtle 1 px window dividers. Source and text buffers get 0.1 line spacing;
 terminal grids retain their normal spacing.
 
-Company and Vertico share a muted selection color. Nerd Icons adds monochrome
-file and buffer icons to completion alongside Marginalia annotations. The
+With Gruber Darker, Company and Vertico share a muted selection color.
+Nerd Icons adds monochrome file and buffer icons to completion alongside
+Marginalia annotations. The
 Doom Modeline emphasizes the file, cursor position, Git branch, and Flymake
 diagnostic count, while retaining input method and process indicators.
 Long branch names are abbreviated to a 24-character budget; narrow windows
@@ -166,8 +190,9 @@ windows. The latest colors have not yet been checked in a graphical screenshot.
 Gruber Darker's legacy nil foreground/background values are normalized to
 `unspecified` before applying its faces, including after theme reloads and
 when deferred packages load. Other face attributes keep their original values.
-The theme and annotation regressions are covered by `tests/startup-ui-tests.el`;
-use that file in the focused test command below to run those checks.
+The theme and annotation regressions are covered by `tests/startup-ui-tests.el`.
+`tests/theme-selection-tests.el` covers switching, saved preferences, and terminal
+shortcut preservation. Use these files in the focused test command below.
 
 Straight checks package changes on saves instead of scanning every checkout
 at startup. After editing a package outside Emacs, run `M-x straight-check-all`
@@ -226,13 +251,12 @@ emacs -Q --batch \
 
 ## Editing and help
 
-Workspaces save their visited files and window layouts on normal interactive
-exit to `var/workspaces.el`; the previous snapshot is kept as `.bak`. A fresh
-interactive startup restores them unless a file was explicitly opened on the
-command line. Such temporary sessions also preserve the existing snapshot on
-exit. Batch processes and daemon startup do not restore or overwrite it.
-Unsaved text and running terminal processes are not serialized. Use
-`C-c w C-s` / `C-c w C-l` to save / restore a snapshot manually.
+Emacs starts with a fresh workspace. Workspaces are never automatically
+restored at startup or saved on exit. `C-c w C-s` manually saves file buffers
+and window layouts atomically to `var/workspaces.el`, keeping the previous
+snapshot as `.bak`. `C-c w C-l` explicitly restores a snapshot. Manual
+saving or restoration does not enable automatic persistence. Unsaved text
+and running terminal processes are not serialized.
 
 `C-x C-b` / `C-c b` open project-grouped Ibuffer. `fd-cd` searches directories
 asynchronously. See [workflow controls](docs/workflows.md) for cleanup safety,
@@ -482,6 +506,7 @@ Sources and file associations live in `config.el`; LSP routing lives in
 - `C-c c f` / `C-c c k`: Cape file / keyword completion.
 - `C-c t w`: toggle whitespace display.
 - `C-c t z`: toggle a centered, distraction-free Zen editing layout.
+- `C-c u t`: select a color theme and remember it for the next startup.
 - `C-c <left>` / `C-c <right>`: restore / redo window layouts.
 - `C-=` / `C-M-=`: expand / contract the selection.
 - `C->` / `C-<`: add the next / previous matching occurrence as a cursor.

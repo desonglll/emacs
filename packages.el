@@ -55,6 +55,7 @@
 ;; Emacs 30's Org satisfies org-modern; keep using the bundled version.
 (package! org :type built-in)
 (package! gruber-darker-theme)
+(package! doom-themes)
 (package! dirvish)
 (package! imenu-list)
 (package! treemacs)
