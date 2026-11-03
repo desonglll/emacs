@@ -5,6 +5,7 @@
   (when-let ((buffer (get-buffer buffer)))
     (with-current-buffer buffer
       (derived-mode-p 'help-mode 'helpful-mode 'compilation-mode
+                      'flycheck-error-list-mode
                       'flymake-diagnostics-buffer-mode
                       'flymake-project-diagnostics-mode))))
 

@@ -8,11 +8,6 @@
 (setq lsp-volar-location-for-typescript-plugin my-language-tools-directory
       lsp-toml-cache-path (expand-file-name "taplo/" my-state-directory))
 
-(my-use-package! flymake
-  :bind
-  (("C-c d b" . flymake-show-buffer-diagnostics)
-   ("C-c d p" . flymake-show-project-diagnostics)))
-
 (my-use-package! lsp-mode
   :commands (lsp lsp-deferred)
   :init
@@ -23,7 +18,7 @@
   (lsp-completion-provider :capf)
   ;; Do not retain empty results returned while a language server is indexing.
   (lsp-completion-no-cache t)
-  (lsp-diagnostics-provider :flymake)
+  (lsp-diagnostics-provider :flycheck)
   (lsp-enable-snippet t)
   (lsp-headerline-breadcrumb-enable nil)
   (lsp-idle-delay 0.5)
@@ -57,15 +52,11 @@
     (yaml-ts-mode . lsp-yaml)
     (toml-mode . lsp-toml)
     (toml-ts-mode . lsp-toml)
+    (markdown-mode . lsp-marksman)
+    (gfm-mode . lsp-marksman)
     (sh-mode . lsp-bash)
     (bash-ts-mode . lsp-bash))
   "Major modes with automatic LSP and any external client feature.")
-
-(defconst my-lsp-native-flymake-backends
-  '((python-mode . python-flymake)
-    (python-ts-mode . python-flymake)
-    (rust-ts-mode . rust-ts-flymake))
-  "Native Flymake backends superseded by LSP diagnostics.")
 
 (defun my-start-language-lsp ()
   "Start the configured language server for the current major mode."
@@ -85,9 +76,6 @@
           (setq-local lsp-enabled-clients (plist-get tools :servers))
           (when (eq client 'lsp-rust)
             (setq-local lsp-inlay-hint-enable t))
-          (when-let ((backend
-                      (alist-get major-mode my-lsp-native-flymake-backends)))
-            (remove-hook 'flymake-diagnostic-functions backend t))
           (setq-local lsp-buffer-uri (lsp--path-to-uri (file-truename buffer-file-name)))
           (lsp-deferred))))))
 
@@ -95,6 +83,11 @@
 ;; After local variables also gives EditorConfig and envrc time to run.
 (add-hook 'hack-local-variables-hook #'my-start-language-lsp 90)
 (remove-hook 'prog-mode-hook #'my-start-language-lsp)
+
+(my-use-package! lsp-marksman
+  :after lsp-mode
+  :custom
+  (lsp-marksman-server-command-args '("server")))
 
 (defun my-jdtls-server-directory ()
   "Return the JDTLS directory containing its plugins, when installed."

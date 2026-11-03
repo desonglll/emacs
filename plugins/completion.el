@@ -78,7 +78,6 @@
    ("C-x b" . consult-buffer)
    ("M-y" . consult-yank-pop)
    ("M-g e" . consult-compile-error)
-   ("M-g f" . consult-flymake)
    ("M-g g" . consult-goto-line)
    ("M-g i" . consult-imenu))
   :init
@@ -91,6 +90,9 @@
    consult-source-bookmark consult-source-file-register
    consult-source-recent-file consult-source-project-recent-file
    :preview-key '(:debounce 0.4 any)))
+
+(my-use-package! consult-flycheck
+  :bind ("M-g f" . consult-flycheck))
 
 (my-use-package! embark
   :bind

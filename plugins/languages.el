@@ -43,6 +43,19 @@
 (my-use-package! yaml-mode :mode "\\.ya?ml\\'")
 (my-use-package! toml-mode :mode "\\.toml\\'")
 
+(defun my-markdown-project (directory)
+  "Recognize a Marksman note collection rooted above DIRECTORY."
+  (when-let ((root (locate-dominating-file directory ".marksman.toml")))
+    (cons 'transient root)))
+
+(with-eval-after-load 'project
+  (add-hook 'project-find-functions #'my-markdown-project 90))
+
+(my-use-package! markdown-mode
+  :mode ("\\.\\(?:md\\|markdown\\|mdown\\)\\'" . markdown-mode)
+  :custom
+  (markdown-enable-wiki-links t))
+
 (my-use-package! web-mode
   :mode "\\.vue\\'"
   :custom

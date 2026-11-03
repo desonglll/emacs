@@ -24,6 +24,7 @@
     (lsp-yaml :servers (yamlls) :commands ("yaml-language-server"))
     (lsp-toml :servers (taplo) :commands ("taplo"))
     (lsp-bash :servers (bash-ls) :commands ("bash-language-server"))
+    (lsp-marksman :servers (marksman) :commands ("marksman"))
     (lsp-pyright :servers (pyright) :commands ("pyright-langserver"))
     (lsp-sourcekit :servers (sourcekit-ls) :commands ("sourcekit-lsp")))
   "Preferred LSP servers and required executables for each client feature.")

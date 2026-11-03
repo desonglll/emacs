@@ -1,7 +1,7 @@
 # Language setup
 
 The current Mac has all tools for Go, Java, Rust, Zig, C/C++, JS/TS/TSX, Vue 3,
-YAML, TOML, and shell editing. Restart Emacs after setup, then run
+YAML, TOML, Markdown, and shell editing. Restart Emacs after setup, then run
 `M-x my-language-tools-check` to see the resolved executable paths.
 
 ## Reproducible installation
@@ -18,7 +18,7 @@ They do not replace project packages or global npm installations.
 ./scripts/setup-language-tools --https-proxy=http://127.0.0.1:7897
 
 # macOS tools; clangd comes with the Xcode Command Line Tools.
-brew install zig zls jdtls taplo shfmt shellcheck clang-format
+brew install zig zls jdtls taplo shfmt shellcheck clang-format marksman
 go install golang.org/x/tools/gopls@latest
 rustup component add rust-analyzer rustfmt rust-src
 ```
@@ -48,7 +48,7 @@ Emacs's tool path when present. Envrc can supply a project's own environment.
   remain available in `rust-ts-mode` for build, check, test, run, and Clippy.
   Rust buffers show inferred variable types as inlay hints; toggle them for the
   current buffer with `M-x lsp-inlay-hints-mode`.
-  Local file aliases are resolved before visiting so LSP and Flymake use the
+  Local file aliases are resolved before visiting so LSP and Flycheck use the
   same canonical path.
   In Cargo compilation output, `RET` on a rustc location jumps to the source;
   `M-g e` searches all recognized compilation errors.
@@ -73,6 +73,32 @@ Emacs's tool path when present. Envrc can supply a project's own environment.
 - **Shell:** a correct `#!/bin/bash` or `#!/bin/sh` shebang identifies the
   dialect. Bash LSP uses ShellCheck for diagnostics. Shfmt receives the real
   filename so `[*.sh]` rules in `.editorconfig` apply correctly.
+- **Markdown:** `.md`, `.markdown`, and `.mdown` use `markdown-mode`, with wiki
+  links highlighted. Markdown and GFM buffers use Marksman for link completion,
+  definition/reference navigation, heading symbols, and broken-link diagnostics.
+  Keep related notes in one LSP project root: a Git repository or a folder with
+  an empty `.marksman.toml` is suitable. Emacs recognizes that marker as a
+  project root even without Git, including from nested note directories.
+  When LSP asks for a root, select that folder. A single-file session cannot
+  resolve links to the rest of a vault.
+  Marksman is an external executable installed through Homebrew; its LSP client
+  is already bundled in `lsp-mode`. Markdown formatting remains with Prettier.
+
+Flycheck is the shared diagnostics display for LSP. `M-g f` uses
+`consult-flycheck`; `C-c d b` opens the current buffer's error list and
+`C-c d p` shows collected diagnostics from the current project. Both lists use
+the bottom panel. Enabling Flycheck disables Flymake in that buffer. LSP files
+wait for server initialization instead of running an additional standalone
+checker first. Other supported local files enable Flycheck after local settings
+load; large and remote files skip automatic checks. `M-x flycheck-verify-setup`
+shows the active checker and executable availability.
+
+Inline messages use Flycheck's built-in `flycheck-annotate-mode`: the current
+line shows full diagnostics underneath, and other lines show a compact message
+after the code. Error IDs are included when supplied by the checker. The text
+is an overlay, so it does not change the file. `M-x flycheck-annotate-mode`
+toggles inline messages in the current buffer. Gruber Darker uses the existing
+muted severity colors for the messages.
 
 Prettier uses the nearest project's executable when available, including its
 plugins and configuration. `.prettierrc`, `.prettierignore`, `.editorconfig`,
@@ -140,4 +166,21 @@ open or build user projects. They are separate from ordinary configuration
 checks because they require the external toolchains.
 
 Protocol references: [TypeScript language server](https://github.com/typescript-language-server/typescript-language-server),
-[Vue server integration](https://github.com/vuejs/language-tools/discussions/5456).
+[Vue server integration](https://github.com/vuejs/language-tools/discussions/5456),
+[Marksman](https://github.com/artempyanykh/marksman),
+[Flycheck](https://www.flycheck.org/en/latest/user/installation.html).
+
+Markdown/Flycheck checks, including a real Marksman process in a temporary
+two-document project, are in `tests/marksman-tests.el`. Use that test file with
+the focused batch command above to verify link navigation, completion,
+diagnostic delivery, and the buffer/project list controls.
+
+Verified on 2026-10-28 with Emacs 30.2, Marksman 2026-02-08, and Flycheck
+40.0-snapshot: ten focused checks passed. A real Marksman process resolved a
+cross-file heading link, completed a wiki link, and delivered two deliberately
+broken-link diagnostics through Flycheck. The checks also covered project
+error lists, `.marksman.toml` roots without Git, existing language routing,
+Markdown hard breaks, completion, and Gruber Darker theme reloads.
+Three additional focused checks verified inline messages from real Marksman
+diagnostics in both the current-line and end-of-line layouts, unchanged file
+contents, the diagnostics panel, and theme reloads.

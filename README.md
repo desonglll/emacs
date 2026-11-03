@@ -39,6 +39,7 @@ then config the dired to use GNU gls.
 - `tools/language-tools/`: pinned npm manifest and lockfile for language tools.
 - `plugins/terminal.el`: project-scoped Eat sessions and bottom-panel behavior.
 - `plugins/dired.el`: asynchronous Git status for Dired and Dirvish.
+- `plugins/diagnostics.el`: Flycheck diagnostics, error lists, and checking policy.
 - `modules/rc.el`: personal interactive commands.
 - `modules/keymaps.el`: global key bindings.
 - `local.el`: optional machine-specific settings; ignored by Git.
@@ -137,7 +138,7 @@ terminal grids retain their normal spacing.
 With Gruber Darker, Company and Vertico share a muted selection color.
 Nerd Icons adds monochrome file and buffer icons to completion alongside
 Marginalia annotations. The
-Doom Modeline emphasizes the file, cursor position, Git branch, and Flymake
+Doom Modeline emphasizes the file, cursor position, Git branch, and Flycheck
 diagnostic count, while retaining input method and process indicators.
 Long branch names are abbreviated to a 24-character budget; narrow windows
 also use Doom Modeline's compact layout.
@@ -152,7 +153,7 @@ consistent selection background. Treemacs and Imenu List use about 18% of the
 frame width, capped at 32 columns; they adapt when the frame width changes.
 Treemacs follows the current file after a short idle delay. Search
 highlights distinguish the active match in amber from other matches in a
-subtle background. Selection, matching parentheses, and Flymake diagnostics
+subtle background. Selection, matching parentheses, and Flycheck diagnostics
 use the same palette. ANSI and Eat's standard 16 terminal colors are also
 coordinated; programs that emit explicit RGB colors retain their own colors.
 
@@ -297,11 +298,11 @@ Prefix groups use English labels such as `Files`, `Workspace`, `Diagnostics`,
 and `Terminal / Toggles`; the latter also retains the existing TODO and
 whitespace commands.
 
-Help, Flymake diagnostic lists, grep results, and compilation output use the
+Help, Flycheck diagnostic lists, grep results, and compilation output use the
 same bottom panel slot as Eat, at about 30% of frame height. They preserve the
 editor's split windows and any hidden terminal process. `q` closes/restores
 the auxiliary view using Emacs's normal window history. `M-g f` searches
-Flymake diagnostics with preview; `M-g e` searches compilation errors.
+Flycheck diagnostics with preview; `M-g e` searches compilation errors.
 `C-c d b` / `C-c d p` opens the buffer/project diagnostic list. Definition and
 reference results use Consult through Xref, retaining `M-.`, `M-?`, and `M-,`.
 
@@ -446,7 +447,13 @@ workspace after changing its toolchain or environment.
 
 Opening a local source file starts the matching language server after project
 settings and Envrc have loaded. Completion uses Company/CAPF, navigation uses
-Xref, and diagnostics use Flymake. Missing tools produce a message instead of
+Xref, and diagnostics use Flycheck. Flymake is disabled when Flycheck takes
+over a buffer. Files assigned to LSP wait for their server to enable Flycheck,
+avoiding duplicate standalone checks during initialization. Other supported
+local files use Flycheck directly; large and remote files skip automatic checks.
+Inline diagnostics appear below the current line and after the code on other
+lines. `M-x flycheck-annotate-mode` toggles this display for the current buffer.
+Missing tools produce a message instead of
 an install prompt; `M-x my-language-tools-check` reports the available paths.
 
 | Files | Mode | Language server | Format on save |
@@ -461,6 +468,7 @@ an install prompt; `M-x my-language-tools-check` reports the available paths.
 | YAML | yaml-ts-mode | yaml-language-server | Prettier |
 | TOML | toml-ts-mode | Taplo | taplo fmt |
 | sh / Bash | bash-ts-mode | bash-language-server + ShellCheck | shfmt |
+| Markdown | markdown-mode / gfm-mode | Marksman | Prettier |
 
 Traditional modes remain as fallbacks where grammars are unavailable. Protobuf
 has a dedicated mode. Python (Pyright), Swift (SourceKit), and Typst (Tinymist)
@@ -495,7 +503,7 @@ Sources and file associations live in `config.el`; LSP routing lives in
 - `C-c f g`: search text with Consult and ripgrep.
 - `C-c f y` / `C-c f Y`: copy absolute / project-relative file path.
 - `C-c f o` / `C-c f R`: reveal in Finder / rename the visited file.
-- `M-g f` / `M-g e`: search Flymake diagnostics / compilation errors.
+- `M-g f` / `M-g e`: search Flycheck diagnostics / compilation errors.
 - `C-c d b` / `C-c d p`: show buffer / project diagnostics.
 - `C-M-\`: format the active region or buffer.
 - `M-.` / `M-,` / `M-?`: definition / back / references.
