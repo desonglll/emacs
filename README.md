@@ -38,6 +38,7 @@ then config the dired to use GNU gls.
 - `modules/theme-selection.el`: switch color themes and remember the selection.
 - `tools/language-tools/`: pinned npm manifest and lockfile for language tools.
 - `plugins/terminal.el`: project-scoped Eat sessions and bottom-panel behavior.
+- `plugins/ghostel.el`: Ghostel terminal commands and native module storage.
 - `plugins/dired.el`: asynchronous Git status for Dired and Dirvish.
 - `plugins/diagnostics.el`: Flycheck diagnostics, error lists, and checking policy.
 - `modules/rc.el`: personal interactive commands.
@@ -346,6 +347,25 @@ forward / backward, and `C-c t o` lists the current buffer's markers.
 
 ## Terminal, HTTP requests, and project environments
 
+`C-c t g` or `M-x ghostel` opens a Ghostel terminal powered by libghostty.
+`C-u C-c t g` creates another session; `M-x ghostel-project` opens one in the
+current project root. `M-x ghostel-list-buffers` selects among Ghostel sessions.
+Use `C-c C-t` for copy mode and `C-c C-j` to resume terminal input. `M-w` or
+Command-C copies selected output, and Command-V pastes. Ghostel buffers are
+included in Ibuffer's terminal group and protected by workspace cleanup.
+
+Ghostel requires Emacs dynamic module support. The pinned package uses the
+matching prebuilt module, stored in `var/ghostel/`; first use on a new machine
+downloads it automatically. No local Zig build is needed. Its shell integration
+tracks the current directory without adding commands to shell startup files.
+See the [Ghostel manual](https://dakra.github.io/ghostel/) for other input modes
+and optional extensions.
+
+Verified on 2026-11-05 with Emacs 30.2 and Ghostel 0.60.0: the Apple Silicon
+native module loaded successfully, and both checks in `tests/ghostel-tests.el`
+passed using real local shells. They covered input/output, colored text, copying,
+terminal key bindings/grouping, clean terminal layout, and zsh directory tracking.
+
 `C-c t t` toggles an Eat panel along the bottom, using about 30% of the frame
 height. The panel reuses the most recent terminal for the current project,
 starting in its root directory; outside a project it uses the current
@@ -530,6 +550,7 @@ Sources and file associations live in `config.el`; LSP routing lives in
 - `C-x u`: visual undo history.
 - `C-c e`: toggle simultaneous editing with Iedit.
 - `C-c t t`: show / hide the current project's terminal panel.
+- `C-c t g`: open Ghostel; with a prefix, create another session.
 - `C-u C-c t t`: create another project terminal session.
 - `C-c t s` / `C-c t r`: select / rename a terminal; prefix selects all projects.
 - `C-c t n` / `C-c t p` / `C-c t o`: next / previous / list TODO markers.

@@ -1,4 +1,8 @@
-;;; packages.el --- Central package declarations -*- lexical-binding: t; -*-
+;;; packages.el --- Central package declarations -*- lexical-binding: t; -*-a
+
+;;; Commentary:
+
+;;; Code:
 
 (setq straight-base-dir my-data-directory
       straight-profiles
@@ -38,7 +42,7 @@
       use-package-always-defer t)
 
 (defmacro my-use-package! (name &rest arguments)
-  "Configure the declared package NAME with use-package ARGUMENTS."
+  "Configure the declared package NAME with `use-package` ARGUMENTS."
   (declare (indent 1))
   `(use-package ,name
      :straight nil
@@ -113,6 +117,10 @@
 
 (package! exec-path-from-shell)
 (package! envrc)
+(package! ghostel
+  :type git :host github :repo "dakra/ghostel"
+  :files (:defaults "etc" "src" "vendor" "build.zig" "build.zig.zon"
+                    "symbols.map"))
 (package! eat
   :type git :host codeberg :repo "akib/emacs-eat"
   :local-repo "eat"

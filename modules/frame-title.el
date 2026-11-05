@@ -18,7 +18,7 @@
     (let ((label (cond
                   ((derived-mode-p 'treemacs-mode 'dired-mode) "Files")
                   ((derived-mode-p 'imenu-list-major-mode) "Outline")
-                  ((derived-mode-p 'eat-mode) "Terminal")
+                  ((derived-mode-p 'eat-mode 'ghostel-mode) "Terminal")
                   (buffer-file-name (file-name-nondirectory buffer-file-name))
                   ((equal (buffer-name) "*scratch*") "Scratch")
                   (t (string-trim (buffer-name) "\\*+" "\\*+")))))
@@ -26,7 +26,7 @@
 
 (dolist (hook '(find-file-hook after-set-visited-file-name-hook
                 dired-mode-hook treemacs-mode-hook
-                imenu-list-major-mode-hook eat-mode-hook))
+                imenu-list-major-mode-hook eat-mode-hook ghostel-mode-hook))
   (add-hook hook #'my-ui-cache-title-project))
 
 (setq frame-title-format '(:eval (my-ui-frame-title))

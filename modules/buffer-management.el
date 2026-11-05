@@ -18,7 +18,7 @@ also consider modified buffers, using the normal save/discard prompt."
                      (and (not (string-prefix-p " " (buffer-name)))
                           (not (string-prefix-p "*" (buffer-name)))
                           (not (get-buffer-process buffer))
-                          (not (derived-mode-p 'eat-mode 'term-mode 'comint-mode
+                          (not (derived-mode-p 'eat-mode 'ghostel-mode 'term-mode 'comint-mode
                                                'compilation-mode 'special-mode))
                           (or (not (buffer-modified-p))
                               (and force
@@ -47,7 +47,8 @@ also consider modified buffers, using the normal save/discard prompt."
             (cl-pushnew my-ibuffer-project-root roots :test #'equal)))))
     (append
      '(("Unsaved files" (and (modified) (visiting-file)))
-       ("Terminals" (or (mode . eat-mode) (mode . term-mode) (mode . shell-mode)))
+       ("Terminals" (or (mode . eat-mode) (mode . ghostel-mode)
+                        (mode . term-mode) (mode . shell-mode)))
        ("Remote" (predicate . (file-remote-p default-directory))))
      ;; Compare project identities, so nested projects and symlinked paths work.
      (mapcar (lambda (root)

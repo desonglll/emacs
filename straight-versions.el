@@ -32,6 +32,7 @@
  ("expreg" . "43433f0e78378494441d16b1dac6595ce2135198")
  ("f.el" . "931b6d0667fe03e7bf1c6c282d6d8d7006143c52")
  ("flycheck" . "0707e3426edf8dd9529bd8ad1058eb0b3add4507")
+ ("ghostel" . "1c8abe0bb6c109ae20476eb2b5124755655a4ea4")
  ("gnu-elpa-mirror" . "f0852d36505d0672d0eb16eb926e0a57a9127e3c")
  ("go-mode.el" . "3a71d28ab47df685e54ca6046a7a3dd3e28b682c")
  ("gptel" . "9cafa41e7172a995e4eeadb5049a8c05bf7c30ba")
