@@ -110,10 +110,12 @@ length-based sort, and `my-recentf` retains its most-recently-used ordering.
 Use `C-c u t` or `M-x my-select-theme` to switch themes. The choice is saved
 in `var/custom.el` and restored at the next startup. Terminal shortcuts under
 `C-c t` retain their existing bindings.
+The picker and confirmation use English: `Theme: ` and `Theme switched: nord`.
 
 | Theme | Style |
 | --- | --- |
 | `gruber-darker` | Original muted charcoal interface (default) |
+| `nord` | Official Nord theme, with arctic blue-gray colors |
 | `doom-one` | One Dark, with balanced syntax colors |
 | `doom-nord` | Cool blue-gray dark theme |
 | `doom-gruvbox` | Warm, earthy dark theme |
@@ -122,6 +124,12 @@ in `var/custom.el` and restored at the next startup. Terminal shortcuts under
 | `modus-operandi` | High-contrast light theme, bundled with Emacs |
 
 The Doom variants come from [Doom Themes](https://github.com/doomemacs/themes).
+`nord` comes from the official [Nord Emacs](https://github.com/nordtheme/emacs)
+repository. Select `nord` with `C-c u t` to use that implementation.
+Verified on 2026-11-05 with Emacs 30.2: all three theme-selection checks passed,
+including Nord activation, removal of Gruber-specific colors when switching,
+saved preferences, and terminal shortcut preservation.
+
 Verified on 2026-10-27 with Emacs 30.2: all seven focused theme/completion
 checks passed, including switching every listed theme and reloading the saved
 preference. A fresh batch startup with Modus Operandi also preserved terminal

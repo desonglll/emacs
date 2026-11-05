@@ -56,6 +56,9 @@
 (package! org :type built-in)
 (package! gruber-darker-theme)
 (package! doom-themes)
+(package! nord-theme
+  :type git :host github :repo "nordtheme/emacs"
+  :local-repo "nord-theme")
 (package! dirvish)
 (package! imenu-list)
 (package! treemacs)

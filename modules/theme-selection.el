@@ -5,7 +5,7 @@
   :group 'faces)
 
 (defconst my-theme-choices
-  '(gruber-darker doom-one doom-nord doom-gruvbox doom-tokyo-night
+  '(gruber-darker nord doom-one doom-nord doom-gruvbox doom-tokyo-night
     modus-vivendi modus-operandi)
   "Themes offered by `my-select-theme'.")
 
@@ -43,13 +43,13 @@
   (setq my-preferred-theme theme)
   (when remember
     (customize-save-variable 'my-preferred-theme theme)
-    (message "已切换主题：%s" theme)))
+    (message "Theme switched: %s" theme)))
 
 (defun my-select-theme ()
   "Choose a color theme and remember it for future Emacs sessions."
   (interactive)
   (my-load-theme
-   (intern (completing-read "主题："
+   (intern (completing-read "Theme: "
                             (mapcar #'symbol-name my-theme-choices)
                             nil t nil nil (symbol-name my-preferred-theme)))
    t))

@@ -62,6 +62,7 @@
  ("nerd-icons-completion" . "f924dd490c8c4c1066fd97a76e0dc31e303fca30")
  ("nerd-icons.el" . "674909974637ff0ec2b5ebf43f9a8aefa35d93e9")
  ("nongnu-elpa" . "f9994e234b4fc9978eb8458e2237be4603d96f89")
+ ("nord-theme" . "551b2b8a0751c0a22e5c5daa6958152f208e668f")
  ("orderless" . "0ffd9d6903714c1f6d8fcbb6a20941fb33dd7ae5")
  ("org-modern" . "d106d02cf045cc968c09989e9c48e0f2b44c574c")
  ("pdf-tools" . "365f88238f46f9b1425685562105881800f10386")
