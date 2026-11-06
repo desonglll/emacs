@@ -16,9 +16,10 @@ manually if the stored snapshot should also reflect that deletion. Use
 unsaved text or running jobs. Reloading `modules/workspace-state.el` also removes
 the old startup/exit hooks and automatic-saving advice in an existing session.
 
-`M-x my/kill-other-buffers` closes other unmodified user buffers in the current
-workspace. A buffer shared with another workspace is only removed from the
-current one. Terminals, process buffers, and internal buffers are preserved.
+`C-s-k` (Control-Command-K on macOS) or `M-x my/kill-other-buffers` closes other
+unmodified user buffers in the current workspace. A buffer shared with another
+workspace is only removed from the current one. Terminals, process buffers,
+and internal buffers are preserved.
 With `C-u`, modified files use Emacs's normal save/discard prompt; modified
 non-file buffers require confirmation. The prefix does not broaden the scope.
 

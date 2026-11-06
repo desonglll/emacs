@@ -1,7 +1,10 @@
 ;;; keymaps.el --- keymap configuration -*- lexical-binding: t; -*-
 
+;;; Commentary:
+
 ;;;; Global key bindings
 
+;;; Code:
 (dolist (binding
          '(("M-<f2>" . dired-jump)
            ("C-," . duplicate-line)
@@ -12,6 +15,7 @@
            ("s-e" . treemacs)
            ("M-o" . ace-window)
            ("C-c RET" . ffap)
+           ("C-s-k" . my/kill-other-buffers)
            ("C-c f r" . my-recentf)
            ("C-c f f" . consult-fd)
            ("C-c f g" . consult-ripgrep)
