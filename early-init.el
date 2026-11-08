@@ -1,5 +1,12 @@
 ;;; early-init.el --- Early startup settings -*- lexical-binding: t; -*-
 
+;;; Commentary:
+
+;;; Code:
+
+;; Older packages may omit this declaration; Emacs 31 warns when loading them.
+(add-to-list 'warning-suppress-log-types '(files missing-lexbind-cookie))
+
 ;; Keep package.el from activating packages before init.el is evaluated.
 (setq package-enable-at-startup nil)
 
