@@ -197,6 +197,11 @@ windows. The latest colors have not yet been checked in a graphical screenshot.
 
 ## Startup and file performance
 
+`early-init.el` loads the built-in `warnings` library before configuring
+`warning-suppress-log-types`, which is not preloaded in Emacs 31.1. It suppresses
+missing `lexical-binding` cookie warnings from older packages, including the
+Gruber Darker and Nord themes, without changing their binding semantics.
+
 Gruber Darker's legacy nil foreground/background values are normalized to
 `unspecified` before applying its faces, including after theme reloads and
 when deferred packages load. Other face attributes keep their original values.

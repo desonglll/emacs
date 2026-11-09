@@ -4,6 +4,9 @@
 
 ;;; Code:
 
+;; Warning variables are not preloaded during early initialization.
+(require 'warnings)
+
 ;; Older packages may omit this declaration; Emacs 31 warns when loading them.
 (add-to-list 'warning-suppress-log-types '(files missing-lexbind-cookie))
 
