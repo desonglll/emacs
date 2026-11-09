@@ -18,6 +18,7 @@
     (lsp-java :servers (jdtls) :commands ("jdtls"))
     (lsp-rust :servers (rust-analyzer) :commands ("rust-analyzer"))
     (lsp-zig :servers (zls) :commands ("zls"))
+    (lsp-lua :servers (lua-language-server) :commands ("lua-language-server"))
     (lsp-javascript :servers (ts-ls) :commands ("typescript-language-server"))
     (lsp-volar :servers (ts-ls vue-semantic-server)
                :commands ("typescript-language-server" "vue-language-server"))

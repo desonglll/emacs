@@ -40,6 +40,8 @@
     (rust-mode . lsp-rust)
     (rust-ts-mode . lsp-rust)
     (zig-mode . lsp-zig)
+    (lua-mode . lsp-lua)
+    (lua-ts-mode . lsp-lua)
     (swift-mode . lsp-sourcekit)
     (swift-ts-mode . lsp-sourcekit)
     (js-mode . lsp-javascript)
@@ -83,6 +85,11 @@
 ;; After local variables also gives EditorConfig and envrc time to run.
 (add-hook 'hack-local-variables-hook #'my-start-language-lsp 90)
 (remove-hook 'prog-mode-hook #'my-start-language-lsp)
+
+(my-use-package! lsp-lua
+  :after lsp-mode
+  :custom
+  (lsp-clients-lua-language-server-command '("lua-language-server")))
 
 (my-use-package! lsp-marksman
   :after lsp-mode

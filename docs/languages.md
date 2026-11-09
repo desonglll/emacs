@@ -1,6 +1,6 @@
 # Language setup
 
-The current Mac has all tools for Go, Java, Rust, Zig, C/C++, JS/TS/TSX, Vue 3,
+The current Mac has all tools for Go, Java, Rust, Zig, Lua, C/C++, JS/TS/TSX, Vue 3,
 YAML, TOML, Markdown, and shell editing. Restart Emacs after setup, then run
 `M-x my-language-tools-check` to see the resolved executable paths.
 
@@ -18,7 +18,7 @@ They do not replace project packages or global npm installations.
 ./scripts/setup-language-tools --https-proxy=http://127.0.0.1:7897
 
 # macOS tools; clangd comes with the Xcode Command Line Tools.
-brew install zig zls jdtls taplo shfmt shellcheck clang-format marksman
+brew install zig zls lua-language-server jdtls taplo shfmt shellcheck clang-format marksman
 go install golang.org/x/tools/gopls@latest
 rustup component add rust-analyzer rustfmt rust-src
 ```
@@ -55,6 +55,12 @@ Emacs's tool path when present. Envrc can supply a project's own environment.
 - **Zig:** `zig-mode` handles `.zig` source and `.zon` package manifests. ZLS
   supplies completion, navigation, diagnostics, rename, inlay hints, and code
   actions. `zig fmt` formats saves; manifests are passed its `--zon` flag.
+- **Lua:** `.lua` files use `lua-ts-mode` when its grammar is installed, with
+  `lua-mode` as the built-in fallback in Emacs 31. Both automatically connect to
+  LuaLS (`lua-language-server`) for completion, navigation, diagnostics, rename,
+  and code actions. The executable is installed through Homebrew; its client
+  ships with `lsp-mode`. Use a project-root `.luarc.json` for runtime versions,
+  library paths, and environment-specific globals rather than global defaults.
 - **C/C++:** provide `compile_commands.json` for accurate includes and compiler
   flags. For CMake, configure with `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`; clangd
   searches the project and conventional build directories. `.clangd` can
@@ -184,3 +190,9 @@ Markdown hard breaks, completion, and Gruber Darker theme reloads.
 Three additional focused checks verified inline messages from real Marksman
 diagnostics in both the current-line and end-of-line layouts, unchanged file
 contents, the diagnostics panel, and theme reloads.
+
+Verified on 2026-11-09 with Emacs 31.1 and LuaLS 3.19.2: batch initialization,
+`lua-mode` fallback without a grammar, and `lua-ts-mode` LSP routing passed.
+A real LuaLS process in a temporary project returned local-variable completion,
+definition locations, document symbols, and diagnostics displayed by Flycheck.
+Feature requests were checked after the server's asynchronous initial analysis.
