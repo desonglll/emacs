@@ -45,7 +45,7 @@
 
 (defun my-markdown-project (directory)
   "Recognize a Marksman note collection rooted above DIRECTORY."
-  (when-let ((root (locate-dominating-file directory ".marksman.toml")))
+  (when-let* ((root (locate-dominating-file directory ".marksman.toml")))
     (cons 'transient root)))
 
 (with-eval-after-load 'project

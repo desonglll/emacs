@@ -13,7 +13,7 @@
           (auto-mode-alist auto-mode-alist))
      (unwind-protect (progn ,@body)
        (dolist (buffer (buffer-list))
-         (when-let ((file (buffer-file-name buffer)))
+         (when-let* ((file (buffer-file-name buffer)))
            (when (string-prefix-p directory file)
              (with-current-buffer buffer (set-buffer-modified-p nil))
              (kill-buffer buffer))))
@@ -164,6 +164,10 @@
                      ("build.zig.zon" ".{.name=.example,.version=\"0.0.0\"}\n"
                       ".{ .name = .example, .version = \"0.0.0\" }")
                      ("main.ts" "function greet(){\nconsole.log(\"hello\")\n}\n" "    console.log('hello');")
+                     ("main.py" "def greet( name ):\n return {'hello':name}\n"
+                      "    return {\"hello\": name}")
+                     ("Dockerfile" "from    alpine:3.20\nrun    echo   hello\n"
+                      "FROM alpine:3.20\nRUN echo hello")
                      ("main.sh" "#!/bin/bash\nif true; then\necho hello\nfi\n" "    echo hello")
                      ("main.toml" "name=\"test\"\n" "name = \"test\"")))
       (with-current-buffer (find-file-noselect (my-test-language-file (car entry) (cadr entry)))

@@ -59,7 +59,7 @@
             (with-current-buffer flycheck-error-list-buffer
               (should (eq flycheck-error-list-scope 'buffer))))
         (flycheck-mode -1)
-        (when-let ((buffer (get-buffer flycheck-error-list-buffer)))
+        (when-let* ((buffer (get-buffer flycheck-error-list-buffer)))
           (kill-buffer buffer))))))
 
 (ert-deftest my-marksman-marker-identifies-a-project-without-git ()
@@ -166,7 +166,7 @@
             (lsp-workspace-shutdown workspace))
           (set-buffer-modified-p nil)
           (kill-buffer buffer)))
-      (when-let ((errors (get-buffer flycheck-error-list-buffer)))
+      (when-let* ((errors (get-buffer flycheck-error-list-buffer)))
         (kill-buffer errors))
       (delete-directory directory t))))
 

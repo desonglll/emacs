@@ -72,7 +72,7 @@
       (dolist (buffer buffers)
         (with-current-buffer buffer (set-buffer-modified-p nil))
         (kill-buffer buffer))
-      (when-let ((buffer (get-buffer "*Ibuffer*"))) (kill-buffer buffer))
+      (when-let* ((buffer (get-buffer "*Ibuffer*"))) (kill-buffer buffer))
       (delete-directory directory t))))
 
 (ert-deftest my-buffer-cleanup-prefix-respects-unsaved-non-file-buffer-refusal ()

@@ -21,7 +21,7 @@ Manual formatting with `C-M-\\' is unaffected.")
 
 (defun format/register-mode (language mode)
   "Register MODE as LANGUAGE in language-id's mode table."
-  (if-let ((definition (assoc language language-id--definitions)))
+  (if-let* ((definition (assoc language language-id--definitions)))
       (unless (memq mode (cdr definition))
         (setcdr definition (cons mode (cdr definition))))
     (push (list language mode) language-id--definitions)))
@@ -127,6 +127,13 @@ Manual formatting with `C-M-\\' is unaffected.")
     (format/register-mode "Swift" 'swift-ts-mode)
     (format/register-mode "Typst" 'typst-ts-mode))
   :config
+  ;; dockerfmt accepts Dockerfile contents directly on stdin.
+  (define-format-all-formatter dockerfmt
+    (:executable "dockerfmt")
+    (:install (macos "brew install dockerfmt"))
+    (:languages "Dockerfile")
+    (:features)
+    (:format (format-all--buffer-easy executable)))
   ;; Upstream shfmt appends .bash to filenames, which breaks [*.sh]
   ;; EditorConfig sections.  Preserve the real filename and shebang detection.
   (define-format-all-formatter project-shfmt
@@ -152,7 +159,7 @@ Manual formatting with `C-M-\\' is unaffected.")
                 '(("C" clang-format)
                   ("C++" clang-format)
                   ("CSS" prettier)
-                  ("Dockerfile" dockfmt)
+                  ("Dockerfile" dockerfmt)
                   ("Emacs Lisp" emacs-lisp)
                   ("Go" gofmt)
                   ("HTML" prettier)

@@ -98,6 +98,10 @@ Keep prefix ARG's workspace selection and the usual toggle for populated trees."
 
 (my-use-package! pdf-tools
   :mode ("\\.pdf\\'" . pdf-view-mode)
+  :init
+  (setq pdf-info-epdfinfo-program
+        (expand-file-name "pdf-tools/epdfinfo" my-state-directory))
+  (make-directory (file-name-directory pdf-info-epdfinfo-program) t)
   :config
   (pdf-tools-install))
 

@@ -98,7 +98,7 @@
 
 (defun my-jdtls-server-directory ()
   "Return the JDTLS directory containing its plugins, when installed."
-  (when-let ((command (executable-find "jdtls")))
+  (when-let* ((command (executable-find "jdtls")))
     (let* ((bin-directory (file-name-directory (file-truename command)))
            (install-directory
             (file-name-directory (directory-file-name bin-directory)))
@@ -129,7 +129,7 @@
         (expand-file-name "lsp-java/workspace/" my-state-directory)
         lsp-java-workspace-cache-dir
         (expand-file-name "lsp-java/cache/" my-state-directory))
-  (when-let ((server-directory (my-jdtls-server-directory)))
+  (when-let* ((server-directory (my-jdtls-server-directory)))
     (setq my-jdtls-external-server-directory server-directory
           lsp-java-server-install-dir server-directory
           lsp-java-jdt-ls-prefer-native-command t
@@ -137,7 +137,7 @@
   :config
   (advice-add 'lsp-java--ls-command :filter-return #'my-jdtls-native-workspace)
   ;; Do not let lsp-java replace or delete a system-managed installation.
-  (when-let ((client (and my-jdtls-external-server-directory
+  (when-let* ((client (and my-jdtls-external-server-directory
                           (gethash 'jdtls lsp-clients))))
     (aset client
           (cl-struct-slot-offset 'lsp--client 'download-server-fn)

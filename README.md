@@ -197,6 +197,9 @@ windows. The latest colors have not yet been checked in a graphical screenshot.
 
 ## Startup and file performance
 
+The configuration and its checks use `if-let*` and `when-let*`, avoiding the
+older macros' deprecation warnings on Emacs 31.
+
 `early-init.el` loads the built-in `warnings` library before configuring
 `warning-suppress-log-types`, which is not preloaded in Emacs 31.1. It suppresses
 missing `lexical-binding` cookie warnings from older packages, including the
@@ -476,6 +479,26 @@ are buffer-local; Envrc starts late during initialization so newly launched
 project tools can use the appropriate environment. Restart an existing LSP
 workspace after changing its toolchain or environment.
 
+## PDF reading
+
+PDF Tools uses the backend at `var/pdf-tools/epdfinfo`, outside downloaded
+package files so rebuilding Straight packages does not remove it.
+After packages have been bootstrapped, install or rebuild the backend from
+the configuration root:
+
+```sh
+brew install pkgconf poppler autoconf automake
+mkdir -p var/pdf-tools
+pdf_backend_dir="$(pwd)/var/pdf-tools"
+(cd straight/repos/pdf-tools/server && ./autobuild -D -i "$pdf_backend_dir")
+```
+
+Open a `.pdf` file normally to use PDF View. `M-x my-language-tools-check`
+reports the configured backend path and whether it is executable.
+
+Verified on 2026-11-10 with Emacs 31.1 and Poppler 26.08.0: backend startup,
+reading a six-page test PDF, text extraction, and 600-pixel PNG rendering passed.
+
 ## Language support
 
 Opening a local source file starts the matching language server after project
@@ -496,6 +519,8 @@ an install prompt; `M-x my-language-tools-check` reports the available paths.
 | Rust | rust-ts-mode | rust-analyzer | rust-analyzer / rustfmt |
 | Zig / ZON | zig-mode | ZLS | zig fmt |
 | C / C++ | c-ts-mode / c++-ts-mode | clangd | clang-format |
+| Python | python-ts-mode | Pyright | Black |
+| Dockerfile | dockerfile-ts-mode | — | dockerfmt |
 | JS / TS / TSX | native Tree-sitter modes | typescript-language-server | Prettier |
 | Vue 3 SFC | web-mode | Vue language server + TypeScript | Prettier |
 | YAML | yaml-ts-mode | yaml-language-server | Prettier |

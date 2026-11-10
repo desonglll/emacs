@@ -2,7 +2,7 @@
 
 (defun my-auxiliary-buffer-p (buffer _action)
   "Match help, diagnostics, search results, and compilation BUFFER."
-  (when-let ((buffer (get-buffer buffer)))
+  (when-let* ((buffer (get-buffer buffer)))
     (with-current-buffer buffer
       (derived-mode-p 'help-mode 'helpful-mode 'compilation-mode
                       'flycheck-error-list-mode

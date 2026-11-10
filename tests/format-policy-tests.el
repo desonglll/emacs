@@ -53,7 +53,7 @@
                 (insert "// second save\n")
                 (save-buffer)))))
       (dolist (buffer (buffer-list))
-        (when-let ((file (buffer-file-name buffer)))
+        (when-let* ((file (buffer-file-name buffer)))
           (when (string-prefix-p directory file)
             (with-current-buffer buffer (set-buffer-modified-p nil))
             (kill-buffer buffer))))

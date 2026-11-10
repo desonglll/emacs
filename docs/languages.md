@@ -19,6 +19,7 @@ They do not replace project packages or global npm installations.
 
 # macOS tools; clangd comes with the Xcode Command Line Tools.
 brew install zig zls lua-language-server jdtls taplo shfmt shellcheck clang-format marksman
+brew install black dockerfmt
 go install golang.org/x/tools/gopls@latest
 rustup component add rust-analyzer rustfmt rust-src
 ```
@@ -65,6 +66,11 @@ Emacs's tool path when present. Envrc can supply a project's own environment.
   flags. For CMake, configure with `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`; clangd
   searches the project and conventional build directories. `.clangd` can
   specify a nonstandard compilation database. Formatting follows `.clang-format`.
+- **Python:** Pyright supplies language features; Black formats on save using
+  the project's `pyproject.toml` settings. Envrc can select a project-specific
+  Black installation instead of the Homebrew fallback.
+- **Dockerfile:** `dockerfile-ts-mode` uses dockerfmt for formatting on save.
+  This replaces the old dockfmt executable; no Docker daemon is needed.
 - **JS/TS/TSX:** keep `tsconfig.json` or `jsconfig.json` and installed project
   dependencies. The project TypeScript SDK takes precedence when it provides
   tsserver. TypeScript 7 projects fall back to the bundled TypeScript 6 editing
@@ -196,3 +202,10 @@ Verified on 2026-11-09 with Emacs 31.1 and LuaLS 3.19.2: batch initialization,
 A real LuaLS process in a temporary project returned local-variable completion,
 definition locations, document symbols, and diagnostics displayed by Flycheck.
 Feature requests were checked after the server's asynchronous initial analysis.
+
+Verified on 2026-11-10 with Emacs 31.1, Black 26.10.1, and dockerfmt 0.5.4:
+25 focused language, formatting-policy, completion, buffer-management, and
+sidebar checks passed, including actual Python and Dockerfile save formatting.
+The configuration and LSP client setup loaded without the old conditional
+macros' deprecation warnings. `my-language-tools-check` now includes Black,
+dockerfmt, and the configured PDF backend.

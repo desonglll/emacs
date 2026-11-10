@@ -31,7 +31,7 @@
          (when (buffer-live-p buffer)
            (with-current-buffer buffer
              (when (derived-mode-p 'eat-mode)
-               (when-let ((process (get-buffer-process buffer)))
+               (when-let* ((process (get-buffer-process buffer)))
                  (set-process-query-on-exit-flag process nil)
                  (delete-process process))
                (kill-buffer buffer)))))

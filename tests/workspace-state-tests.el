@@ -47,7 +47,7 @@
       (dolist (name (list one two))
         (when (member name (persp-names)) (persp-kill name)))
       (dolist (file files)
-        (when-let ((buffer (get-file-buffer file))) (kill-buffer buffer)))
+        (when-let* ((buffer (get-file-buffer file))) (kill-buffer buffer)))
       (delete-directory directory t))))
 
 (ert-deftest my-workspace-failed-save-preserves-previous-snapshot ()

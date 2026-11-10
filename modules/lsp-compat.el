@@ -26,7 +26,7 @@ Volar 3.3 uses a flat vector; earlier versions use a nested vector."
                     (lsp-volar--send-notify
                      workspace "tsserver/response"
                      (if nested (vector payload) payload))))))
-    (if-let ((typescript (lsp-find-workspace
+    (if-let* ((typescript (lsp-find-workspace
                          lsp-volar-typescript-server-id
                          (lsp--workspace-root workspace))))
         (with-lsp-workspace typescript

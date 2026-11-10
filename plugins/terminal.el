@@ -45,7 +45,7 @@ The bundled 32-bit entries cannot be read by Apple's older ncurses."
 (defun my-terminal-find-buffer (root)
   "Return the most recently used live terminal belonging to ROOT."
   (seq-find (lambda (buffer)
-              (when-let ((process (get-buffer-process buffer)))
+              (when-let* ((process (get-buffer-process buffer)))
                 (process-live-p process)))
             (my-terminal-buffers root)))
 

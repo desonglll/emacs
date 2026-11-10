@@ -50,7 +50,7 @@
        (dolist (buffer (cl-set-difference (buffer-list) existing-buffers))
          (when (buffer-live-p buffer)
            (with-current-buffer buffer
-             (when-let ((process (get-buffer-process buffer)))
+             (when-let* ((process (get-buffer-process buffer)))
                (set-process-query-on-exit-flag process nil)
                (set-process-sentinel process #'ignore)
                (delete-process process))

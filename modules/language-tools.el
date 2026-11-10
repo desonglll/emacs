@@ -41,9 +41,15 @@
                        (or (executable-find command) "MISSING")))))
     (princ "\nFormatters and shell diagnostics\n\n")
     (dolist (command '("gofmt" "rustfmt" "zig" "clang-format" "prettier"
+                       "black" "dockerfmt"
                        "taplo" "shfmt" "shellcheck"))
       (princ (format "%-28s %s\n" command
                      (or (executable-find command) "MISSING"))))
+    (princ "\nPDF backend\n\n")
+    (let ((backend (bound-and-true-p pdf-info-epdfinfo-program)))
+      (princ (format "%-28s %s\n" "epdfinfo"
+                     (if (and backend (file-executable-p backend))
+                         backend "MISSING"))))
     (princ "\nJava and Rust formatting use LSP to honor project settings.\n")))
 
 (provide 'my-language-tools)

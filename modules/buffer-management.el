@@ -42,7 +42,7 @@ also consider modified buffers, using the normal save/discard prompt."
         (setq my-ibuffer-project-root nil)
         (when (and (or buffer-file-name (derived-mode-p 'dired-mode))
                    (not (file-remote-p default-directory)))
-          (when-let ((project (project-current nil)))
+          (when-let* ((project (project-current nil)))
             (setq my-ibuffer-project-root (file-truename (project-root project)))
             (cl-pushnew my-ibuffer-project-root roots :test #'equal)))))
     (append

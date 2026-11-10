@@ -78,7 +78,7 @@
               (save-buffer)
               (should (= calls 2))))
           (kill-buffer))
-      (when-let ((buffer (get-file-buffer file)))
+      (when-let* ((buffer (get-file-buffer file)))
         (with-current-buffer buffer (set-buffer-modified-p nil))
         (kill-buffer buffer))
       (delete-file file))))

@@ -7,7 +7,7 @@
   "Refresh the project label when visiting a file or entering a browser."
   (setq my-ui-title-project
         (unless (file-remote-p default-directory)
-          (when-let ((project (project-current nil)))
+          (when-let* ((project (project-current nil)))
             (file-name-nondirectory
              (directory-file-name (project-root project)))))))
 
