@@ -1,6 +1,6 @@
 # Language setup
 
-The current Mac has all tools for Go, Java, Rust, Zig, Lua, C/C++, JS/TS/TSX, Vue 3,
+The current Mac has all tools for Go, Java, Kotlin, Rust, Zig, Lua, C/C++, JS/TS/TSX, Vue 3,
 YAML, TOML, Markdown, and shell editing. Restart Emacs after setup, then run
 `M-x my-language-tools-check` to see the resolved executable paths.
 
@@ -20,6 +20,8 @@ They do not replace project packages or global npm installations.
 # macOS tools; clangd comes with the Xcode Command Line Tools.
 brew install zig zls lua-language-server jdtls taplo shfmt shellcheck clang-format marksman
 brew install black dockerfmt
+brew install ktlint
+brew install --cask kotlin-lsp
 go install golang.org/x/tools/gopls@latest
 rustup component add rust-analyzer rustfmt rust-src
 ```
@@ -43,6 +45,19 @@ Emacs's tool path when present. Envrc can supply a project's own environment.
   build model and supplies completion, diagnostics, refactoring and formatting.
   Maven/Gradle wrapper dependencies still need to be resolvable by the project.
   Standalone Java files have less project information available.
+- **Kotlin:** `.kt` and `.kts` files, including `build.gradle.kts`, use
+  `kotlin-mode` and JetBrains' official `kotlin-lsp`. Open files under the
+  Gradle/Maven project root and allow the initial project import to finish;
+  its dependencies must be resolvable. Exported `workspace.json` projects are
+  also supported by the server. The separate `kotlin-jetbrains` client keeps
+  the old community server from starting alongside it.
+  Ktlint formats on save and with `C-M-\\`; `C-c t f` controls automatic
+  formatting. The real filename is passed through `--stdin-path` so Kotlin
+  scripts and file-specific `.editorconfig` rules retain their meaning.
+  The server bundles its own runtime; a project's JDK/Gradle requirements
+  remain project settings. Upstream currently describes the server as alpha,
+  Android Gradle support as experimental, and KMP support as incomplete;
+  see the [official Kotlin LSP documentation](https://github.com/Kotlin/kotlin-lsp).
 - **Rust:** open a Cargo project. Rust-analyzer supplies semantic features and
   invokes rustfmt using the Cargo edition, including async syntax in edition
   2024. `rustfmt.toml` remains authoritative. The `rust-mode` Cargo commands
@@ -209,3 +224,13 @@ sidebar checks passed, including actual Python and Dockerfile save formatting.
 The configuration and LSP client setup loaded without the old conditional
 macros' deprecation warnings. `my-language-tools-check` now includes Black,
 dockerfmt, and the configured PDF backend.
+
+Verified on 2026-11-11 with Emacs 31.1, Kotlin LSP 263.7084.0, and ktlint 1.8.0:
+six focused checks passed, covering `.kt`/`.kts` modes, exclusive server routing,
+save formatting, Gradle-script EditorConfig indentation, and formatting toggles.
+A real server imported an isolated `workspace.json` with a cached Kotlin
+standard library, completed a local function, resolved its definition, returned
+document symbols, and reported a type mismatch through Flycheck. Diagnostics
+are requested again after asynchronous project import completes.
+Full Gradle/Maven imports and Android/KMP projects were not exercised by that
+isolated fixture.

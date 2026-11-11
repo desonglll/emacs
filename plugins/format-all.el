@@ -127,6 +127,15 @@ Manual formatting with `C-M-\\' is unaffected.")
     (format/register-mode "Swift" 'swift-ts-mode)
     (format/register-mode "Typst" 'typst-ts-mode))
   :config
+  ;; Keep Kotlin script detection and file-specific EditorConfig rules on stdin.
+  (define-format-all-formatter project-ktlint
+    (:executable "ktlint")
+    (:install (macos "brew install ktlint"))
+    (:languages "Kotlin")
+    (:features)
+    (:format (format-all--buffer-easy
+              executable "--log-level=none" "--format" "--stdin"
+              (when buffer-file-name (list "--stdin-path" buffer-file-name)))))
   ;; dockerfmt accepts Dockerfile contents directly on stdin.
   (define-format-all-formatter dockerfmt
     (:executable "dockerfmt")
@@ -167,6 +176,7 @@ Manual formatting with `C-M-\\' is unaffected.")
                   ("JSON" prettier)
                   ("JSON5" prettier)
                   ("JSX" prettier)
+                  ("Kotlin" project-ktlint)
                   ("Markdown" prettier)
                   ("Python" black)
                   ("Rust" rustfmt)

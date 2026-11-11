@@ -32,6 +32,10 @@
     ("build.zig.zon" ".{ .name = .example, .version = \"0.0.0\" }\n"
      zig-mode "Zig" (zls))
     ("Main.java" "class Main {}\n" java-ts-mode "Java" (jdtls))
+    ("Main.kt" "fun main() { println(\"hello\") }\n"
+     kotlin-mode "Kotlin" (kotlin-jetbrains))
+    ("build.gradle.kts" "plugins { id(\"java\") }\n"
+     kotlin-mode "Kotlin" (kotlin-jetbrains))
     ("main.rs" "fn main() {}\n" rust-ts-mode "Rust" (rust-analyzer))
     ("main.c" "int main(void) { return 0; }\n" c-ts-mode "C" (clangd))
     ("main.cpp" "int main() { return 0; }\n" c++-ts-mode "C++" (clangd))
@@ -157,7 +161,7 @@
   (my-test-with-language-project
     (my-test-language-file ".clang-format" "BasedOnStyle: LLVM\nIndentWidth: 4\nAllowShortFunctionsOnASingleLine: None\n")
     (my-test-language-file ".prettierrc.json" "{\"singleQuote\": true, \"tabWidth\": 4}")
-    (my-test-language-file ".editorconfig" "root = true\n[*.sh]\nindent_style = space\nindent_size = 4\n")
+    (my-test-language-file ".editorconfig" "root = true\n[*.sh]\nindent_style = space\nindent_size = 4\n[*.gradle.kts]\nindent_size = 2\n")
     (dolist (entry '(("main.c" "int main(){\nreturn 0;\n}\n" "    return 0;")
                      ("main.zig" "pub fn main() void {\nconst count:u8=1;\n_ = count;\n}\n"
                       "    const count: u8 = 1;")
@@ -166,6 +170,10 @@
                      ("main.ts" "function greet(){\nconsole.log(\"hello\")\n}\n" "    console.log('hello');")
                      ("main.py" "def greet( name ):\n return {'hello':name}\n"
                       "    return {\"hello\": name}")
+                     ("Main.kt" "fun greet( name: String ) : String {return name}\n"
+                      "fun greet(name: String): String = name")
+                     ("build.gradle.kts" "plugins{\nid(\"java\")\n}\n"
+                      "plugins {\n  id(\"java\")\n}")
                      ("Dockerfile" "from    alpine:3.20\nrun    echo   hello\n"
                       "FROM alpine:3.20\nRUN echo hello")
                      ("main.sh" "#!/bin/bash\nif true; then\necho hello\nfi\n" "    echo hello")

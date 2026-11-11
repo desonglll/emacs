@@ -2,7 +2,8 @@
 
 (load (expand-file-name "language-tools.el" my-modules-directory) nil 'nomessage)
 (with-eval-after-load 'lsp-mode
-  (load (expand-file-name "lsp-compat.el" my-modules-directory) nil 'nomessage))
+  (load (expand-file-name "lsp-compat.el" my-modules-directory) nil 'nomessage)
+  (load (expand-file-name "kotlin-lsp.el" my-modules-directory) nil 'nomessage))
 
 ;; Set these before lsp-mode loads its clients, including Volar's TS plugin.
 (setq lsp-volar-location-for-typescript-plugin my-language-tools-directory
@@ -35,6 +36,7 @@
     (go-ts-mode . lsp-go)
     (java-mode . lsp-java)
     (java-ts-mode . lsp-java)
+    (kotlin-mode . my-kotlin-lsp)
     (python-mode . lsp-pyright)
     (python-ts-mode . lsp-pyright)
     (rust-mode . lsp-rust)

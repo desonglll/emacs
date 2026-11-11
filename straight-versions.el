@@ -47,6 +47,7 @@
  ("indent-bars" . "afc98cb156ef03df4c28968d48790b79e3d1210d")
  ("inheritenv" . "b9e67cc20c069539698a9ac54d0e6cc11e616c6f")
  ("just-mode.el" . "5513ab0350d2701a94deb8cafef57d3c369a5e9b")
+ ("kotlin-mode" . "fddd747e5b4736e8b27a147960f369b86179ddff")
  ("let-alist" . "a331a39b02da002c6c570c4960106454f88a99a5")
  ("llama" . "4d4024048053b898a01521046e0f063ee47615b0")
  ("lsp-docker" . "f666fba72b496c7750bb3f349771b07aa51714f0")

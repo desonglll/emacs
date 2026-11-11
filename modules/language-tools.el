@@ -16,6 +16,7 @@
   '((lsp-clangd :servers (clangd) :commands ("clangd"))
     (lsp-go :servers (gopls) :commands ("gopls"))
     (lsp-java :servers (jdtls) :commands ("jdtls"))
+    (my-kotlin-lsp :servers (kotlin-jetbrains) :commands ("kotlin-lsp"))
     (lsp-rust :servers (rust-analyzer) :commands ("rust-analyzer"))
     (lsp-zig :servers (zls) :commands ("zls"))
     (lsp-lua :servers (lua-language-server) :commands ("lua-language-server"))
@@ -41,7 +42,7 @@
                        (or (executable-find command) "MISSING")))))
     (princ "\nFormatters and shell diagnostics\n\n")
     (dolist (command '("gofmt" "rustfmt" "zig" "clang-format" "prettier"
-                       "black" "dockerfmt"
+                       "black" "dockerfmt" "ktlint"
                        "taplo" "shfmt" "shellcheck"))
       (princ (format "%-28s %s\n" command
                      (or (executable-find command) "MISSING"))))

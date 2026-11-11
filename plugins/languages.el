@@ -20,6 +20,9 @@
 (my-use-package! go-mode
   :mode "\\.go\\'")
 
+(my-use-package! kotlin-mode
+  :mode "\\.kts?\\'")
+
 (my-use-package! zig-mode
   :mode "\\.\\(?:zig\\|zon\\)\\'"
   :custom

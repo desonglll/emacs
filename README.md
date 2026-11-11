@@ -35,6 +35,7 @@ then config the dired to use GNU gls.
 - `modules/directory-search.el`: asynchronous `fd-cd` through Consult.
 - `modules/language-tools.el`: discover language tools and report missing binaries.
 - `modules/lsp-compat.el`: TypeScript and Vue server compatibility.
+- `modules/kotlin-lsp.el`: JetBrains Kotlin language server client.
 - `modules/theme-selection.el`: switch color themes and remember the selection.
 - `tools/language-tools/`: pinned npm manifest and lockfile for language tools.
 - `plugins/terminal.el`: project-scoped Eat sessions and bottom-panel behavior.
@@ -516,6 +517,7 @@ an install prompt; `M-x my-language-tools-check` reports the available paths.
 | --- | --- | --- | --- |
 | Go | go-ts-mode | gopls | gofmt |
 | Java | java-ts-mode | JDTLS | JDTLS |
+| Kotlin / Kotlin scripts | kotlin-mode | JetBrains Kotlin LSP | ktlint |
 | Rust | rust-ts-mode | rust-analyzer | rust-analyzer / rustfmt |
 | Zig / ZON | zig-mode | ZLS | zig fmt |
 | C / C++ | c-ts-mode / c++-ts-mode | clangd | clang-format |

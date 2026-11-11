@@ -137,6 +137,7 @@
 (package! rust-mode)
 (package! go-mode)
 (package! zig-mode)
+(package! kotlin-mode)
 (package! swift-mode)
 (package! swift-ts-mode)
 (package! lsp-java)
