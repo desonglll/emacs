@@ -46,6 +46,8 @@
 (my-use-package! yaml-mode :mode "\\.ya?ml\\'")
 (my-use-package! toml-mode :mode "\\.toml\\'")
 
+(add-to-list 'auto-mode-alist '("\\.\\(?:xsd\\|xslt\\|rng\\)\\'" . nxml-mode))
+
 (defun my-markdown-project (directory)
   "Recognize a Marksman note collection rooted above DIRECTORY."
   (when-let* ((root (locate-dominating-file directory ".marksman.toml")))

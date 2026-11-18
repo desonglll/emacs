@@ -290,6 +290,8 @@ opens native Dired. Listings show file details and put directories first;
 deletes marked files. With two directory windows, copy/move prompts suggest
 the other directory as the destination. Use `C-f` / `C-b` to move within
 a filename, `C-SPC` to start a selection, and `M-w` to copy it.
+Dragging from Finder into a Dired listing opens files in Emacs and directories
+in Dired.
 
 Dirvish remains available explicitly through `M-x dirvish`, with `C-c C-p`
 for previews and `?` for its menu. Its global Dired override is disabled.
@@ -527,6 +529,7 @@ an install prompt; `M-x my-language-tools-check` reports the available paths.
 | Vue 3 SFC | web-mode | Vue language server + TypeScript | Prettier |
 | YAML | yaml-ts-mode | yaml-language-server | Prettier |
 | TOML | toml-ts-mode | Taplo | taplo fmt |
+| XML / XSD / XSLT / RNG | nxml-mode | — | xmllint |
 | sh / Bash | bash-ts-mode | bash-language-server + ShellCheck | shfmt |
 | Markdown | markdown-mode / gfm-mode | Marksman | Prettier |
 

@@ -4,6 +4,9 @@
       "-l --almost-all --human-readable --group-directories-first --no-group"
       dired-dwim-target t)
 
+;; Open dropped files and directories using the standard Emacs handler.
+(setq dired-dnd-protocol-alist nil)
+
 (my-use-package! dirvish
   :commands (dirvish dirvish-dwim dirvish-layout-toggle dirvish-dispatch)
   :init

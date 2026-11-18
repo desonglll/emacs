@@ -97,6 +97,12 @@ Emacs's tool path when present. Envrc can supply a project's own environment.
 - **YAML/TOML:** schemas provide additional key completion and validation.
   Generic files still receive syntax diagnostics and formatting. Schema
   downloads depend on network access.
+- **XML:** Maven POMs, XML test reports, and files ending in `.xml`, `.xsd`,
+  `.xsl`, `.xslt`, and `.rng` open in Emacs's built-in `nxml-mode`.
+  `C-c /` closes the current element. Completion with `C-M-i` uses the
+  available RELAX NG schema. `xmllint` supplies Flycheck syntax diagnostics
+  and formats on save or through the manual format command. macOS provides
+  `xmllint`; on Linux it is part of the libxml2 tools.
 - **Shell:** a correct `#!/bin/bash` or `#!/bin/sh` shebang identifies the
   dialect. Bash LSP uses ShellCheck for diagnostics. Shfmt receives the real
   filename so `[*.sh]` rules in `.editorconfig` apply correctly.

@@ -164,6 +164,22 @@ Manual formatting with `C-M-\\' is unaffected.")
               (when (and buffer-file-name
                          (string-suffix-p ".zon" buffer-file-name))
                 "--zon"))))
+  (define-format-all-formatter xmllint
+    (:executable "xmllint")
+    (:install)
+    (:languages "XML")
+    (:features)
+    (:format
+     (let* ((coding (coding-system-base buffer-file-coding-system))
+            (encoding (if (memq coding '(utf-8 utf-8-with-signature))
+                          'utf-8
+                        (coding-system-get coding :mime-charset)))
+            ;; Let the output BOM select the byte order of generic UTF-16.
+            (coding-system-for-read (if (eq encoding 'utf-16) 'utf-16 coding))
+            (coding-system-for-write coding))
+       (format-all--buffer-easy executable "--nonet" "--format"
+                                (when encoding (list "--encode" (symbol-name encoding)))
+                                "-"))))
   (setq-default format-all-formatters
                 '(("C" clang-format)
                   ("C++" clang-format)
@@ -187,7 +203,7 @@ Manual formatting with `C-M-\\' is unaffected.")
                   ("TypeScript" prettier)
                   ("TOML" taplo-fmt)
                   ("Vue" prettier)
-                  ("XML" html-tidy)
+                  ("XML" xmllint)
                   ("YAML" prettier)
                   ("Zig" project-zig)))
   (setq format-all-show-errors 'errors)

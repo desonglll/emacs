@@ -79,6 +79,21 @@
                 (dolist (server lsp-enabled-clients)
                   (should (gethash server lsp-clients)))))))))))
 
+(ert-deftest my-xml-format-on-save-preserves-unicode-and-mixed-content ()
+  (skip-unless (executable-find "xmllint"))
+  (my-test-with-language-project
+    (let* ((coding-system-for-write 'utf-8-unix)
+           (file (my-test-language-file
+                  "pom.xml"
+                  "<project><name>中文</name><notes>See <b>你好</b>!</notes></project>\n")))
+      (with-current-buffer (find-file-noselect file)
+        (should (eq major-mode 'nxml-mode))
+        (should (eq (flycheck-get-checker-for-buffer) 'xml-xmllint))
+        (set-buffer-modified-p t)
+        (save-buffer)
+        (should (string-search "\n  <name>中文</name>\n" (buffer-string)))
+        (should (string-search "<notes>See <b>你好</b>!</notes>" (buffer-string)))))))
+
 (ert-deftest my-language-file-visits-resolve-true-paths ()
   (my-test-with-language-project
     (let* ((real-directory (expand-file-name "real" default-directory))
