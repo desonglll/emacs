@@ -1,5 +1,9 @@
 ;;; appearance.el --- Shared interface styling -*- lexical-binding: t; -*-
 
+;;; Commentary:
+
+;;; Code:
+
 (load (expand-file-name "theme-selection.el" my-modules-directory) nil 'nomessage)
 
 (defun my-gruber-darker-valid-colors (args)
@@ -174,7 +178,7 @@
                                   my-ui-palette)))))
    `(,(intern (format "imenu-list-entry-subalist-face-%d" depth))
      ((t (:foreground ,(alist-get 'cool my-ui-palette)
-          :weight bold :underline nil))))))
+                      :weight bold :underline nil))))))
 
 ;; Emacs 28+ Eat inherits ANSI faces; term.el uses the older term-color faces.
 (require 'color)
@@ -189,10 +193,10 @@
     (dolist (prefix '("ansi-color-" "term-color-"))
       (custom-theme-set-faces
        'my-gruber-ui `(,(intern (concat prefix name))
-               ((t (:foreground ,normal :background ,normal))))))
+                       ((t (:foreground ,normal :background ,normal))))))
     (custom-theme-set-faces
      'my-gruber-ui `(,(intern (concat "ansi-color-bright-" name))
-             ((t (:foreground ,bright :background ,bright)))))))
+                     ((t (:foreground ,bright :background ,bright)))))))
 
 (my-load-theme my-preferred-theme)
 

@@ -1,40 +1,50 @@
 # Language setup
 
-The current Mac has all tools for Go, Java, Kotlin, Rust, Zig, Lua, C/C++, JS/TS/TSX, Vue 3,
-YAML, TOML, Markdown, and shell editing. Restart Emacs after setup, then run
-`M-x my-language-tools-check` to see the resolved executable paths.
+See the README for [platform setup](../README.md#installation), the
+[language and executable matrix](../README.md#language-support), and
+[package-manager commands](../README.md#install-the-language-tools).
 
-## Reproducible installation
+## External tool installers
 
-Node tools are installed inside `var/language-tools`, with exact versions and
-transitive dependencies recorded in `tools/language-tools/package-lock.json`.
-They do not replace project packages or global npm installations.
+Install the tools for the languages you use. On Linux and native Windows,
+choose binaries for the platform where Emacs itself runs.
+
+| Language | Upstream installation |
+| --- | --- |
+| Go | Install [Go](https://go.dev/doc/install), then run `go install golang.org/x/tools/gopls@latest`. |
+| Rust | Install [rustup](https://rustup.rs/), then run `rustup component add rust-analyzer rustfmt rust-src` for the project's toolchain. |
+| Java | Install [Eclipse JDT LS](https://github.com/eclipse-jdtls/eclipse.jdt.ls#installation) with its required JDK. Put its `jdtls` launcher on `PATH`. |
+| Kotlin | Choose a [JetBrains standalone release](https://github.com/Kotlin/kotlin-lsp/releases) with a launcher that supports `kotlin-lsp --stdio`, and follow that release's runtime requirements. Install [ktlint](https://github.com/ktlint/ktlint/releases) for formatting. |
+| Zig | Install [Zig](https://ziglang.org/download/) and the compatible [ZLS release](https://github.com/zigtools/zls/releases). |
+| Lua | Use the [LuaLS release](https://github.com/LuaLS/lua-language-server/releases), with `lua-language-server` on `PATH`. |
+| C / C++ | Install [clangd](https://clangd.llvm.org/installation) and [clang-format](https://clang.llvm.org/docs/ClangFormat.html) from your distro or LLVM. |
+| Python | Install Python, [Pyright](https://github.com/microsoft/pyright#installation), and [Black](https://black.readthedocs.io/en/stable/getting_started.html). Pyright is configured to use `python3`. If your Windows installation provides `python.exe`, set `lsp-pyright-python-executable-cmd` to `"python"` in `local.el`. |
+| Dockerfile | Use the [dockerfmt release](https://github.com/reteps/dockerfmt/releases). |
+| TOML | Use the [Taplo CLI release](https://github.com/tamasfe/taplo/releases) with LSP support. |
+| XML | Install `xmllint` from your system's libxml2 tools. Windows users can use the [MSYS2 UCRT64 libxml2 package](https://packages.msys2.org/package/mingw-w64-ucrt-x86_64-libxml2). |
+| Shell | The Node bundle provides Bash LSP. Install [ShellCheck](https://github.com/koalaman/shellcheck#installing) and [shfmt](https://github.com/mvdan/sh/releases) separately. |
+| Markdown | Use the [Marksman release](https://github.com/artempyanykh/marksman/releases). The Node bundle provides Prettier. |
+| Swift | Install a [Swift toolchain](https://www.swift.org/install/) with `sourcekit-lsp` and [SwiftFormat](https://github.com/nicklockwood/SwiftFormat#installation). |
+| Typst | Use the [Tinymist release](https://github.com/Myriad-Dreamin/tinymist/releases). |
+
+The Homebrew JDTLS launcher supplies its own compatible Java runtime. The
+server runtime and the JDK used by your project are separate choices. This
+configuration stores workspace data in `var/lsp-java/workspace/` when it
+detects the external installation, and disables the LSP package downloader
+for that installation.
+
+The Node bundle is locked by `tools/language-tools/package-lock.json`. If npm
+needs a proxy, pass it to this installation only:
 
 ```sh
-# Node >= 22.22.2 is required by the pinned TypeScript language server.
-./scripts/setup-language-tools
-
-# If npm needs a proxy, pass it explicitly for this installation only:
 ./scripts/setup-language-tools --https-proxy=http://127.0.0.1:7897
-
-# macOS tools; clangd comes with the Xcode Command Line Tools.
-brew install zig zls lua-language-server jdtls taplo shfmt shellcheck clang-format marksman
-brew install black dockerfmt
-brew install ktlint
-brew install --cask kotlin-lsp
-go install golang.org/x/tools/gopls@latest
-rustup component add rust-analyzer rustfmt rust-src
 ```
 
-Go, a Rust toolchain, and the project's Java runtime/build tools must also be
-installed. The Homebrew JDTLS launcher supplies its own compatible Java
-runtime; a project's required JDK is a separate setting. JDTLS reuses the
-system installation and stores workspace data in `var/lsp-java/workspace/`.
-Its package downloader is disabled for that installation.
-
-On another OS, install the same executable names through its package manager.
-`~/go/bin`, `~/.cargo/bin`, and the local Node tool directory are added to
-Emacs's tool path when present. Envrc can supply a project's own environment.
+`~/go/bin`, `~/.cargo/bin`, and the local Node executable directory are
+added to Emacs's tool path at startup when present. If Go uses a different
+`GOBIN`, add that directory to `PATH`. Envrc can provide project-specific
+paths. Start Emacs with the updated environment and run
+`M-x my-language-tools-check` to confirm which executables it resolves.
 
 ## Project settings
 
@@ -54,10 +64,9 @@ Emacs's tool path when present. Envrc can supply a project's own environment.
   Ktlint formats on save and with `C-M-\\`; `C-c t f` controls automatic
   formatting. The real filename is passed through `--stdin-path` so Kotlin
   scripts and file-specific `.editorconfig` rules retain their meaning.
-  The server bundles its own runtime; a project's JDK/Gradle requirements
-  remain project settings. Upstream currently describes the server as alpha,
-  Android Gradle support as experimental, and KMP support as incomplete;
-  see the [official Kotlin LSP documentation](https://github.com/Kotlin/kotlin-lsp).
+  The project's JDK and Gradle requirements apply during import. See the
+  [official Kotlin LSP documentation](https://github.com/Kotlin/kotlin-lsp)
+  and release notes for current Android and KMP support.
 - **Rust:** open a Cargo project. Rust-analyzer supplies semantic features and
   invokes rustfmt using the Cargo edition, including async syntax in edition
   2024. `rustfmt.toml` remains authoritative. The `rust-mode` Cargo commands

@@ -57,6 +57,14 @@ Checking on selection also catches changes made in an external terminal."
                      (file-in-directory-p file default-directory))
             (diff-hl-dired-update)))))))
 
+(defun my-dired-git-allow-status-process-cancellation (result)
+  "Allow a temporary Diff-Hl status process in RESULT to stop silently."
+  (when-let* ((buffer (and (processp result) (process-buffer result)))
+              (name (buffer-name buffer))
+              ((string-prefix-p " *diff-hl-dired* tmp status" name)))
+    (set-process-query-on-exit-flag result nil))
+  result)
+
 (my-use-package! diff-hl-dired
   :commands diff-hl-dired-mode
   :hook (dired-mode . my-dired-git-setup)
@@ -64,6 +72,10 @@ Checking on selection also catches changes made in an external terminal."
   ;; Keep untracked/new files, but skip ignored files and their extra scan.
   (diff-hl-dired-extra-indicators nil)
   :config
+  ;; VC starts a new process for each stage of a directory status refresh.
+  (advice-add 'vc-do-command :filter-return
+              #'my-dired-git-allow-status-process-cancellation)
+  (mapc #'my-dired-git-allow-status-process-cancellation (process-list))
   (add-hook 'after-save-hook #'my-dired-git-refresh-after-save))
 
 (provide 'my-plugins-dired)

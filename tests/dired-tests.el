@@ -96,6 +96,27 @@
                (lambda (&rest _) (ert-fail "Remote Git scan enabled"))))
       (my-dired-git-setup))))
 
+(ert-deftest my-dired-git-status-processes-can-stop-without-prompting ()
+  (require 'diff-hl-dired)
+  (require 'vc-git)
+  (my-dired-test-repository
+    (let ((start-stage (symbol-function 'vc-git-dir-status-goto-stage))
+          (checked 0))
+      (cl-letf (((symbol-function 'vc-git-dir-status-goto-stage)
+                 (lambda (state)
+                   (funcall start-stage state)
+                   (when-let* ((process (get-buffer-process (current-buffer))))
+                     (cl-incf checked)
+                     (should-not (process-query-on-exit-flag process))))))
+        (dired directory)
+        (my-dired-test-wait))
+      (should (> checked 1)))
+    (with-temp-buffer
+      (let ((process (vc-do-command t 'async "git" nil "--version")))
+        (unwind-protect
+            (should (process-query-on-exit-flag process))
+          (set-process-query-on-exit-flag process nil))))))
+
 (ert-deftest my-dired-git-survives-dirvish-render-and-revert ()
   (let ((override-active dirvish-override-dired-mode))
     (unwind-protect

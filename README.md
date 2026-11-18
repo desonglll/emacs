@@ -2,20 +2,90 @@
 
 A small, Doom-style configuration using straight.el for package management.
 
-## Requirements
+## Installation
 
-For macOS, install GNU ls or dir...
+Use GNU Emacs 30 or newer and Git. The first launch needs network access to
+bootstrap Straight and download the Emacs packages. Dired uses GNU `ls`.
+File and text search use `fd` and `rg`. Install the external tools for the
+languages you work with from [Language support](#language-support).
 
-```shell
-brew install coreutils
+### macOS
+
+```sh
+brew install --cask emacs-app
+brew install git coreutils fd ripgrep
 ```
 
-then config the dired to use GNU gls.
+Homebrew's `coreutils` provides `gls`, which this configuration selects
+automatically. If you already have a suitable Emacs app, install the CLI tools
+only. For Tree-sitter grammar builds, install the Xcode Command Line Tools with
+`xcode-select --install`.
+
+### Linux
+
+```sh
+# Debian / Ubuntu
+sudo apt update
+sudo apt install emacs-gtk git coreutils fd-find ripgrep
+
+# Arch Linux
+sudo pacman -S --needed emacs git coreutils fd ripgrep
+```
+
+Check `emacs --version`. If your distro ships a release older than 30, choose a
+newer build from the [GNU Emacs download options](https://www.gnu.org/software/emacs/download.html).
+Debian and Ubuntu install the search binary as `fdfind`.
+If `fd` is missing, create a link and make sure `~/.local/bin` is on `PATH`.
+
+```sh
+mkdir -p ~/.local/bin
+ln -s "$(command -v fdfind)" ~/.local/bin/fd
+```
+
+Tree-sitter grammar builds need a C/C++ compiler, available through
+`build-essential` on Debian/Ubuntu or `base-devel` on Arch.
+See [fd installation](https://github.com/sharkdp/fd#installation).
+
+### Windows
+
+For WSL 2, install Emacs and all external tools inside the same Linux
+distribution and follow the Linux steps there. WSLg can run the graphical
+Emacs build. See [Microsoft's WSL GUI setup](https://learn.microsoft.com/en-us/windows/wsl/tutorials/gui-apps).
+
+For native Windows, install [GNU Emacs](https://www.gnu.org/software/emacs/download.html#windows)
+and [Git for Windows](https://gitforwindows.org/). Use Windows builds of
+[`fd`](https://github.com/sharkdp/fd#installation) and
+[`rg`](https://github.com/BurntSushi/ripgrep#installation) and add them to your
+user `PATH`. Dired's listing options require GNU `ls.exe`, available in
+[MSYS2 coreutils](https://packages.msys2.org/packages/coreutils).
+Enable it in `local.el` and adjust the path if MSYS2 is installed elsewhere.
 
 ```elisp
-(setq insert-directory-program "gls")
-(setq dired-use-ls-dired t)
+(setq ls-lisp-use-insert-directory-program t
+      insert-directory-program "C:/msys64/usr/bin/ls.exe")
 ```
+
+Clone the configuration into `~/.emacs.d` as seen by Windows Emacs. Use
+`C-x d ~/` to find that home directory. Run the Node setup from Git Bash with
+Windows Node.js on `PATH`. Building Tree-sitter grammars also requires
+`gcc` and `g++` on `PATH`, available from the
+[MSYS2 UCRT64 toolchain](https://www.msys2.org/docs/environments/).
+Repository runtime checks were performed on macOS.
+[GNU Emacs on Windows](https://www.gnu.org/software/emacs/manual/html_node/emacs/Windows-HOME.html).
+
+### First launch
+
+On macOS and Linux, run the following from a shell. If an existing init file
+takes precedence, back it up before switching configurations.
+[How Emacs finds your init file](https://www.gnu.org/software/emacs/manual/html_node/emacs/Find-Init.html).
+
+```sh
+git clone https://github.com/desonglll/emacs.git "${XDG_CONFIG_HOME:-$HOME/.config}/emacs"
+```
+
+Open Emacs once to let Straight bootstrap. For Tree-sitter modes, use an
+Emacs build with Tree-sitter support and run
+`M-x my-install-language-grammars` to build the pinned parsers.
 
 ## Structure
 
@@ -46,14 +116,14 @@ then config the dired to use GNU gls.
 - `modules/keymaps.el`: global key bindings.
 - `local.el`: optional machine-specific settings; ignored by Git.
 
-The hand-written configuration lives in `~/.config/emacs`. Downloaded
-packages, Tree-sitter grammars, native compilation output, and generated state
-live under this configuration directory; persistent state is grouped in `var/`.
+Downloaded packages and generated state live under the checkout. Persistent
+state and the local Node tool bundle are grouped in `var/`.
 
-Because Emacs prefers an existing `~/.emacs.d` over the XDG configuration
-directory, these startup links connect the data directory to this repository:
+To keep `~/.emacs.d` as your startup directory with the checkout at the
+default XDG path, link the startup files after backing up any existing files:
 
 ```sh
+mkdir -p ~/.emacs.d
 ln -s ../.config/emacs/early-init.el ~/.emacs.d/early-init.el
 ln -s ../.config/emacs/init.el ~/.emacs.d/init.el
 ```
@@ -307,7 +377,8 @@ come from the same palette as the in-file Diff-Hl gutter. Dirvish reserves an
 Status refreshes asynchronously after saving a file, returning to a directory
 window, or pressing `g` to refresh the listing. External changes are picked up
 when returning or refreshing; there is no polling timer or per-file Git log
-lookup. Remote directories skip these scans. Focused checks are in
+lookup. These temporary status processes can be cancelled without prompting.
+Remote directories skip these scans. Focused checks are in
 `tests/dired-tests.el` and include nested folders, staged/untracked/ignored
 files, save/commit refreshes, and Dirvish rendering.
 
@@ -486,18 +557,31 @@ workspace after changing its toolchain or environment.
 
 PDF Tools uses the backend at `var/pdf-tools/epdfinfo`, outside downloaded
 package files so rebuilding Straight packages does not remove it.
-After packages have been bootstrapped, install or rebuild the backend from
-the configuration root:
+Install the build dependencies for your system after Straight has bootstrapped.
+See [PDF Tools installation](https://github.com/vedang/pdf-tools#installation)
+for other distributions and native Windows.
 
 ```sh
+# macOS
 brew install pkgconf poppler autoconf automake
+
+# Debian / Ubuntu, including WSL
+sudo apt install build-essential pkg-config autoconf automake libpng-dev \
+  libpoppler-dev libpoppler-glib-dev zlib1g-dev
+```
+
+On macOS or Linux, build the backend from the configuration root:
+
+```sh
 mkdir -p var/pdf-tools
 pdf_backend_dir="$(pwd)/var/pdf-tools"
 (cd straight/repos/pdf-tools/server && ./autobuild -D -i "$pdf_backend_dir")
 ```
 
-Open a `.pdf` file normally to use PDF View. `M-x my-language-tools-check`
-reports the configured backend path and whether it is executable.
+Open a `.pdf` file normally to use PDF View. If you installed `epdfinfo`
+elsewhere, set `pdf-info-epdfinfo-program` to its full path in `local.el`.
+`M-x my-language-tools-check` reports the configured path and whether it is
+executable.
 
 Verified on 2026-11-10 with Emacs 31.1 and Poppler 26.08.0: backend startup,
 reading a six-page test PDF, text extraction, and 600-pixel PNG rendering passed.
@@ -517,34 +601,84 @@ an install prompt; `M-x my-language-tools-check` reports the available paths.
 
 | Files | Mode | Language server | Format on save |
 | --- | --- | --- | --- |
-| Go | go-ts-mode | gopls | gofmt |
-| Java | java-ts-mode | JDTLS | JDTLS |
-| Kotlin / Kotlin scripts | kotlin-mode | JetBrains Kotlin LSP | ktlint |
-| Rust | rust-ts-mode | rust-analyzer | rust-analyzer / rustfmt |
-| Zig / ZON | zig-mode | ZLS | zig fmt |
-| C / C++ | c-ts-mode / c++-ts-mode | clangd | clang-format |
-| Python | python-ts-mode | Pyright | Black |
-| Dockerfile | dockerfile-ts-mode | — | dockerfmt |
-| JS / TS / TSX | native Tree-sitter modes | typescript-language-server | Prettier |
-| Vue 3 SFC | web-mode | Vue language server + TypeScript | Prettier |
-| YAML | yaml-ts-mode | yaml-language-server | Prettier |
-| TOML | toml-ts-mode | Taplo | taplo fmt |
-| XML / XSD / XSLT / RNG | nxml-mode | — | xmllint |
-| sh / Bash | bash-ts-mode | bash-language-server + ShellCheck | shfmt |
-| Markdown | markdown-mode / gfm-mode | Marksman | Prettier |
+| Go | go-ts-mode | `gopls` | `gofmt` from Go |
+| Java | java-ts-mode | `jdtls` | JDTLS |
+| Kotlin / Kotlin scripts | kotlin-mode | `kotlin-lsp` | `ktlint` |
+| Rust | rust-ts-mode | `rust-analyzer` | Rust Analyzer with `rustfmt` |
+| Zig / ZON | zig-mode | `zls` | `zig fmt` |
+| Lua | lua-ts-mode / lua-mode | `lua-language-server` | — |
+| C / C++ | c-ts-mode / c++-ts-mode | `clangd` | `clang-format` |
+| Python | python-ts-mode | `pyright-langserver` | `black` |
+| Dockerfile | dockerfile-ts-mode | — | `dockerfmt` |
+| JS / TS / TSX | native Tree-sitter modes | `typescript-language-server` | `prettier` |
+| Vue 3 SFC | web-mode | `vue-language-server` + `typescript-language-server` | `prettier` |
+| HTML / CSS / SCSS / JSON | built-in modes | — | `prettier` |
+| YAML | yaml-ts-mode | `yaml-language-server` | `prettier` |
+| TOML | toml-ts-mode | `taplo` | `taplo fmt` |
+| XML / XSD / XSLT / RNG | nxml-mode | — | `xmllint` also checks syntax |
+| sh / Bash | bash-ts-mode | `bash-language-server` with `shellcheck` | `shfmt` |
+| Markdown | markdown-mode / gfm-mode | `marksman` | `prettier` |
+| Swift | swift-mode / swift-ts-mode | `sourcekit-lsp` from Swift | `swiftformat` |
+| Typst | typst-ts-mode | `tinymist` | — |
 
-Traditional modes remain as fallbacks where grammars are unavailable. Protobuf
-has a dedicated mode. Python (Pyright), Swift (SourceKit), and Typst (Tinymist)
-retain their existing integrations. Bash LSP is not started for zsh buffers.
+Traditional modes remain as fallbacks where available. Protobuf has a
+dedicated mode. Bash LSP runs in Bash buffers. Typst supports manual formatting
+through Tinymist.
 
-The listed servers and formatters are installed on this Mac. For a new machine,
-setup commands, project requirements, and focused verification, see
-[Language setup](docs/languages.md). Node tools are local to `var/language-tools`
-and reproducible from the checked-in npm lockfile:
+### Install the language tools
+
+The pinned Node bundle installs TypeScript, Vue, YAML, and Bash language
+servers, the Vue TypeScript plugin, and Prettier under `var/language-tools`.
+Install Node.js 22.22.2 or newer and npm, then run this from the checkout.
+[Node.js downloads](https://nodejs.org/en/download).
 
 ```sh
 ./scripts/setup-language-tools
 ```
+
+Install the remaining tools for the languages you use. These examples can be
+run one line at a time.
+
+**macOS**
+
+```sh
+brew install llvm
+brew install go
+brew install jdtls
+brew install --cask kotlin-lsp
+brew install ktlint
+brew install zig zls lua-language-server
+brew install pyright black
+brew install taplo shfmt shellcheck marksman dockerfmt
+brew install swiftformat tinymist
+```
+
+`clangd` may already be available through the Xcode Command Line Tools. If
+using Homebrew LLVM, add `$(brew --prefix llvm)/bin` to your login shell's
+`PATH`. macOS provides `/usr/bin/xmllint`. For Swift, install an
+[Xcode or Swift toolchain](https://www.swift.org/install/macos/) that supplies
+`sourcekit-lsp`.
+
+**Debian / Ubuntu, including WSL**
+
+```sh
+sudo apt install clangd clang-format
+sudo apt install shellcheck shfmt
+sudo apt install libxml2-utils
+sudo apt install python3 pipx
+pipx install black
+npm install -g pyright
+```
+
+On other Linux distributions, use their package manager or the upstream
+releases for the tools in the table. For Windows outside WSL, use native
+Windows releases and make the executables visible to Windows Emacs. The
+[language setup guide](docs/languages.md#external-tool-installers) links the
+upstream installers for Go, Rust, Java, Kotlin, Zig, and the remaining tools.
+
+After installing tools, run `M-x my-language-tools-check` for the paths Emacs
+resolves. To check an individual tool, evaluate `(executable-find "xmllint")`
+with `M-:`, replacing `xmllint` with the expected executable name.
 
 This bundle pins TypeScript 6.0.3 because typescript-language-server requires
 its tsserver API. Compatible project TypeScript versions take precedence;
@@ -552,10 +686,9 @@ projects using the TypeScript 7 native compiler use this fallback for editing.
 Vue's request forwarding accepts both the older nested messages and Volar
 3.3's flat messages. The current Vue tooling targets Vue 3.
 
-Use `M-x my-install-language-grammars` to install missing pinned grammars.
-Sources and file associations live in `config.el`; LSP routing lives in
-`plugins/lsp.el`. Nerd Icons fonts can be installed with
-`M-x nerd-icons-install-fonts` if missing.
+Tree-sitter sources and file associations live in `config.el`, and LSP
+routing lives in `plugins/lsp.el`. See [Language setup](docs/languages.md)
+for project settings and focused checks.
 
 ## Key bindings
 
