@@ -1,6 +1,7 @@
 ;;; config.el --- Native Emacs configuration -*- lexical-binding: t; -*-
 
 ;;;; Defaults
+(setq-default abbrev-mode t)
 (setq native-comp-async-report-warnings-errors 'silent)
 (setq inhibit-startup-screen t
       inhibit-startup-message t
@@ -44,7 +45,7 @@
     (display-line-numbers-mode 1)))
 
 (dolist (hook '(prog-mode-hook conf-mode-hook yaml-mode-hook yaml-ts-mode-hook
-                toml-mode-hook toml-ts-mode-hook))
+                               toml-mode-hook toml-ts-mode-hook))
   (add-hook hook #'my-code-line-numbers))
 
 (defun my-prose-layout ()
