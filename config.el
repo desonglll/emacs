@@ -1,5 +1,9 @@
 ;;; config.el --- Native Emacs configuration -*- lexical-binding: t; -*-
 
+;;; Commentary:
+
+;;; Code:
+
 ;;;; Defaults
 (setq-default abbrev-mode t)
 (setq native-comp-async-report-warnings-errors 'silent)
