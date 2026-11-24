@@ -1,5 +1,9 @@
 ;;; init.el --- Personal Emacs configuration -*- lexical-binding: t; -*-
 
+;;; Commentary:
+
+;;; Code:
+
 (defconst my-config-directory
   (file-name-as-directory
    (file-name-directory
